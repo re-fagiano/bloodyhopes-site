@@ -16,6 +16,8 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [That Austerlitz Sun](https://bloodyhopesmusic.example/songs/austerlitz-sun.html): Battle of Austerlitz, Napoleonic Wars, 1805.
 - [He Raised His Hands — A Gettysburg War Ballad](https://bloodyhopesmusic.example/songs/gettysburg-ballad.html): Battle of Gettysburg, 1863.
 - [Not a Drop of Water — Old Ironsides](https://bloodyhopesmusic.example/songs/old-ironsides.html): USS Constitution, War of 1812.
+- [Blessed Is the Man Who Smiles — The Montréal Smile](https://bloodyhopesmusic.example/songs/montreal-smile.html): Capitulation of Montréal, Seven Years' War, 1760.
+- [For a Better World — The Leipzig Watch](https://bloodyhopesmusic.example/songs/leipzig-watch.html): Battle of Leipzig, Napoleonic Wars, 1813.
 
 ## Other resources
 
