@@ -1,0 +1,23 @@
+# Bloody Hopes
+
+> Bloody Hopes is a cinematic historical music project about forgotten soldiers, lost battles and the human cost of war. It publishes original historical war ballads, AI-assisted, historically grounded, spanning the American Civil War, the Napoleonic Wars, the Seven Years' War, the Crimean War, the Age of Sail and other forgotten conflicts. These are not celebrations of war — they are acts of remembrance.
+
+Bloody Hopes is an AI-assisted music project: song lyrics are written with AI assistance grounded in real historical research (specific battles, events, and period expressions), while music, vocals and visuals are produced with AI tools under human creative direction and historical curation.
+
+## Key pages
+
+- [Home](https://bloodyhopesmusic.example/index.html): project overview, mission, featured song.
+- [About / Mission](https://bloodyhopesmusic.example/about.html): full mission statement, approach to AI-assisted production, FAQ.
+- [Catalog](https://bloodyhopesmusic.example/catalog.html): full list of songs organized by historical era (American Civil War, Napoleonic Wars, 18th century, Forgotten Wars & Colonial Conflicts).
+
+## Song deep-dives
+
+- [The Elephant — Civil War Song of Manassas](https://bloodyhopesmusic.example/songs/the-elephant.html): First Battle of Bull Run, 1861.
+- [That Austerlitz Sun](https://bloodyhopesmusic.example/songs/austerlitz-sun.html): Battle of Austerlitz, Napoleonic Wars, 1805.
+- [He Raised His Hands — A Gettysburg War Ballad](https://bloodyhopesmusic.example/songs/gettysburg-ballad.html): Battle of Gettysburg, 1863.
+- [Not a Drop of Water — Old Ironsides](https://bloodyhopesmusic.example/songs/old-ironsides.html): USS Constitution, War of 1812.
+
+## Other resources
+
+- [YouTube channel](https://www.youtube.com/@BloodyHopesMusic): full video catalog, primary publishing platform.
+- Contact: bloodyhopesmusic@gmail.com
