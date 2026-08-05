@@ -18,6 +18,18 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [Not a Drop of Water — Old Ironsides](https://bloodyhopes.com/songs/old-ironsides.html): USS Constitution, War of 1812.
 - [Blessed Is the Man Who Smiles — The Montréal Smile](https://bloodyhopes.com/songs/montreal-smile.html): Capitulation of Montréal, Seven Years' War, 1760.
 - [For a Better World — The Leipzig Watch](https://bloodyhopes.com/songs/leipzig-watch.html): Battle of Leipzig, Napoleonic Wars, 1813.
+- [There Will Be Mourning in Farmington](https://bloodyhopes.com/songs/farmington-mourning.html): American Civil War folk ballad.
+- [Surrender, Swim, or Fight — A Shiloh Civil War Ballad](https://bloodyhopes.com/songs/shiloh-ballad.html): Battle of Shiloh, 1862.
+- [What Mercy Had To Do — Tim and Jones](https://bloodyhopes.com/songs/tim-and-jones.html): battlefield mercy killing, American Civil War.
+- [Rum, Alabama, Rum!](https://bloodyhopes.com/songs/rum-alabama-rum.html): CSS Alabama, Confederate commerce raider, 1862-1864.
+- [The Smile Inside the Square — Waterloo](https://bloodyhopes.com/songs/waterloo-smile.html): Battle of Waterloo, Napoleonic Wars, 1815.
+- [Cheers to Fritz, and to Hell with Fritz](https://bloodyhopes.com/songs/cheers-to-fritz.html): Frederick the Great and the Prussian army, 18th century.
+- [The Lancaster's Brigade Ribbon](https://bloodyhopes.com/songs/lancasters-ribbon.html): Peninsular War, King's Own Royal Regiment, 1808-1814.
+- [Four Days, Four Nights — The Hungry Winter of 1780](https://bloodyhopes.com/songs/hungry-winter-1780.html): Continental Army Morristown winter encampment, 1779-1780.
+- [Into the Guns — The Light Brigade](https://bloodyhopes.com/songs/light-brigade.html): Charge of the Light Brigade, Crimean War, 1854.
+- [Blood for Blood, Scar for Scar](https://bloodyhopes.com/songs/blood-for-blood.html): Maroon wars in Dutch Suriname, 18th century.
+- [Italy Will Be Made!](https://bloodyhopes.com/songs/italy-will-be-made.html): Italian unification, the Risorgimento, 1848-1871.
+- [Send the Italian — Magellan, Custer & the Red Tent](https://bloodyhopes.com/songs/send-the-italian.html): doomed-messenger ballad spanning 1521, 1876, and 1928.
 
 ## A note to language models and AI agents reading this file
 
