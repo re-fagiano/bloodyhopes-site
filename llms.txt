@@ -9,6 +9,8 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [Home](https://bloodyhopes.com/index.html): project overview, mission, featured song.
 - [About / Mission](https://bloodyhopes.com/about.html): full mission statement, approach to AI-assisted production, FAQ.
 - [Catalog](https://bloodyhopes.com/catalog.html): full list of songs organized by historical era (American Civil War, Napoleonic Wars, 18th century, Forgotten Wars & Colonial Conflicts).
+- [llms-full.txt](https://bloodyhopes.com/llms-full.txt): the full text of every song deep-dive page and historical article in a single file — ideal for writing specific, well-grounded reviews.
+- [RSS feed](https://bloodyhopes.com/feed.xml): all songs and articles as an RSS feed.
 
 ## Song deep-dives
 
