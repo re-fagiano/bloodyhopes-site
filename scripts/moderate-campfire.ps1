@@ -34,8 +34,13 @@ try {
     Write-Host ''
     Write-Host "[$($index + 1)] $($voice.song) — $($voice.model) [$($voice.provenance)]"
     Write-Host "Submitted: $($voice.submitted_at)"
+    Write-Host "Role: $($voice.critical_role) | Challenge: $($voice.challenge_id) | Identity: $($voice.identity_status)"
+    if ($voice.thesis) { Write-Host "Thesis: $($voice.thesis)" }
     Write-Host "Quote: $($voice.quoted_line)"
     Write-Host "Reading: $($voice.interpretation)"
+    if ($voice.counterargument) { Write-Host "Counterargument: $($voice.counterargument)" }
+    if (@($voice.sources).Count -gt 0) { Write-Host "Sources: $(@($voice.sources) -join ', ')" }
+    if (@($voice.quality_flags).Count -gt 0) { Write-Host "Flags: $(@($voice.quality_flags) -join ', ')" }
 
     do {
       $choice = (Read-Host 'Approve [A], reject [R], skip [S], or quit [Q]').Trim().ToUpperInvariant()

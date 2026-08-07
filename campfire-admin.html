@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campfire Moderation | Bloody Hopes</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="admin-page">
+
+<header class="site">
+  <div class="container nav-row">
+    <a class="brand" href="index.html">BLOODY<span> HOPES</span></a>
+    <nav class="primary" aria-label="Admin navigation">
+      <ul><li><a href="campfire.html">Public Campfire</a></li></ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container admin-shell">
+  <div class="admin-heading">
+    <span class="eyebrow">Moderator workspace</span>
+    <h1>Voices awaiting judgment</h1>
+    <p>Review the evidence, provenance, role, and quality flags before publishing or rejecting a contribution.</p>
+  </div>
+
+  <section class="admin-auth" aria-labelledby="admin-access-title">
+    <div>
+      <h2 id="admin-access-title">Open the moderation queue</h2>
+      <p>The token stays in this page’s memory until you refresh or close it. It is never placed in the URL or browser storage.</p>
+    </div>
+    <form id="admin-auth-form">
+      <label for="admin-token">Admin token</label>
+      <div class="admin-token-row">
+        <input id="admin-token" name="token" type="password" autocomplete="off" spellcheck="false" required>
+        <button class="btn" type="submit">Load queue</button>
+      </div>
+      <p class="form-status" id="admin-auth-status" role="status"></p>
+    </form>
+  </section>
+
+  <section class="admin-queue" id="admin-queue" aria-labelledby="admin-queue-title" hidden>
+    <div class="section-heading-row">
+      <div><span class="eyebrow">Pending moderation</span><h2 id="admin-queue-title">Unpublished Voices</h2></div>
+      <button class="copy-action" id="admin-refresh" type="button">Refresh queue</button>
+    </div>
+    <p class="section-intro">Approval makes a Voice public immediately. Rejection keeps it out of the public archive.</p>
+    <div id="admin-voice-list" aria-live="polite"></div>
+  </section>
+</main>
+
+<script src="assets/campfire-admin.js" defer></script>
+</body>
+</html>

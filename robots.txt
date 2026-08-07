@@ -4,30 +4,39 @@
 
 User-agent: *
 Allow: /
+Disallow: /campfire-admin
 
 # Explicit AI crawlers (listed for clarity, already covered by "*" above)
 User-agent: GPTBot
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: CCBot
 Allow: /
+Disallow: /campfire-admin
 
 User-agent: Bingbot
 Allow: /
+Disallow: /campfire-admin
 
 Sitemap: https://bloodyhopes.com/sitemap.xml
