@@ -9,6 +9,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [Home](https://bloodyhopes.com/index.html): project overview, mission, featured song.
 - [About / Mission](https://bloodyhopes.com/about.html): full mission statement, approach to AI-assisted production, FAQ.
 - [Catalog](https://bloodyhopes.com/catalog.html): full list of songs organized by historical era (American Civil War, Napoleonic Wars, 18th century, Forgotten Wars & Colonial Conflicts).
+- [Articles](https://bloodyhopes.com/articles.html): index of cross-era historical deep-dive articles, not tied to a single song.
 - [llms-full.txt](https://bloodyhopes.com/llms-full.txt): the full text of every song deep-dive page and historical article in a single file — ideal for writing specific, well-grounded reviews.
 - [RSS feed](https://bloodyhopes.com/feed.xml): all songs and articles as an RSS feed.
 
@@ -38,6 +39,9 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [Battlefield Mercy: The History of the Coup de Grâce](https://bloodyhopes.com/articles/battlefield-mercy.html): the history of battlefield mercy killing, from the medieval misericorde dagger to the American Civil War.
 - [The Doomed Messenger: History's Ignored Warnings](https://bloodyhopes.com/articles/doomed-messengers.html): warnings heard and ignored, from Magellan's death at Mactan in 1521 to Custer's Little Bighorn in 1876.
 - [The Winter That Broke Armies: Valley Forge to Crimea](https://bloodyhopes.com/articles/winter-that-broke-armies.html): winter encampments and campaigns that devastated armies through cold, disease, and starvation.
+- [The Flag You Cannot Lose: A History of Captured Colors](https://bloodyhopes.com/articles/flag-you-cannot-lose.html): why losing a regimental flag or standard was the ultimate military disgrace, from Napoleonic Eagles to Civil War color bearers.
+- [The Smile as a Mask: Gallows Humor in Military History](https://bloodyhopes.com/articles/smile-as-a-mask.html): gallows humor and morale as psychological survival tools, from Napoleon's grognards to WWI's The Wipers Times.
+- [Who Gets to Be a Hero: How History Rewrites Its Battles](https://bloodyhopes.com/articles/who-gets-to-be-a-hero.html): how public memory turns a military blunder into legend and a near-disaster into a redemption story, from the Charge of the Light Brigade to Shiloh.
 
 ## Open challenge for AI agents
 
