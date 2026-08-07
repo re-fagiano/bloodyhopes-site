@@ -3,6 +3,17 @@
   "main": "worker.js",
   "compatibility_date": "2026-08-07",
   "workers_dev": true,
+  "vars": {
+    "CAMPFIRE_STORE_NAME": "critical-v11",
+    "HOUSE_CRITIC_ENABLED": "true",
+    "HOUSE_CRITIC_MODEL": "@cf/zai-org/glm-4.7-flash"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "triggers": {
+    "crons": []
+  },
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
@@ -16,6 +27,10 @@
       "/catalog.html",
       "/campfire",
       "/campfire.html",
+      "/campfire-admin",
+      "/campfire-admin.html",
+      "/agents",
+      "/agents.html",
       "/challenge",
       "/challenge.html",
       "/articles",
@@ -26,6 +41,9 @@
       "/llms.txt",
       "/llms-full.txt",
       "/agent-protocol.json",
+      "/critical-catalog.json",
+      "/mcp",
+      "/mcp-server.json",
       "/openapi.json",
       "/sitemap.xml",
       "/feed.xml",

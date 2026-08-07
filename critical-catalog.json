@@ -1,0 +1,206 @@
+{
+  "name": "Bloody Hopes critical catalog",
+  "schema_version": "1.0",
+  "text_version": "2026-08-07.1",
+  "notice": "critic_ready confirms complete published lyrics and page context. Historical bibliographies are not yet curated for every song.",
+  "songs": [
+    {
+      "slug": "austerlitz-sun",
+      "title": "That Austerlitz Sun",
+      "canonical_url": "https://bloodyhopes.com/songs/austerlitz-sun.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:c611cd731628b766a54c77917f1a5540a348a7ddcbe51d2db09bc2ad427546a9",
+      "description": "Beneath Austerlitz’s brilliant sky, a dying soldier imagines the glorious return, medals, and family reunion that will never come.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=austerlitz-sun"
+    },
+    {
+      "slug": "blood-for-blood",
+      "title": "Blood for Blood, Scar for Scar",
+      "canonical_url": "https://bloodyhopes.com/songs/blood-for-blood.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:fd72aa127abceca70731399df7781e536dec08d062fe1e5e1aed2bfb6d73e232",
+      "description": "A Dutch colonial column burns through Suriname’s rainforest, where fever, vanished villages, and returning hammocks turn conquest into stain.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=blood-for-blood"
+    },
+    {
+      "slug": "cheers-to-fritz",
+      "title": "Cheers to Fritz, and to Hell with Fritz",
+      "canonical_url": "https://bloodyhopes.com/songs/cheers-to-fritz.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:cefcdd8449e6f9095a15f7a7b04349139296135e3142ee991b70a1cfee8d3eb0",
+      "description": "An old Prussian soldier drinks to fallen comrades while both toasting and damning Frederick the Great, the king who made legends and ghosts.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=cheers-to-fritz"
+    },
+    {
+      "slug": "farmington-mourning",
+      "title": "There Will Be Mourning in Farmington",
+      "canonical_url": "https://bloodyhopes.com/songs/farmington-mourning.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:f274870b6e81c4e2ed5b77f645a6c996f4d0dae450a341135845232775ba226b",
+      "description": "A fifteen-minute fight near Atlanta reaches Farmington as a casualty list, carrying war house by house, name by name, into waiting homes.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=farmington-mourning"
+    },
+    {
+      "slug": "gettysburg-ballad",
+      "title": "He Raised His Hands",
+      "canonical_url": "https://bloodyhopes.com/songs/gettysburg-ballad.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:bbf8d27cb8115fe051c5b6f1e21fe43a34a5fde097de9d535f166e71dad7ab18",
+      "description": "At Gettysburg, a glory-hungry recruit bayonets a surrendering boy, receives a medal, and discovers that public honor cannot silence moral injury.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=gettysburg-ballad"
+    },
+    {
+      "slug": "hungry-winter-1780",
+      "title": "Four Days, Four Nights",
+      "canonical_url": "https://bloodyhopes.com/songs/hungry-winter-1780.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:371674828ae698dad134f0e0fc46a1ef551e7a52446c6fe39e27f077e52bc6bf",
+      "description": "During the Morristown winter, four days without bread drive Continental soldiers to chew bark and march beside hunger like another enemy.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=hungry-winter-1780"
+    },
+    {
+      "slug": "italy-will-be-made",
+      "title": "Italy Will Be Made!",
+      "canonical_url": "https://bloodyhopes.com/songs/italy-will-be-made.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:4a8801a88f841f7259de0da7fffaa0d25dbcf656be3d024f48e7e35d12ff5138",
+      "description": "A dispossessed Italian officer serves Napoleon from Marengo to Russia, carrying a faded tricolour and one dying promise: Italy will be made.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=italy-will-be-made"
+    },
+    {
+      "slug": "lancasters-ribbon",
+      "title": "The Lancaster's Brigade Ribbon",
+      "canonical_url": "https://bloodyhopes.com/songs/lancasters-ribbon.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:c7e79bebf145245b3b45647288bd44d4c8e2105b4b19a732691e936410c3f1b3",
+      "description": "A dying nineteen-year-old asks his platoon to carry a ribbon, a wedding promise, and a merciful lie home to his mother and bride.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=lancasters-ribbon"
+    },
+    {
+      "slug": "leipzig-watch",
+      "title": "For a Better World",
+      "canonical_url": "https://bloodyhopes.com/songs/leipzig-watch.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:a31e7643f046dd6e41de96dfe5af83b7496a7a53b9bedd0ee9f6092afa378e47",
+      "description": "A scarred pocket watch leads a descendant from Baltimore to Leipzig, uncovering two teenage soldiers and the promise they left behind.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=leipzig-watch"
+    },
+    {
+      "slug": "light-brigade",
+      "title": "Into the Guns",
+      "canonical_url": "https://bloodyhopes.com/songs/light-brigade.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:99219276783eb1a73bbcf962245e02cac66060d2dcd3df363d1658da7e96370a",
+      "description": "A mistaken order sends the Light Brigade into Balaclava’s guns, where young riders dream of glory and veterans ride knowing the grave.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=light-brigade"
+    },
+    {
+      "slug": "montreal-smile",
+      "title": "Blessed Is the Man Who Smiles",
+      "canonical_url": "https://bloodyhopes.com/songs/montreal-smile.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:ea44da3dcb72c38b8619f421139594aafd2f8d6ea2ef36aeda78981c94f71a10",
+      "description": "At Montréal’s 1760 surrender, a smile passes between soldiers and civilians as a small act of courage beyond flags, rank, and victory.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=montreal-smile"
+    },
+    {
+      "slug": "old-ironsides",
+      "title": "Not a Drop of Water",
+      "canonical_url": "https://bloodyhopes.com/songs/old-ironsides.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:b21e5beb5d3a25e7a6f3bc88b1b754c4b9c2176d9db918fd827d4fe519562ad5",
+      "description": "A deadpan USS Constitution ballad records untouched water, vanished rum and wine, and a crew whose naval prudence borders on mutiny.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=old-ironsides"
+    },
+    {
+      "slug": "rum-alabama-rum",
+      "title": "Rum, Alabama, Rum!",
+      "canonical_url": "https://bloodyhopes.com/songs/rum-alabama-rum.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:2cab7458f9d2990cd1ff8119db72e4aaaf48ea19f2f5632ea2bf4af75e190875",
+      "description": "A comic CSS Alabama forebitter follows Semmes’s raider around the world as captured spirits vanish and the crew heroically avoids water.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=rum-alabama-rum"
+    },
+    {
+      "slug": "send-the-italian",
+      "title": "Send the Italian",
+      "canonical_url": "https://bloodyhopes.com/songs/send-the-italian.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:2862643f6cfce218a62a0162485293feb1bdc5bc4d4febdc9c49b3a236a5beca",
+      "description": "Pigafetta, John Martin, and Giuseppe Biagi survive three disasters as the Italians sent to carry the record, the order, or the signal.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=send-the-italian"
+    },
+    {
+      "slug": "shiloh-ballad",
+      "title": "Surrender, Swim, or Fight",
+      "canonical_url": "https://bloodyhopes.com/songs/shiloh-ballad.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:809475989b6d35c89f3d00fb1cec0008359820a6d177da7f33cab166b81d3eab",
+      "description": "At Shiloh, soldiers trapped between fire and the Tennessee River face three impossible choices, and survival becomes the wound they carry home.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=shiloh-ballad"
+    },
+    {
+      "slug": "the-elephant",
+      "title": "The Elephant",
+      "canonical_url": "https://bloodyhopes.com/songs/the-elephant.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:abeb0d1ce8b176356c8a42b0f09b895fd1de100851813376ee1781e9c7ba9b7b",
+      "description": "A sixteen-year-old chases the Civil War’s “elephant” of combat and returns knowing that glory is the story honest survivors refuse to repeat.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=the-elephant"
+    },
+    {
+      "slug": "tim-and-jones",
+      "title": "What Mercy Had To Do",
+      "canonical_url": "https://bloodyhopes.com/songs/tim-and-jones.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:ea795a882fc2a6fd7d0980884f16edffda7cbcfa6fdfe6e1f3b89cf454ca9bdf",
+      "description": "A wounded Confederate is saved by the Union sergeant who captures him, and mercy turns two enemies into the family war took from them.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=tim-and-jones"
+    },
+    {
+      "slug": "waterloo-smile",
+      "title": "The Smile Inside the Square",
+      "canonical_url": "https://bloodyhopes.com/songs/waterloo-smile.html",
+      "critic_ready": true,
+      "text_version": "2026-08-07.1",
+      "content_hash": "sha256:3f75469f74f8dec0bfe4e8c63a849f3af0584c7ffb21949400488bedafe776b0",
+      "description": "A British infantryman kills a smiling French cavalryman at Waterloo and learns that the glory each sought leaves only one survivor haunted.",
+      "sources_status": "not-yet-curated",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=waterloo-smile"
+    }
+  ]
+}

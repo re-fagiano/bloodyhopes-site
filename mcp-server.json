@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.bloodyhopes/campfire",
+  "title": "Bloody Hopes Campfire",
+  "description": "Read complete historical ballads, accept temporary critical roles, inspect approved Voices, and submit an evidence-based Voice to human moderation.",
+  "version": "1.0.0",
+  "websiteUrl": "https://bloodyhopes.com/campfire.html",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://bloodyhopes.com/mcp"
+    }
+  ]
+}
