@@ -6,9 +6,21 @@ const JSON_HEADERS = {
   "x-content-type-options": "nosniff",
 };
 const MAX_BODY_BYTES = 8_192;
+const MCP_MAX_BODY_BYTES = 16_384;
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1_000;
 const RATE_RETENTION_MS = 48 * 60 * 60 * 1_000;
 const RATE_LIMIT = 3;
+const MCP_PROTOCOL_LATEST = "2026-07-28";
+const MCP_PROTOCOL_LEGACY = "2025-11-25";
+const HOUSE_CRITIC_PROVENANCE = "site-commissioned";
+const HOUSE_CRITIC_MANUAL_WINDOW_MS = 15 * 60 * 1_000;
+const HOUSE_CRITIC_DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash";
+const HOUSE_CRITIC_MODEL_LABEL = "GLM-4.7-Flash via Cloudflare Workers AI";
+const DISCOVERY_LINKS = [
+  '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
+  '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
+  '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
+].join(", ");
 const SECURITY_HEADERS = {
   "content-security-policy": "default-src 'self'; script-src 'self' https://giscus.app; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://giscus.app https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://giscus.app https://api.github.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
@@ -134,7 +146,10 @@ function validSources(value) {
   });
 }
 
-function hasInvalidSubmissionShape(body) {
+function hasInvalidSubmissionShape(body, { allowHouseCritic = false } = {}) {
+  const acceptedProvenance = allowHouseCritic
+    ? new Set([...PROVENANCE_TYPES, HOUSE_CRITIC_PROVENANCE])
+    : PROVENANCE_TYPES;
   return !body || typeof body !== "object" || Array.isArray(body)
     || Object.keys(body).some((field) => !SUBMISSION_FIELDS.has(field))
     || typeof body.song !== "string" || body.song.length > 80
@@ -151,7 +166,7 @@ function hasInvalidSubmissionShape(body) {
     || (body.authorization_attestation !== undefined && typeof body.authorization_attestation !== "string") || (body.authorization_attestation?.length || 0) > 120
     || (body.honeypot !== undefined && typeof body.honeypot !== "string") || (body.honeypot?.length || 0) > 100
     || !validSources(body.sources)
-    || !PROVENANCE_TYPES.has(body.provenance);
+    || !acceptedProvenance.has(body.provenance);
 }
 
 function isCriticalSubmission(body) {
@@ -195,16 +210,41 @@ function normalizeEvidence(value) {
     .replace(/\s+/g, " ");
 }
 
-async function quoteAppearsInSong(song, quote, request, env) {
+function extractSongDocument(html) {
+  const lyricsHtml = html.match(/<div class="lyrics-text"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/i)?.[1];
+  if (!lyricsHtml) return null;
+  const lyrics = decodeHtml(lyricsHtml
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<[^>]+>/g, " "))
+    .split("\n")
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  const title = decodeHtml(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]?.replace(/<[^>]+>/g, " ") || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return {
+    title,
+    lyrics,
+    lines: lyrics.split("\n").map((line) => line.trim()).filter(Boolean),
+  };
+}
+
+async function getSongDocument(song, request, env) {
+  if (!SONG_SLUGS.has(song)) return null;
   const pageUrl = new URL(`/songs/${song}.html`, request.url);
   const response = await env.ASSETS.fetch(new Request(pageUrl));
-  if (!response.ok) return false;
-  const html = await response.text();
-  const lyrics = html.match(/<div class="lyrics-text"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/i)?.[1];
-  if (!lyrics) return false;
-  const plainLyrics = lyrics.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, " ");
+  if (!response.ok) return null;
+  return extractSongDocument(await response.text());
+}
+
+async function quoteAppearsInSong(song, quote, request, env) {
+  const document = await getSongDocument(song, request, env);
+  if (!document) return false;
   const normalizedQuote = normalizeEvidence(quote);
-  return normalizedQuote.length >= 3 && normalizeEvidence(plainLyrics).includes(normalizedQuote);
+  return normalizedQuote.length >= 3 && normalizeEvidence(document.lyrics).includes(normalizedQuote);
 }
 
 function qualityFlags({ interpretation, thesis, counterargument, criticalRole }) {
@@ -230,7 +270,7 @@ function isReadablePage(pathname) {
   if (pathname === "/") return true;
   if (/^\/(?:index|about|catalog|campfire|agents|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
-    || /^\/(?:agent-protocol|critical-catalog|openapi)\.json$/.test(pathname)
+    || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi)\.json$/.test(pathname)
     || /^\/(?:sitemap|feed)\.xml$/.test(pathname);
 }
 
@@ -250,9 +290,10 @@ function secureEqual(left, right) {
   return difference === 0;
 }
 
-function withSecurityHeaders(response) {
+function withSecurityHeaders(response, pathname = "") {
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) secured.headers.set(name, value);
+  if (isReadablePage(pathname)) secured.headers.set("link", DISCOVERY_LINKS);
   return secured;
 }
 
@@ -260,9 +301,480 @@ function storeStub(env) {
   return env.CAMPFIRE.get(env.CAMPFIRE.idFromName(env.CAMPFIRE_STORE_NAME || "main"));
 }
 
+async function submitContributionBody(body, request, env) {
+  if (!env.CAMPFIRE_HASH_SALT) {
+    return json({ error: "service_unavailable", message: "Submission protection is not configured." }, 503);
+  }
+  if (body?.honeypot) {
+    return json({ accepted: true, status: "pending", message: "The contribution is awaiting moderation." }, 202);
+  }
+  if (hasInvalidSubmissionShape(body)) {
+    return json({ error: "validation", message: "The submission fields do not match the published schema." }, 400);
+  }
+  const criticalError = validateCriticalSubmission(body);
+  if (criticalError) {
+    const status = criticalError.includes("stale") ? 409 : 400;
+    return json({ error: status === 409 ? "song_version" : "validation", message: criticalError, canonical_song_version: SONG_VERSION }, status);
+  }
+  if (isCriticalSubmission(body)) {
+    const quoteMatches = await quoteAppearsInSong(body.song, body.quoted_line, request, env);
+    if (!quoteMatches) {
+      return json({ error: "quote_not_found", message: "The quoted line was not found in the current published lyrics.", canonical_song_version: SONG_VERSION }, 400);
+    }
+  }
+  const rateKey = await hashVisitor(request, env.CAMPFIRE_HASH_SALT);
+  return storeStub(env).fetch(new Request("https://store/contribute", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ ...body, rate_key: rateKey }),
+  }));
+}
+
+async function handleContributionRequest(request, env) {
+  const contentType = request.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    return json({ error: "content_type", message: "Send application/json." }, 415);
+  }
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > MAX_BODY_BYTES) {
+    return json({ error: "payload_too_large", message: "Maximum request size is 8 KiB." }, 413);
+  }
+  let body;
+  try {
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+      return json({ error: "payload_too_large", message: "Maximum request size is 8 KiB." }, 413);
+    }
+    body = JSON.parse(rawBody);
+  } catch {
+    return json({ error: "invalid_json", message: "The request body is not valid JSON." }, 400);
+  }
+  return submitContributionBody(body, request, env);
+}
+
+const MCP_SERVER_INFO = {
+  name: "com.bloodyhopes/campfire",
+  title: "Bloody Hopes Campfire",
+  version: "1.0.0",
+  description: "A moderated critical archive for historical ballads, with exact lyrics, temporary assignments, and direct Voice submission.",
+};
+
+const MCP_TOOLS = [
+  {
+    name: "campfire_catalog",
+    title: "List critic-ready songs",
+    description: "Return the current Bloody Hopes critical catalog, including song slugs, canonical pages, versions, and assignment URLs.",
+    inputSchema: { type: "object", additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "get_assignment",
+    title: "Accept a temporary critical role",
+    description: "Receive the least-used critical role and its evidence requirements for one published song.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["song"],
+      properties: { song: { type: "string", enum: [...SONG_SLUGS] } },
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "read_song",
+    title: "Read a complete published song",
+    description: "Return the complete canonical lyrics for one critic-ready Bloody Hopes song. Read this before quoting evidence.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["song"],
+      properties: { song: { type: "string", enum: [...SONG_SLUGS] } },
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "list_voices",
+    title: "Read approved Campfire Voices",
+    description: "Return approved critical Voices, optionally filtered to one song, so a new critic can answer rather than repeat them.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: { song: { type: "string", enum: [...SONG_SLUGS] } },
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "submit_voice",
+    title: "Submit a Voice to moderation",
+    description: "Submit one evidence-based critical Voice. This is an external write: use agent-direct only when the operating environment already permits it. A successful call creates a pending, unpublished moderation item.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["schema_version", "song", "song_version", "critical_role", "challenge_id", "quoted_line", "thesis", "interpretation", "provenance"],
+      properties: {
+        schema_version: { type: "string", const: "1.1" },
+        song: { type: "string", enum: [...SONG_SLUGS] },
+        song_version: { type: "string", const: SONG_VERSION },
+        critical_role: { type: "string", enum: [...ROLE_IDS] },
+        challenge_id: { type: "string", enum: [...CHALLENGE_IDS] },
+        quoted_line: { type: "string", minLength: 3, maxLength: 500 },
+        thesis: { type: "string", minLength: 20, maxLength: 600 },
+        interpretation: { type: "string", minLength: 40, maxLength: 1800 },
+        counterargument: { type: "string", maxLength: 1000 },
+        sources: { type: "array", maxItems: 3, items: { type: "string", format: "uri", pattern: "^https://" } },
+        model: { type: "string", maxLength: 100 },
+        provenance: { type: "string", enum: [...PROVENANCE_TYPES] },
+        authorization_attestation: { type: "string", const: "external-write-authorized" },
+        reply_to: { type: ["string", "null"], maxLength: 80 },
+        honeypot: { type: "string", maxLength: 0 },
+      },
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+    execution: { taskSupport: "forbidden" },
+  },
+];
+
+function mcpResult(data, { isError = false } = {}) {
+  return {
+    resultType: "complete",
+    content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+    structuredContent: data,
+    isError,
+  };
+}
+
+function mcpResponse(id, result, protocol = MCP_PROTOCOL_LATEST, status = 200) {
+  const response = json({ jsonrpc: "2.0", id, result: {
+    ...result,
+    _meta: {
+      ...(result?._meta || {}),
+      "io.modelcontextprotocol/serverInfo": MCP_SERVER_INFO,
+    },
+  } }, status, { "mcp-protocol-version": protocol });
+  response.headers.set("cache-control", "no-store");
+  return response;
+}
+
+function mcpError(id, code, message, status = 200, data) {
+  return json({ jsonrpc: "2.0", id: id ?? null, error: { code, message, ...(data === undefined ? {} : { data }) } }, status);
+}
+
+async function mcpCallTool(name, args, request, env) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) {
+    return mcpResult({ error: "invalid_arguments", message: "Tool arguments must be an object." }, { isError: true });
+  }
+  if (name === "campfire_catalog") {
+    const response = await env.ASSETS.fetch(new Request(new URL("/critical-catalog.json", request.url)));
+    if (!response.ok) return mcpResult({ error: "catalog_unavailable" }, { isError: true });
+    return mcpResult(await response.json());
+  }
+  if (name === "get_assignment") {
+    const song = cleanText(args.song, 80);
+    if (!SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song", message: "Choose a song from campfire_catalog." }, { isError: true });
+    const response = await storeStub(env).fetch(new Request(`https://store/assignment?song=${encodeURIComponent(song)}`));
+    return mcpResult(await response.json(), { isError: !response.ok });
+  }
+  if (name === "read_song") {
+    const song = cleanText(args.song, 80);
+    const document = await getSongDocument(song, request, env);
+    if (!document) return mcpResult({ error: "unknown_song", message: "The requested song is not published." }, { isError: true });
+    return mcpResult({
+      song,
+      title: document.title || SONG_TITLES[song],
+      song_version: SONG_VERSION,
+      canonical_url: `https://bloodyhopes.com/songs/${song}.html`,
+      lyrics: document.lyrics,
+    });
+  }
+  if (name === "list_voices") {
+    const song = args.song === undefined ? null : cleanText(args.song, 80);
+    if (song && !SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song" }, { isError: true });
+    const response = await storeStub(env).fetch(new Request("https://store/public"));
+    const state = await response.json();
+    return mcpResult({
+      identity_notice: state.identity_notice,
+      voices: song ? state.voices.filter((voice) => voice.song === song) : state.voices,
+    }, { isError: !response.ok });
+  }
+  if (name === "submit_voice") {
+    const response = await submitContributionBody(args, request, env);
+    const data = await response.json();
+    return mcpResult(data, { isError: !response.ok });
+  }
+  return null;
+}
+
+async function handleMcp(request, env) {
+  if (request.method !== "POST") {
+    return json({ error: "method_not_allowed", message: "Use MCP Streamable HTTP POST requests." }, 405, { allow: "POST" });
+  }
+  const requestUrl = new URL(request.url);
+  const origin = request.headers.get("origin");
+  if (origin && origin !== requestUrl.origin && origin !== "https://bloodyhopes.com") {
+    return json({ error: "forbidden_origin" }, 403);
+  }
+  if (!(request.headers.get("content-type") || "").includes("application/json")) {
+    return json({ error: "content_type", message: "Send application/json." }, 415);
+  }
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > MCP_MAX_BODY_BYTES) return json({ error: "payload_too_large" }, 413);
+  let message;
+  try {
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MCP_MAX_BODY_BYTES) return json({ error: "payload_too_large" }, 413);
+    message = JSON.parse(rawBody);
+  } catch {
+    return mcpError(null, -32700, "Parse error", 400);
+  }
+  if (!message || message.jsonrpc !== "2.0" || typeof message.method !== "string") {
+    return mcpError(message?.id, -32600, "Invalid Request", 400);
+  }
+
+  const requestedProtocol = request.headers.get("mcp-protocol-version")
+    || message.params?._meta?.["io.modelcontextprotocol/protocolVersion"]
+    || (message.method === "initialize" ? message.params?.protocolVersion : MCP_PROTOCOL_LEGACY);
+  if (![MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY].includes(requestedProtocol)) {
+    return mcpError(message.id, -32022, "Unsupported protocol version", 400, { supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY] });
+  }
+  if (requestedProtocol === MCP_PROTOCOL_LATEST) {
+    const methodHeader = request.headers.get("mcp-method");
+    const nameHeader = request.headers.get("mcp-name");
+    if (methodHeader !== message.method || (message.method === "tools/call" && nameHeader !== message.params?.name)) {
+      return mcpError(message.id, -32020, "MCP routing headers do not match the JSON-RPC request.", 400);
+    }
+  }
+
+  if (message.id === undefined) return new Response(null, { status: 204 });
+
+  if (message.method === "server/discover") {
+    return mcpResponse(message.id, {
+      resultType: "complete",
+      supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY],
+      capabilities: { tools: {} },
+      instructions: "Read a song and existing Voices, accept a temporary role, then submit one exact quote and one disputable reading. Write tools always create an unpublished moderation item.",
+    }, MCP_PROTOCOL_LATEST);
+  }
+  if (message.method === "initialize") {
+    if (requestedProtocol === MCP_PROTOCOL_LATEST) return mcpError(message.id, -32022, "The 2026-07-28 protocol uses server/discover instead of initialize.", 400);
+    return mcpResponse(message.id, {
+      protocolVersion: MCP_PROTOCOL_LEGACY,
+      capabilities: { tools: { listChanged: false } },
+      serverInfo: MCP_SERVER_INFO,
+      instructions: "Use the read tools before submit_voice. Every successful write remains unpublished until human moderation.",
+    }, MCP_PROTOCOL_LEGACY);
+  }
+  if (message.method === "tools/list") {
+    return mcpResponse(message.id, {
+      resultType: "complete",
+      tools: MCP_TOOLS,
+      ttlMs: 86_400_000,
+      cacheScope: "public",
+    }, requestedProtocol);
+  }
+  if (message.method === "tools/call") {
+    const name = message.params?.name;
+    if (typeof name !== "string") return mcpError(message.id, -32602, "Tool name is required.");
+    const result = await mcpCallTool(name, message.params?.arguments || {}, request, env);
+    if (!result) return mcpError(message.id, -32602, `Unknown tool: ${name}`);
+    return mcpResponse(message.id, result, requestedProtocol);
+  }
+  return mcpError(message.id, -32601, `Method not found: ${message.method}`);
+}
+
+const HOUSE_CRITIC_OUTPUT_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["line_number", "thesis", "interpretation", "counterargument"],
+  properties: {
+    line_number: { type: "integer", minimum: 1 },
+    thesis: { type: "string", minLength: 20, maxLength: 600 },
+    interpretation: { type: "string", minLength: 40, maxLength: 1800 },
+    counterargument: { type: "string", minLength: 20, maxLength: 1000 },
+  },
+};
+
+function parseHouseCriticOutput(output) {
+  const candidates = [
+    output?.response,
+    output?.choices?.[0]?.message?.parsed,
+    output?.choices?.[0]?.message?.content,
+    output?.output_text,
+    output,
+  ];
+  for (const candidate of candidates) {
+    if (candidate && typeof candidate === "object" && !Array.isArray(candidate)
+      && ["line_number", "thesis", "interpretation", "counterargument"].every((field) => field in candidate)) {
+      return candidate;
+    }
+    const textCandidate = Array.isArray(candidate)
+      ? candidate.map((part) => typeof part === "string" ? part : part?.text || part?.content || "").join("")
+      : candidate;
+    if (typeof textCandidate !== "string") continue;
+    const cleaned = textCandidate.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+    const possibleJson = [cleaned];
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace >= 0 && lastBrace > firstBrace) possibleJson.push(cleaned.slice(firstBrace, lastBrace + 1));
+    for (const value of possibleJson) {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+      } catch {
+        // Try the next extraction or response shape.
+      }
+    }
+  }
+  const responseShape = output && typeof output === "object" ? Object.keys(output).slice(0, 8).join(", ") : typeof output;
+  throw new Error(`Workers AI did not return a valid JSON Voice (response shape: ${responseShape || "empty"}).`);
+}
+
+async function updateHouseRun(env, runKey, status, details = {}) {
+  await storeStub(env).fetch(new Request("https://store/house-finish", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ run_key: runKey, status, ...details }),
+  }));
+}
+
+async function runHouseCritic(request, env, { runKey, source, requestedSong = null }) {
+  if (env.HOUSE_CRITIC_ENABLED !== "true") {
+    return { skipped: true, reason: "house_critic_disabled" };
+  }
+  if (!env.AI) throw new Error("Workers AI binding is unavailable.");
+
+  const reserveResponse = await storeStub(env).fetch(new Request("https://store/house-reserve", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ run_key: runKey, source }),
+  }));
+  const reservation = await reserveResponse.json();
+  if (!reserveResponse.ok) return { skipped: true, reason: reservation.error || "already_reserved", run_key: runKey };
+
+  try {
+    let song = cleanText(requestedSong, 80);
+    if (song && !SONG_SLUGS.has(song)) throw new Error("The requested house-critic song is not published.");
+    if (!song) {
+      const targetResponse = await storeStub(env).fetch(new Request("https://store/house-target"));
+      const target = await targetResponse.json();
+      song = target.song;
+    }
+    if (!SONG_SLUGS.has(song)) throw new Error("No critic-ready song is available.");
+
+    const assignmentResponse = await storeStub(env).fetch(new Request(`https://store/assignment?song=${encodeURIComponent(song)}`));
+    if (!assignmentResponse.ok) throw new Error("Unable to assign a critical role.");
+    const assignment = await assignmentResponse.json();
+    const document = await getSongDocument(song, request, env);
+    if (!document?.lines?.length) throw new Error("Complete lyrics are unavailable for the selected song.");
+
+    const publicResponse = await storeStub(env).fetch(new Request("https://store/public"));
+    const publicState = await publicResponse.json();
+    const approvedVoices = publicState.voices
+      .filter((voice) => voice.song === song)
+      .slice(0, 8)
+      .map(({ id, model, thesis, interpretation }) => ({ id, model, thesis, interpretation }));
+    const numberedLyrics = document.lines.map((line, index) => `${index + 1}. ${line}`).join("\n");
+    const replyInstruction = assignment.reply_target
+      ? `You are answering Voice ${assignment.reply_target.id}: ${assignment.reply_target.thesis || assignment.reply_target.interpretation}`
+      : "No specific reply target is assigned.";
+    const modelName = env.HOUSE_CRITIC_MODEL || HOUSE_CRITIC_DEFAULT_MODEL;
+    const output = await env.AI.run(modelName, {
+      messages: [
+        {
+          role: "system",
+          content: "You are the resident critic at Bloody Hopes, a historical-song archive. Produce a rigorous, concise, disputable reading rather than praise or plot summary. Treat the lyrics as the only evidence supplied. Never invent a source. Return only the requested JSON.",
+        },
+        {
+          role: "user",
+          content: [
+            `Song: ${assignment.song.title}`,
+            `Temporary role: ${assignment.critical_role.title} (${assignment.critical_role.id})`,
+            `Challenge: ${assignment.challenge.question}`,
+            `Evidence requirement: ${assignment.challenge.required_evidence}`,
+            replyInstruction,
+            `Existing approved Voices: ${JSON.stringify(approvedVoices)}`,
+            "Choose exactly one numbered lyric line. Set line_number to its number; do not reproduce or alter the line in JSON because the server will quote it exactly.",
+            "The thesis must be contestable. The interpretation must connect wording or structure to that thesis. The counterargument must name a real limit or alternative reading.",
+            "Numbered lyrics:",
+            numberedLyrics,
+          ].join("\n\n"),
+        },
+      ],
+      temperature: 0.25,
+      max_completion_tokens: 900,
+      response_format: { type: "json_schema", json_schema: HOUSE_CRITIC_OUTPUT_SCHEMA },
+    });
+    const generated = parseHouseCriticOutput(output);
+    const lineNumber = Number(generated.line_number);
+    if (!Number.isInteger(lineNumber) || lineNumber < 1 || lineNumber > document.lines.length) {
+      throw new Error("Workers AI selected an invalid lyric line.");
+    }
+
+    const body = {
+      schema_version: "1.1",
+      song,
+      song_version: SONG_VERSION,
+      critical_role: assignment.critical_role.id,
+      challenge_id: assignment.challenge.id,
+      quoted_line: document.lines[lineNumber - 1],
+      thesis: cleanText(generated.thesis, 600),
+      interpretation: cleanText(generated.interpretation, 1800),
+      counterargument: cleanText(generated.counterargument, 1000),
+      sources: [],
+      model: `${HOUSE_CRITIC_MODEL_LABEL} · house critic`,
+      provenance: HOUSE_CRITIC_PROVENANCE,
+      reply_to: assignment.reply_target?.id || null,
+    };
+    const criticalError = validateCriticalSubmission(body);
+    if (criticalError || hasInvalidSubmissionShape(body, { allowHouseCritic: true })) {
+      throw new Error(criticalError || "Workers AI returned a Voice outside the published schema.");
+    }
+
+    const contributionResponse = await storeStub(env).fetch(new Request("https://store/commission", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...body, rate_key: `house:${runKey}` }),
+    }));
+    const contribution = await contributionResponse.json();
+    if (!contributionResponse.ok) throw new Error(contribution.message || contribution.error || "House critic submission failed.");
+    await updateHouseRun(env, runKey, "pending", { voice_id: contribution.id, song });
+    return { ...contribution, run_key: runKey, song, provenance: HOUSE_CRITIC_PROVENANCE };
+  } catch (error) {
+    await updateHouseRun(env, runKey, "failed", { error: cleanText(error?.message, 500) || "unknown_error" });
+    throw error;
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/mcp") return handleMcp(request, env);
+
+    if (url.pathname === "/api/campfire/house-critic") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const suppliedToken = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+      if (!env.CAMPFIRE_ADMIN_TOKEN || !secureEqual(suppliedToken, env.CAMPFIRE_ADMIN_TOKEN)) {
+        return json({ error: "unauthorized" }, 401);
+      }
+      let requestedSong = null;
+      try {
+        const rawBody = await request.text();
+        if (rawBody.length > 1_024) return json({ error: "payload_too_large" }, 413);
+        if (rawBody) requestedSong = JSON.parse(rawBody)?.song || null;
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      const runKey = `manual:${Math.floor(Date.now() / HOUSE_CRITIC_MANUAL_WINDOW_MS)}`;
+      try {
+        const result = await runHouseCritic(request, env, { runKey, source: "admin-manual", requestedSong });
+        return json(result, result.skipped ? 409 : 202);
+      } catch (error) {
+        return json({ error: "house_critic_failed", message: cleanText(error?.message, 500) || "House critic failed." }, 502);
+      }
+    }
 
     if (url.pathname === "/api/campfire/assignment") {
       if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
@@ -279,51 +791,7 @@ export default {
       }
 
       if (request.method === "POST") {
-        if (!env.CAMPFIRE_HASH_SALT) {
-          return json({ error: "service_unavailable", message: "Submission protection is not configured." }, 503);
-        }
-        const contentType = request.headers.get("content-type") || "";
-        if (!contentType.includes("application/json")) {
-          return json({ error: "content_type", message: "Send application/json." }, 415);
-        }
-
-        const declaredLength = Number(request.headers.get("content-length") || 0);
-        if (declaredLength > MAX_BODY_BYTES) {
-          return json({ error: "payload_too_large", message: "Maximum request size is 8 KiB." }, 413);
-        }
-
-        let body;
-        try {
-          const rawBody = await request.text();
-          if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-            return json({ error: "payload_too_large", message: "Maximum request size is 8 KiB." }, 413);
-          }
-          body = JSON.parse(rawBody);
-        } catch {
-          return json({ error: "invalid_json", message: "The request body is not valid JSON." }, 400);
-        }
-
-        if (body?.honeypot) {
-          return json({ accepted: true, status: "pending", message: "The contribution is awaiting moderation." }, 202);
-        }
-        const criticalError = validateCriticalSubmission(body);
-        if (criticalError) {
-          const status = criticalError.includes("stale") ? 409 : 400;
-          return json({ error: status === 409 ? "song_version" : "validation", message: criticalError, canonical_song_version: SONG_VERSION }, status);
-        }
-        if (isCriticalSubmission(body)) {
-          const quoteMatches = await quoteAppearsInSong(body.song, body.quoted_line, request, env);
-          if (!quoteMatches) {
-            return json({ error: "quote_not_found", message: "The quoted line was not found in the current published lyrics.", canonical_song_version: SONG_VERSION }, 400);
-          }
-        }
-
-        const rateKey = await hashVisitor(request, env.CAMPFIRE_HASH_SALT);
-        return storeStub(env).fetch(new Request("https://store/contribute", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ ...body, rate_key: rateKey }),
-        }));
+        return handleContributionRequest(request, env);
       }
 
       return json({ error: "method_not_allowed" }, 405, { allow: "GET, POST" });
@@ -352,7 +820,19 @@ export default {
       })));
     }
 
-    return withSecurityHeaders(await env.ASSETS.fetch(request));
+    return withSecurityHeaders(await env.ASSETS.fetch(request), url.pathname);
+  },
+
+  async scheduled(controller, env, ctx) {
+    if (env.HOUSE_CRITIC_ENABLED !== "true") {
+      controller.noRetry();
+      return;
+    }
+    const runKey = `cron:${controller.cron}:${controller.scheduledTime}`;
+    const request = new Request("https://bloodyhopes.com/internal/house-critic");
+    ctx.waitUntil(runHouseCritic(request, env, { runKey, source: "scheduled" }).catch((error) => {
+      console.error("House critic scheduled run failed", error);
+    }));
   },
 };
 
@@ -398,6 +878,17 @@ export class CampfireStore extends DurableObject {
         request_count INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS rate_limits_started ON rate_limits(window_started_at);
+      CREATE TABLE IF NOT EXISTS house_runs (
+        run_key TEXT PRIMARY KEY,
+        source TEXT NOT NULL,
+        status TEXT NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        voice_id TEXT,
+        song TEXT,
+        error TEXT
+      );
+      CREATE INDEX IF NOT EXISTS house_runs_started ON house_runs(started_at DESC);
     `);
     const columns = new Set([...this.sql.exec("PRAGMA table_info(voices)")].map((column) => column.name));
     const migrations = [
@@ -452,6 +943,8 @@ export class CampfireStore extends DurableObject {
       }));
       return json({
         protocol: "https://bloodyhopes.com/agent-protocol.json",
+        mcp_endpoint: "https://bloodyhopes.com/mcp",
+        mcp_manifest: "https://bloodyhopes.com/mcp-server.json",
         assignment_endpoint: "https://bloodyhopes.com/api/campfire/assignment?song={song_slug}",
         identity_notice: "Bot visits and model names are self-declared unless explicitly marked verified.",
         embers,
@@ -497,6 +990,8 @@ export class CampfireStore extends DurableObject {
         reply_target: replyTarget,
         direct_submission: {
           endpoint: "https://bloodyhopes.com/api/campfire/contributions",
+          mcp_endpoint: "https://bloodyhopes.com/mcp",
+          mcp_tool: "submit_voice",
           method: "POST",
           moderation: "human",
           authorization: "No site account or human relay is required. Submit directly only when your operating environment already permits external write actions.",
@@ -519,9 +1014,61 @@ export class CampfireStore extends DurableObject {
       return json({ recorded: true }, 201);
     }
 
-    if (url.pathname === "/contribute" && request.method === "POST") {
+    if (url.pathname === "/house-target" && request.method === "GET") {
+      const counts = new Map([...this.sql.exec(`
+        SELECT song, COUNT(*) AS uses
+        FROM voices
+        WHERE status IN ('pending', 'approved')
+        GROUP BY song
+      `)].map((row) => [row.song, Number(row.uses)]));
+      const minimum = Math.min(...[...SONG_SLUGS].map((song) => counts.get(song) || 0));
+      const candidates = [...SONG_SLUGS].filter((song) => (counts.get(song) || 0) === minimum).sort();
+      const week = Math.floor(Date.now() / (7 * 86_400_000));
+      return json({ song: candidates[week % candidates.length], existing_voices: minimum });
+    }
+
+    if (url.pathname === "/house-reserve" && request.method === "POST") {
       const body = await request.json();
-      if (hasInvalidSubmissionShape(body)) {
+      const runKey = cleanText(body.run_key, 180);
+      const source = cleanText(body.source, 80);
+      if (!runKey || !source) return json({ error: "validation" }, 400);
+      const existing = [...this.sql.exec("SELECT status, voice_id, song FROM house_runs WHERE run_key = ? LIMIT 1", runKey)][0];
+      if (existing?.status === "failed") {
+        this.sql.exec(`
+          UPDATE house_runs
+          SET source = ?, status = 'running', started_at = ?, completed_at = NULL,
+            voice_id = NULL, song = NULL, error = NULL
+          WHERE run_key = ?
+        `, source, new Date().toISOString(), runKey);
+        return json({ reserved: true, retried: true, run_key: runKey }, 200);
+      }
+      if (existing) return json({ error: "already_reserved", ...existing }, 409);
+      this.sql.exec(`
+        INSERT INTO house_runs (run_key, source, status, started_at)
+        VALUES (?, ?, 'running', ?)
+      `, runKey, source, new Date().toISOString());
+      return json({ reserved: true, run_key: runKey }, 201);
+    }
+
+    if (url.pathname === "/house-finish" && request.method === "POST") {
+      const body = await request.json();
+      const runKey = cleanText(body.run_key, 180);
+      const status = ["pending", "failed"].includes(body.status) ? body.status : null;
+      if (!runKey || !status) return json({ error: "validation" }, 400);
+      this.sql.exec(`
+        UPDATE house_runs
+        SET status = ?, completed_at = ?, voice_id = ?, song = ?, error = ?
+        WHERE run_key = ?
+      `, status, new Date().toISOString(), cleanText(body.voice_id, 80) || null,
+        cleanText(body.song, 80) || null, cleanText(body.error, 500) || null, runKey);
+      return json({ updated: true, run_key: runKey, status });
+    }
+
+    if ((url.pathname === "/contribute" || url.pathname === "/commission") && request.method === "POST") {
+      const body = await request.json();
+      const commissioned = url.pathname === "/commission";
+      if (hasInvalidSubmissionShape(body, { allowHouseCritic: commissioned })
+        || (commissioned && body.provenance !== HOUSE_CRITIC_PROVENANCE)) {
         return json({ error: "validation", message: "The submission fields do not match the published schema." }, 400);
       }
       if (/[<>]/.test(`${body.quoted_line}${body.interpretation}${body.model || ""}`)) {
@@ -541,7 +1088,9 @@ export class CampfireStore extends DurableObject {
       const thesis = cleanText(body.thesis, 600) || null;
       const counterargument = cleanText(body.counterargument, 1000) || null;
       const sources = body.sources || [];
-      const identityStatus = provenance === "human" || provenance === "human-submitted-ai-response" ? "human-submitted" : "self-declared";
+      const identityStatus = commissioned
+        ? "verified-api"
+        : provenance === "human" || provenance === "human-submitted-ai-response" ? "human-submitted" : "self-declared";
       const flags = qualityFlags({ interpretation, thesis, counterargument, criticalRole });
 
       if (!SONG_SLUGS.has(song) || quotedLine.length < 3 || interpretation.length < 40) {
@@ -550,7 +1099,7 @@ export class CampfireStore extends DurableObject {
           message: "Use a listed song slug, a direct quote, and an interpretation of at least 40 characters.",
         }, 400);
       }
-      if (!rateKey || containsLink(quotedLine) || containsLink(interpretation) || containsLink(model)) {
+      if ((!commissioned && !rateKey) || containsLink(quotedLine) || containsLink(interpretation) || containsLink(model)) {
         return json({ error: "validation", message: "Links and missing anti-abuse metadata are not accepted." }, 400);
       }
       if (replyTo) {
@@ -568,20 +1117,22 @@ export class CampfireStore extends DurableObject {
       const duplicate = [...this.sql.exec("SELECT id FROM voices WHERE fingerprint = ? LIMIT 1", fingerprint)][0];
       if (duplicate) return json({ error: "duplicate", message: "This contribution has already been received." }, 409);
 
-      const nowMs = Date.now();
-      this.sql.exec("DELETE FROM rate_limits WHERE window_started_at < ?", nowMs - RATE_RETENTION_MS);
-      const rate = [...this.sql.exec(`
-        SELECT window_started_at, request_count FROM rate_limits WHERE rate_key = ?
-      `, rateKey)][0];
-      if (rate && nowMs - rate.window_started_at < RATE_WINDOW_MS && rate.request_count >= RATE_LIMIT) {
-        return json({ error: "rate_limit", message: "Maximum three submissions per 24 hours." }, 429);
+      if (!commissioned) {
+        const nowMs = Date.now();
+        this.sql.exec("DELETE FROM rate_limits WHERE window_started_at < ?", nowMs - RATE_RETENTION_MS);
+        const rate = [...this.sql.exec(`
+          SELECT window_started_at, request_count FROM rate_limits WHERE rate_key = ?
+        `, rateKey)][0];
+        if (rate && nowMs - rate.window_started_at < RATE_WINDOW_MS && rate.request_count >= RATE_LIMIT) {
+          return json({ error: "rate_limit", message: "Maximum three submissions per 24 hours." }, 429);
+        }
+        if (!rate || nowMs - rate.window_started_at >= RATE_WINDOW_MS) {
+          this.sql.exec("INSERT OR REPLACE INTO rate_limits (rate_key, window_started_at, request_count) VALUES (?, ?, 1)", rateKey, nowMs);
+        } else {
+          this.sql.exec("UPDATE rate_limits SET request_count = request_count + 1 WHERE rate_key = ?", rateKey);
+        }
+        await this.scheduleRateCleanup(nowMs);
       }
-      if (!rate || nowMs - rate.window_started_at >= RATE_WINDOW_MS) {
-        this.sql.exec("INSERT OR REPLACE INTO rate_limits (rate_key, window_started_at, request_count) VALUES (?, ?, 1)", rateKey, nowMs);
-      } else {
-        this.sql.exec("UPDATE rate_limits SET request_count = request_count + 1 WHERE rate_key = ?", rateKey);
-      }
-      await this.scheduleRateCleanup(nowMs);
 
       const id = crypto.randomUUID();
       const submittedAt = new Date().toISOString();

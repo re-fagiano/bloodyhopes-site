@@ -25,6 +25,18 @@ function Submit-Voice {
 
 $page = Invoke-WebRequest "$BaseUrl/campfire.html" -UseBasicParsing
 if (-not $page.Headers['Content-Security-Policy']) { throw 'Missing Content-Security-Policy header' }
+if ($page.Headers['Link'] -notmatch 'mcp-server.json') { throw 'Missing MCP discovery Link header' }
+$mcpManifest = Invoke-RestMethod "$BaseUrl/mcp-server.json"
+if ($mcpManifest.remotes[0].type -ne 'streamable-http') { throw 'MCP manifest is incomplete' }
+$discoverBody = @{ jsonrpc = '2.0'; id = 1; method = 'server/discover'; params = @{ _meta = @{ 'io.modelcontextprotocol/protocolVersion' = '2026-07-28' } } } | ConvertTo-Json -Depth 6
+$discover = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'server/discover' } -Body $discoverBody
+if ($discover.result.supportedVersions -notcontains '2026-07-28') { throw 'MCP discovery did not negotiate the current protocol' }
+$toolsBody = @{ jsonrpc = '2.0'; id = 2; method = 'tools/list'; params = @{} } | ConvertTo-Json -Depth 5
+$tools = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'tools/list' } -Body $toolsBody
+if (@($tools.result.tools).Count -ne 5 -or 'submit_voice' -notin $tools.result.tools.name) { throw 'MCP tool list is incomplete' }
+$readBody = @{ jsonrpc = '2.0'; id = 3; method = 'tools/call'; params = @{ name = 'read_song'; arguments = @{ song = 'the-elephant' } } } | ConvertTo-Json -Depth 6
+$readSong = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'tools/call'; 'Mcp-Name' = 'read_song' } -Body $readBody
+if ($readSong.result.structuredContent.lyrics -notmatch 'You must see the elephant') { throw 'MCP read_song did not return complete lyrics' }
 $agentsPage = Invoke-WebRequest "$BaseUrl/agents.html" -UseBasicParsing
 if ($agentsPage.StatusCode -ne 200) { throw "Agents page returned $($agentsPage.StatusCode)" }
 $adminPage = Invoke-WebRequest "$BaseUrl/campfire-admin.html" -UseBasicParsing
@@ -100,6 +112,8 @@ if ($accepted.status -ne 'pending' -or $accepted.schema_version -ne '1.1') { thr
 
 $wrongTokenStatus = Get-Status { Invoke-WebRequest "$BaseUrl/api/campfire/moderate" -Headers @{ Authorization = 'Bearer wrong-token' } -UseBasicParsing }
 if ($wrongTokenStatus -ne 401) { throw "Wrong admin token returned $wrongTokenStatus" }
+$wrongHouseTokenStatus = Get-Status { Invoke-WebRequest "$BaseUrl/api/campfire/house-critic" -Method Post -Headers @{ Authorization = 'Bearer wrong-token' } -ContentType 'application/json' -Body '{}' -UseBasicParsing }
+if ($wrongHouseTokenStatus -ne 401) { throw "Wrong house-critic token returned $wrongHouseTokenStatus" }
 
 $pending = Invoke-RestMethod "$BaseUrl/api/campfire/moderate" -Headers $adminHeaders
 if ($accepted.id -notin $pending.voices.id) { throw 'Pending Voice not visible to moderator' }
@@ -173,6 +187,8 @@ if ($rateStatus -ne 429) { throw "Rate limit returned $rateStatus" }
   Page = $page.StatusCode
   AgentsPage = $agentsPage.StatusCode
   AdminPage = $adminPage.StatusCode
+  McpTools = @($tools.result.tools).Count
+  McpReadSong = $readSong.result.structuredContent.song
   CriticalCatalogSongs = @($criticalCatalog.songs).Count
   ArticlesPage = $articlesPage.StatusCode
   PrivateAssets = 'all 404'
@@ -184,6 +200,7 @@ if ($rateStatus -ne 429) { throw "Rate limit returned $rateStatus" }
   MissingQuote = $badQuoteStatus
   InvalidSource = $badSourceStatus
   WrongToken = $wrongTokenStatus
+  WrongHouseToken = $wrongHouseTokenStatus
   ApprovedPublic = $true
   RejectedPrivate = $true
   Duplicate = $duplicateStatus

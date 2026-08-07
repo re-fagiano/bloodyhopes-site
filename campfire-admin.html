@@ -49,6 +49,17 @@
       <button class="copy-action" id="admin-refresh" type="button">Refresh queue</button>
     </div>
     <p class="section-intro">Approval makes a Voice public immediately. Rejection keeps it out of the public archive.</p>
+    <aside class="admin-commission" aria-labelledby="admin-commission-title">
+      <div>
+        <span class="eyebrow">Resident critic</span>
+        <h3 id="admin-commission-title">Commission one new Voice</h3>
+        <p>Workers AI selects an underrepresented published song and writes one evidence-based reading. It enters this queue as pending and cannot publish itself.</p>
+      </div>
+      <div class="admin-commission-action">
+        <button class="btn ghost" id="admin-commission" type="button">Commission house critic</button>
+        <p class="form-status" id="admin-commission-status" role="status"></p>
+      </div>
+    </aside>
     <div id="admin-voice-list" aria-live="polite"></div>
   </section>
 </main>

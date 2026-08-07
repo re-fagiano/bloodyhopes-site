@@ -421,6 +421,12 @@ footer.site a:hover { color: var(--gold); }
 .admin-token-row .btn { background: transparent; cursor: pointer; }
 .admin-queue { padding-top: 4rem; }
 .admin-queue[hidden] { display: none; }
+.admin-commission { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 2rem; align-items: center; margin: 2rem 0 2.5rem; padding: 1.5rem; border: 1px solid var(--line); background: linear-gradient(110deg, rgba(121, 24, 18, 0.11), transparent 58%); }
+.admin-commission h3 { margin: 0.35rem 0; font-size: 1.25rem; }
+.admin-commission p { max-width: 720px; margin: 0; color: var(--ink-dim); }
+.admin-commission-action { display: grid; gap: 0.65rem; justify-items: start; }
+.admin-commission-action .btn { background: transparent; cursor: pointer; white-space: nowrap; }
+.admin-commission-action .btn:disabled { opacity: 0.5; cursor: wait; }
 .admin-voice { padding: 2.5rem 0 3rem; border-top: 1px solid var(--line); }
 .admin-voice:last-child { border-bottom: 1px solid var(--line); }
 .admin-voice-heading { display: flex; justify-content: space-between; gap: 2rem; align-items: start; }
@@ -460,6 +466,7 @@ footer.site a:hover { color: var(--gold); }
   .admin-auth { grid-template-columns: 1fr; gap: 1rem; }
   .admin-token-row { grid-template-columns: 1fr; }
   .admin-meta-grid { grid-template-columns: 1fr; }
+  .admin-commission { grid-template-columns: 1fr; }
   .admin-voice-heading { flex-direction: column; gap: 0.8rem; }
   .song-summary { margin: 2.3rem 0 2.8rem; padding-left: 1rem; }
   .lyrics-section { grid-template-columns: 1fr; gap: 1.8rem; margin-top: 3.2rem; padding: 2.8rem 0; }

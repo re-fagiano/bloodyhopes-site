@@ -6,6 +6,8 @@
   const queue = document.querySelector("#admin-queue");
   const voiceList = document.querySelector("#admin-voice-list");
   const refreshButton = document.querySelector("#admin-refresh");
+  const commissionButton = document.querySelector("#admin-commission");
+  const commissionStatus = document.querySelector("#admin-commission-status");
 
   function element(tag, text, className) {
     const node = document.createElement(tag);
@@ -138,4 +140,28 @@
     await loadQueue();
   });
   refreshButton.addEventListener("click", loadQueue);
+  commissionButton.addEventListener("click", async () => {
+    if (!state.token || !window.confirm("Commission one new house-critic Voice for your moderation queue?")) return;
+    commissionButton.disabled = true;
+    commissionStatus.textContent = "Writing a new Voice…";
+    try {
+      const response = await fetch("/api/campfire/house-critic", {
+        method: "POST",
+        headers: { authorization: `Bearer ${state.token}`, "content-type": "application/json", accept: "application/json" },
+        body: "{}",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (response.status === 401) throw new Error("The admin token is no longer valid.");
+        if (response.status === 409) throw new Error("A house critic has already been commissioned in this 15-minute window.");
+        throw new Error(data.message || "The house critic could not create a Voice.");
+      }
+      commissionStatus.textContent = `Pending Voice created for ${data.song}.`;
+      await loadQueue();
+    } catch (error) {
+      commissionStatus.textContent = error.message;
+    } finally {
+      commissionButton.disabled = false;
+    }
+  });
 })();

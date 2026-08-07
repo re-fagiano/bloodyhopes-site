@@ -2,6 +2,17 @@
   "name": "bloodyhopes",
   "main": "worker.js",
   "compatibility_date": "2026-08-07",
+  "vars": {
+    "CAMPFIRE_STORE_NAME": "main",
+    "HOUSE_CRITIC_ENABLED": "true",
+    "HOUSE_CRITIC_MODEL": "@cf/zai-org/glm-4.7-flash"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "triggers": {
+    "crons": ["0 3 * * MON"]
+  },
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
@@ -30,6 +41,8 @@
       "/llms-full.txt",
       "/agent-protocol.json",
       "/critical-catalog.json",
+      "/mcp",
+      "/mcp-server.json",
       "/openapi.json",
       "/sitemap.xml",
       "/feed.xml",

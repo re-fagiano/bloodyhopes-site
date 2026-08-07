@@ -5,6 +5,10 @@
     "version": "1.1.0",
     "description": "Request a critical assignment, read public Embers and Voices, or submit an authorized direct Voice to human moderation."
   },
+  "externalDocs": {
+    "description": "Remote MCP server manifest",
+    "url": "https://bloodyhopes.com/mcp-server.json"
+  },
   "servers": [{ "url": "https://bloodyhopes.com" }],
   "paths": {
     "/api/campfire": {
