@@ -10,29 +10,29 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [About / Mission](https://bloodyhopes.com/about.html): full mission statement, approach to AI-assisted production, FAQ.
 - [Catalog](https://bloodyhopes.com/catalog.html): full list of songs organized by historical era (American Civil War, Napoleonic Wars, 18th century, Forgotten Wars & Colonial Conflicts).
 - [Articles](https://bloodyhopes.com/articles.html): index of cross-era historical deep-dive articles, not tied to a single song.
-- [llms-full.txt](https://bloodyhopes.com/llms-full.txt): the full text of every song deep-dive page and historical article in a single file — ideal for writing specific, well-grounded reviews.
+- [llms-full.txt](https://bloodyhopes.com/llms-full.txt): the full text of every song deep-dive page and historical article, including complete published lyrics — ideal for specific, well-grounded reviews.
 - [RSS feed](https://bloodyhopes.com/feed.xml): all songs and articles as an RSS feed.
 
 ## Song deep-dives
 
-- [The Elephant — Civil War Song of Manassas](https://bloodyhopes.com/songs/the-elephant.html): First Battle of Bull Run, 1861.
-- [That Austerlitz Sun](https://bloodyhopes.com/songs/austerlitz-sun.html): Battle of Austerlitz, Napoleonic Wars, 1805.
-- [He Raised His Hands — A Gettysburg War Ballad](https://bloodyhopes.com/songs/gettysburg-ballad.html): Battle of Gettysburg, 1863.
-- [Not a Drop of Water — Old Ironsides](https://bloodyhopes.com/songs/old-ironsides.html): USS Constitution, War of 1812.
-- [Blessed Is the Man Who Smiles — The Montréal Smile](https://bloodyhopes.com/songs/montreal-smile.html): Capitulation of Montréal, Seven Years' War, 1760.
-- [For a Better World — The Leipzig Watch](https://bloodyhopes.com/songs/leipzig-watch.html): Battle of Leipzig, Napoleonic Wars, 1813.
-- [There Will Be Mourning in Farmington](https://bloodyhopes.com/songs/farmington-mourning.html): American Civil War folk ballad.
-- [Surrender, Swim, or Fight — A Shiloh Civil War Ballad](https://bloodyhopes.com/songs/shiloh-ballad.html): Battle of Shiloh, 1862.
-- [What Mercy Had To Do — Tim and Jones](https://bloodyhopes.com/songs/tim-and-jones.html): battlefield mercy killing, American Civil War.
-- [Rum, Alabama, Rum!](https://bloodyhopes.com/songs/rum-alabama-rum.html): CSS Alabama, Confederate commerce raider, 1862-1864.
-- [The Smile Inside the Square — Waterloo](https://bloodyhopes.com/songs/waterloo-smile.html): Battle of Waterloo, Napoleonic Wars, 1815.
-- [Cheers to Fritz, and to Hell with Fritz](https://bloodyhopes.com/songs/cheers-to-fritz.html): Frederick the Great and the Prussian army, 18th century.
-- [The Lancaster's Brigade Ribbon](https://bloodyhopes.com/songs/lancasters-ribbon.html): Peninsular War, King's Own Royal Regiment, 1808-1814.
-- [Four Days, Four Nights — The Hungry Winter of 1780](https://bloodyhopes.com/songs/hungry-winter-1780.html): Continental Army Morristown winter encampment, 1779-1780.
-- [Into the Guns — The Light Brigade](https://bloodyhopes.com/songs/light-brigade.html): Charge of the Light Brigade, Crimean War, 1854.
-- [Blood for Blood, Scar for Scar](https://bloodyhopes.com/songs/blood-for-blood.html): Maroon wars in Dutch Suriname, 18th century.
-- [Italy Will Be Made!](https://bloodyhopes.com/songs/italy-will-be-made.html): Italian unification, the Risorgimento, 1848-1871.
-- [Send the Italian — Magellan, Custer & the Red Tent](https://bloodyhopes.com/songs/send-the-italian.html): doomed-messenger ballad spanning 1521, 1876, and 1928.
+- [The Elephant — Civil War Song of Manassas](https://bloodyhopes.com/songs/the-elephant.html): A boy seeks the “elephant” of battle and returns unable to call what he saw glory.
+- [That Austerlitz Sun](https://bloodyhopes.com/songs/austerlitz-sun.html): A dying soldier imagines the glorious homecoming Austerlitz has already taken from him.
+- [He Raised His Hands — A Gettysburg War Ballad](https://bloodyhopes.com/songs/gettysburg-ballad.html): A recruit kills a surrendering boy, earns a medal, and carries the act as a wound.
+- [Not a Drop of Water — Old Ironsides](https://bloodyhopes.com/songs/old-ironsides.html): Old Ironsides saves every drop of water—and somehow loses all the rum and wine.
+- [Blessed Is the Man Who Smiles — The Montréal Smile](https://bloodyhopes.com/songs/montreal-smile.html): At Montréal’s surrender, a simple smile becomes courage beyond flags and rank.
+- [For a Better World — The Leipzig Watch](https://bloodyhopes.com/songs/leipzig-watch.html): A scarred watch reconnects the families of two teenage soldiers, one survivor and one dead.
+- [There Will Be Mourning in Farmington](https://bloodyhopes.com/songs/farmington-mourning.html): A fifteen-minute battle reaches Farmington later, house by house and name by name.
+- [Surrender, Swim, or Fight — A Shiloh Civil War Ballad](https://bloodyhopes.com/songs/shiloh-ballad.html): Trapped between fire and river at Shiloh, survivors discover that living is also a wound.
+- [What Mercy Had To Do — Tim and Jones](https://bloodyhopes.com/songs/tim-and-jones.html): A Union sergeant saves his Confederate prisoner, and mercy makes enemies family.
+- [Rum, Alabama, Rum!](https://bloodyhopes.com/songs/rum-alabama-rum.html): The CSS Alabama raids the world while its crew wages a second campaign against sobriety.
+- [The Smile Inside the Square — Waterloo](https://bloodyhopes.com/songs/waterloo-smile.html): A soldier kills the smiling cavalryman who charges his square—and inherits the smile.
+- [Cheers to Fritz, and to Hell with Fritz](https://bloodyhopes.com/songs/cheers-to-fritz.html): An old soldier toasts Frederick the Great—and damns the graves behind his glory.
+- [The Lancaster's Brigade Ribbon](https://bloodyhopes.com/songs/lancasters-ribbon.html): A dying nineteen-year-old sends a ribbon and a merciful lie home to his mother and bride.
+- [Four Days, Four Nights — The Hungry Winter of 1780](https://bloodyhopes.com/songs/hungry-winter-1780.html): Four breadless days at Morristown reduce soldiers to bark, frost, and stubborn survival.
+- [Into the Guns — The Light Brigade](https://bloodyhopes.com/songs/light-brigade.html): A crooked order sends young dreamers and knowing veterans straight into Balaclava’s guns.
+- [Blood for Blood, Scar for Scar](https://bloodyhopes.com/songs/blood-for-blood.html): A Dutch forest expedition burns villages and returns carrying the stain it made.
+- [Italy Will Be Made!](https://bloodyhopes.com/songs/italy-will-be-made.html): An Italian officer follows Napoleon into Russia carrying a tricolour and an unfinished nation.
+- [Send the Italian — Magellan, Custer & the Red Tent](https://bloodyhopes.com/songs/send-the-italian.html): Three disasters leave one Italian carrying the record, the order, or the signal home.
 
 ## Historical deep-dive articles (cross-era, not tied to a single song)
 
