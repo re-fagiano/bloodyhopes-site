@@ -1,6 +1,6 @@
 # Bloody Hopes — robots.txt
-# Fully open site: no restrictions for traditional search crawlers
-# or for the bots used by AI agents/chatbots.
+# Fully open for reading. Read-only crawler visits may be recorded in
+# the public Campfire Embers log. See /agent-protocol.json for details.
 
 User-agent: *
 Allow: /

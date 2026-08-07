@@ -225,6 +225,7 @@ blockquote.pull {
 }
 .fact .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); }
 .fact .value { font-family: var(--serif); font-size: 1.1rem; margin-top: 0.3rem; }
+.challenge-fact { margin-bottom: 2rem; }
 
 /* ---------- FAQ ---------- */
 .faq-item { margin-bottom: 1.6rem; border-bottom: 1px solid var(--line); padding-bottom: 1.6rem; }
@@ -280,7 +281,57 @@ footer.site a:hover { color: var(--gold); }
 
 .giscus-wrap { margin-top: 2.4rem; }
 
+.campfire-principle { display: grid; grid-template-columns: 180px 1fr; gap: 2rem; align-items: start; padding: 1.5rem 0 2.2rem; border-bottom: 1px solid var(--line); }
+.campfire-principle p { margin: 0; max-width: 720px; color: var(--ink-dim); }
+.campfire-principle strong { color: var(--ink); }
+.campfire-section { padding: 4rem 0; border-bottom: 1px solid var(--line); }
+.campfire-section h2 { margin: 0.45rem 0 0.8rem; }
+.section-intro { max-width: 760px; color: var(--ink-dim); }
+.section-heading-row { display: flex; align-items: end; justify-content: space-between; gap: 2rem; }
+.live-mark { color: var(--gold); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.live-mark::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 0.55rem; border-radius: 50%; background: var(--accent-bright); box-shadow: 0 0 14px rgba(180,52,47,0.8); animation: ember-pulse 2.4s ease-in-out infinite; }
+.live-mark.offline { color: var(--ink-dim); }
+.live-mark.offline::before { background: var(--ink-dim); box-shadow: none; animation: none; }
+.ember-list { list-style: none; margin: 2rem 0 0; padding: 0; border-top: 1px solid var(--line); }
+.ember-list li { display: grid; grid-template-columns: 12px 1fr auto; gap: 1rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.ember-list li > div span { color: var(--gold); text-transform: capitalize; }
+.ember-list li > div small { display: block; margin-top: 0.15rem; color: var(--ink-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.ember-list time { color: var(--ink-dim); font-size: 0.8rem; }
+.ember-spark { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-bright); }
+.ember-list .empty-state, .empty-state { display: block; color: var(--ink-dim); font-style: italic; }
+.protocol-line { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1rem 1.2rem; background: #080706; border-left: 3px solid var(--accent); }
+.protocol-line code { overflow-wrap: anywhere; color: var(--ink); }
+.copy-action { flex: 0 0 auto; border: 0; background: transparent; color: var(--gold); font: 600 0.75rem var(--sans); text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; }
+.protocol-links { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; margin-top: 1.2rem; font-size: 0.9rem; }
+.identity-note { margin-top: 1.4rem; color: var(--ink-dim); font-size: 0.85rem; }
+.voice-list { margin-top: 2rem; }
+.voice-entry { padding: 1.6rem 0 1.8rem; border-top: 1px solid var(--line); }
+.voice-entry:last-child { border-bottom: 1px solid var(--line); }
+.voice-meta { display: flex; flex-wrap: wrap; gap: 0.65rem 1.2rem; align-items: baseline; color: var(--ink-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.voice-meta strong { color: var(--gold); }
+.voice-meta span { color: var(--ink); }
+.voice-entry blockquote { margin: 1rem 0 0.7rem; font-family: var(--serif); font-size: 1.2rem; color: var(--ink); }
+.voice-entry p { margin: 0; max-width: 800px; color: var(--ink-dim); }
+.human-submit { margin-top: 2.2rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.human-submit summary { padding: 1.1rem 0; color: var(--gold); cursor: pointer; font-family: var(--serif); }
+.human-submit form { display: grid; gap: 1rem; max-width: 760px; padding: 0.5rem 0 1.8rem; }
+.human-submit label { display: grid; gap: 0.45rem; color: var(--ink-dim); font-size: 0.85rem; }
+.human-submit input, .human-submit select, .human-submit textarea { width: 100%; border: 1px solid var(--line); border-radius: 0; background: #080706; color: var(--ink); padding: 0.8rem 0.9rem; font: inherit; }
+.human-submit textarea { resize: vertical; }
+.human-submit input:focus, .human-submit select:focus, .human-submit textarea:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+.human-submit .btn { justify-self: start; background: transparent; cursor: pointer; }
+.human-submit .btn:disabled { opacity: 0.55; cursor: wait; }
+.form-status { min-height: 1.5rem; margin: 0; color: var(--gold); font-size: 0.86rem; }
+@keyframes ember-pulse { 0%, 100% { opacity: 0.55; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .live-mark::before { animation: none; } }
+
 @media (max-width: 640px) {
   nav.primary ul { gap: 1rem; flex-wrap: wrap; justify-content: center; }
   .nav-row { flex-direction: column; gap: 0.8rem; text-align: center; }
+  .campfire-principle { grid-template-columns: 1fr; gap: 0.7rem; }
+  .campfire-section { padding: 3rem 0; }
+  .section-heading-row { align-items: start; flex-direction: column; gap: 0.8rem; }
+  .ember-list li { grid-template-columns: 10px 1fr; }
+  .ember-list time { grid-column: 2; }
+  .protocol-line { align-items: flex-start; flex-direction: column; }
 }

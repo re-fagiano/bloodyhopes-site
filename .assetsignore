@@ -1,9 +1,16 @@
 .git
+.gitignore
 .github
+.wrangler
 .assetsignore
 wrangler.jsonc
+wrangler.*.jsonc
 wrangler.toml
 package.json
 package-lock.json
 node_modules
 README.md
+security_best_practices_report.md
+worker.js
+tests
+scripts
