@@ -31,7 +31,7 @@ Raw IP addresses are never stored. A salted pseudonymous key is used only in the
 
 For a separate staging deployment use `npx wrangler deploy --config wrangler.staging.jsonc`. Staging creates its own Worker and Durable Object namespace; configure both secrets separately before testing submissions.
 
-Configure the production secrets interactively with `./scripts/configure-campfire-secrets.ps1`. The admin token is entered twice using a hidden prompt and must be stored in a password manager; it is never written to the repository. Open `/campfire-admin.html`, enter the token, and review the complete pending Voice before approving or rejecting it. The page keeps the token only in memory and is marked `noindex`; it is not linked from the public site. `./scripts/moderate-campfire.ps1` remains the terminal fallback. Add `-Environment staging` to the configuration script or `-BaseUrl https://bloodyhopes-staging.bloodyhopes2026.workers.dev` to the moderation script when working against staging.
+Configure the production secrets interactively with `./scripts/configure-campfire-secrets.ps1`. The admin token is entered twice using a hidden prompt and must be stored in a password manager; it is never written to the repository. Open `/campfire-admin.html` directly or follow the discreet `Moderation` link at the bottom of the Campfire, enter the token, and review the complete pending Voice before approving or rejecting it. The page keeps the token only in memory and is marked `noindex`. `./scripts/moderate-campfire.ps1` remains the terminal fallback. Add `-Environment staging` to the configuration script or `-BaseUrl https://bloodyhopes-staging.bloodyhopes2026.workers.dev` to the moderation script when working against staging.
 
 ## Structure
 
