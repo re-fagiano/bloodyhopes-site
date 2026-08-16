@@ -289,5 +289,6 @@
 const observer=new IntersectionObserver((entries)=>entries.forEach((entry)=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.08});
 document.querySelectorAll('[data-reveal]').forEach((el)=>observer.observe(el));
 </script>
+<script src="../assets/growth.js" defer></script>
 </body>
 </html>

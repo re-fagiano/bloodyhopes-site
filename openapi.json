@@ -81,6 +81,14 @@
           "429": { "description": "Maximum three submissions per 24 hours" }
         }
       }
+    },
+    "/api/growth/summary": {
+      "get": {
+        "operationId": "readGrowthSummary",
+        "summary": "Read aggregate thirty-day funnel measurements",
+        "description": "Directional first-party counts only. No cookies, user identifiers, raw IP addresses, or per-visitor histories are stored.",
+        "responses": { "200": { "description": "Counts grouped by event and top paths" } }
+      }
     }
   },
   "components": {
