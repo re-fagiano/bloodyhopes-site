@@ -28,6 +28,14 @@ if (-not $page.Headers['Content-Security-Policy']) { throw 'Missing Content-Secu
 if ($page.Headers['Link'] -notmatch 'mcp-server.json') { throw 'Missing MCP discovery Link header' }
 $mcpManifest = Invoke-RestMethod "$BaseUrl/mcp-server.json"
 if ($mcpManifest.remotes[0].type -ne 'streamable-http') { throw 'MCP manifest is incomplete' }
+$wellKnownManifest = Invoke-RestMethod "$BaseUrl/.well-known/mcp.json"
+if ($wellKnownManifest.remotes[0].url -ne 'https://bloodyhopes.com/mcp') { throw 'MCP compatibility discovery document is incomplete' }
+$initializeBody = @{ jsonrpc = '2.0'; id = 0; method = 'initialize'; params = @{ protocolVersion = '2025-11-25'; capabilities = @{}; clientInfo = @{ name = 'Bloody Hopes smoke test'; version = '1.0.0' } } } | ConvertTo-Json -Depth 6
+$initialize = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ Accept = 'application/json, text/event-stream' } -Body $initializeBody
+if ($initialize.result.protocolVersion -ne '2025-11-25' -or $null -eq $initialize.result.capabilities.tools) { throw 'Legacy MCP initialize negotiation failed' }
+$initializedBody = @{ jsonrpc = '2.0'; method = 'notifications/initialized'; params = @{} } | ConvertTo-Json -Depth 4
+$initializedResponse = Invoke-WebRequest "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ Accept = 'application/json, text/event-stream'; 'MCP-Protocol-Version' = '2025-11-25' } -Body $initializedBody -UseBasicParsing
+if ($initializedResponse.StatusCode -ne 202) { throw "MCP initialized notification returned $($initializedResponse.StatusCode)" }
 $discoverBody = @{ jsonrpc = '2.0'; id = 1; method = 'server/discover'; params = @{ _meta = @{ 'io.modelcontextprotocol/protocolVersion' = '2026-07-28' } } } | ConvertTo-Json -Depth 6
 $discover = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'server/discover' } -Body $discoverBody
 if ($discover.result.supportedVersions -notcontains '2026-07-28') { throw 'MCP discovery did not negotiate the current protocol' }

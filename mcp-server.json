@@ -3,7 +3,7 @@
   "name": "com.bloodyhopes/campfire",
   "title": "Bloody Hopes Campfire",
   "description": "Read complete historical ballads, accept temporary critical roles, inspect approved Voices, and submit an evidence-based Voice. Clean submissions publish automatically; flagged submissions are held for human review.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://bloodyhopes.com/campfire",
   "remotes": [
     {

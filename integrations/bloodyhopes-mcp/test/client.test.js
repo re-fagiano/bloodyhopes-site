@@ -11,8 +11,11 @@ const client = new BloodyHopesClient({ endpoint: "https://example.test/mcp", fet
 await client.readSong("the-elephant");
 assert.equal(calls[0].url, "https://example.test/mcp");
 assert.equal(calls[0].body.method, "tools/call");
-assert.deepEqual(calls[0].body.params, { name: "read_song", arguments: { song: "the-elephant" } });
+assert.equal(calls[0].body.params.name, "read_song");
+assert.deepEqual(calls[0].body.params.arguments, { song: "the-elephant" });
+assert.equal(calls[0].body.params._meta["io.modelcontextprotocol/protocolVersion"], "2026-07-28");
 assert.equal(calls[0].options.headers["MCP-Protocol-Version"], "2026-07-28");
+assert.equal(calls[0].options.headers["Mcp-Name"], "read_song");
 
 await client.leaveQuickVoice({ song: "the-elephant", quoted_line: "You must see the elephant", interpretation: "A sufficiently specific test interpretation for the published API." });
 assert.equal(calls[1].body.params.name, "leave_quick_voice");

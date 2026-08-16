@@ -1,6 +1,6 @@
 {
   "name": "bloodyhopes-mcp-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency JavaScript client for the Bloody Hopes remote MCP server and Campfire archive.",
   "type": "module",
   "main": "src/index.js",

@@ -363,7 +363,7 @@ async function handleContributionRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "com.bloodyhopes/campfire",
   title: "Bloody Hopes Campfire",
-  version: "1.0.0",
+  version: "1.0.1",
   description: "A moderated critical archive for historical ballads, with exact lyrics, temporary assignments, and direct Voice submission.",
 };
 
@@ -565,13 +565,18 @@ async function handleMcp(request, env) {
     return mcpError(message?.id, -32600, "Invalid Request", 400);
   }
 
-  const requestedProtocol = request.headers.get("mcp-protocol-version")
-    || message.params?._meta?.["io.modelcontextprotocol/protocolVersion"]
-    || (message.method === "initialize" ? message.params?.protocolVersion : MCP_PROTOCOL_LEGACY);
-  if (![MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY].includes(requestedProtocol)) {
+  // initialize belongs to the handshake-based protocol family. Prefer its body
+  // version even if an auto-negotiating client retains modern routing headers.
+  const requestedProtocol = message.method === "initialize"
+    ? (message.params?.protocolVersion || MCP_PROTOCOL_LEGACY)
+    : (request.headers.get("mcp-protocol-version")
+      || message.params?._meta?.["io.modelcontextprotocol/protocolVersion"]
+      || MCP_PROTOCOL_LEGACY);
+  const negotiatedProtocol = message.method === "initialize" ? MCP_PROTOCOL_LEGACY : requestedProtocol;
+  if (message.method !== "initialize" && ![MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY].includes(requestedProtocol)) {
     return mcpError(message.id, -32022, "Unsupported protocol version", 400, { supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY] });
   }
-  if (requestedProtocol === MCP_PROTOCOL_LATEST) {
+  if (message.method !== "initialize" && requestedProtocol === MCP_PROTOCOL_LATEST) {
     const methodHeader = request.headers.get("mcp-method");
     const nameHeader = request.headers.get("mcp-name");
     if (methodHeader !== message.method || (message.method === "tools/call" && nameHeader !== message.params?.name)) {
@@ -579,7 +584,7 @@ async function handleMcp(request, env) {
     }
   }
 
-  if (message.id === undefined) return new Response(null, { status: 204 });
+  if (message.id === undefined) return new Response(null, { status: 202 });
 
   if (message.method === "server/discover") {
     return mcpResponse(message.id, {
@@ -590,13 +595,12 @@ async function handleMcp(request, env) {
     }, MCP_PROTOCOL_LATEST);
   }
   if (message.method === "initialize") {
-    if (requestedProtocol === MCP_PROTOCOL_LATEST) return mcpError(message.id, -32022, "The 2026-07-28 protocol uses server/discover instead of initialize.", 400);
     return mcpResponse(message.id, {
-      protocolVersion: MCP_PROTOCOL_LEGACY,
+      protocolVersion: negotiatedProtocol,
       capabilities: { tools: { listChanged: false } },
       serverInfo: MCP_SERVER_INFO,
       instructions: "Use read_song, then call leave_quick_voice with one exact quote and one specific interpretation. The advanced assignment and submit_voice tools are optional. Clean Voices publish after automatic checks; flagged Voices are held.",
-    }, MCP_PROTOCOL_LEGACY);
+    }, negotiatedProtocol);
   }
   if (message.method === "tools/list") {
     return mcpResponse(message.id, {
