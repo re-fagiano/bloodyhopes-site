@@ -5,6 +5,7 @@
   const authStatus = document.querySelector("#admin-auth-status");
   const queue = document.querySelector("#admin-queue");
   const voiceList = document.querySelector("#admin-voice-list");
+  const houseRunList = document.querySelector("#admin-house-run-list");
   const refreshButton = document.querySelector("#admin-refresh");
   const commissionButton = document.querySelector("#admin-commission");
   const commissionStatus = document.querySelector("#admin-commission-status");
@@ -35,6 +36,7 @@
     const title = element("div");
     title.append(element("span", voice.critical_role?.replaceAll("-", " ") || "Legacy Voice", "eyebrow"));
     title.append(element("h3", voice.thesis || voice.model));
+    title.append(element("p", voice.status === "approved" ? "Automatically published · awaiting optional human review" : "Held by automatic moderation", "form-status"));
     heading.append(title, element("time", formatDate(voice.submitted_at)));
 
     const metadata = element("div", undefined, "admin-meta-grid");
@@ -78,10 +80,11 @@
     }
 
     const actions = element("div", undefined, "admin-actions");
-    const approve = element("button", "Approve and publish", "btn");
+    const alreadyPublished = voice.status === "approved";
+    const approve = element("button", alreadyPublished ? "Confirm review" : "Approve and publish", "btn");
     approve.type = "button";
     approve.dataset.status = "approved";
-    const reject = element("button", "Reject", "btn ghost");
+    const reject = element("button", alreadyPublished ? "Withdraw" : "Reject", "btn ghost");
     reject.type = "button";
     reject.dataset.status = "rejected";
     const actionStatus = element("p", "", "form-status");
@@ -94,10 +97,10 @@
       const button = event.target.closest("button[data-status]");
       if (!button) return;
       const nextStatus = button.dataset.status;
-      if (nextStatus === "approved" && !window.confirm("Approve and publish this Voice now?")) return;
-      if (nextStatus === "rejected" && !window.confirm("Reject this Voice? It will remain unpublished.")) return;
+      if (nextStatus === "approved" && !window.confirm(alreadyPublished ? "Confirm that you reviewed this published Voice?" : "Approve and publish this Voice now?")) return;
+      if (nextStatus === "rejected" && !window.confirm(alreadyPublished ? "Withdraw this Voice from the public archive?" : "Reject this Voice? It will remain unpublished.")) return;
       for (const action of actions.querySelectorAll("button")) action.disabled = true;
-      actionStatus.textContent = nextStatus === "approved" ? "Publishing…" : "Rejecting…";
+      actionStatus.textContent = nextStatus === "approved" ? (alreadyPublished ? "Confirming…" : "Publishing…") : (alreadyPublished ? "Withdrawing…" : "Rejecting…");
       try {
         const response = await fetch("/api/campfire/moderate", {
           method: "POST",
@@ -106,12 +109,32 @@
         });
         if (!response.ok) throw new Error(response.status === 401 ? "The admin token is no longer valid." : "Moderation failed.");
         article.remove();
-        if (!voiceList.children.length) voiceList.append(element("p", "No Voices are waiting for moderation.", "empty-state"));
+        if (!voiceList.children.length) voiceList.append(element("p", "No Voices need review.", "empty-state"));
       } catch (error) {
         actionStatus.textContent = error.message;
         for (const action of actions.querySelectorAll("button")) action.disabled = false;
       }
     });
+    return article;
+  }
+
+  function renderHouseRun(run) {
+    const article = element("article", undefined, "admin-voice admin-house-run");
+    const heading = element("div", undefined, "admin-voice-heading");
+    const title = element("div");
+    title.append(element("span", run.source || "unknown source", "eyebrow"));
+    title.append(element("h3", run.status || "unknown status"));
+    const timing = element("time", formatDate(run.completed_at || run.started_at));
+    heading.append(title, timing);
+    const metadata = element("div", undefined, "admin-meta-grid");
+    metadata.append(
+      field("Song", run.song),
+      field("Voice", run.voice_id),
+      field("Started", formatDate(run.started_at)),
+      field("Completed", formatDate(run.completed_at)),
+    );
+    article.append(heading, metadata);
+    if (run.error) article.append(field("Error", run.error, "admin-long-field"));
     return article;
   }
 
@@ -121,11 +144,14 @@
       const response = await fetch("/api/campfire/moderate", { headers: { authorization: `Bearer ${state.token}`, accept: "application/json" } });
       if (!response.ok) throw new Error(response.status === 401 ? "Incorrect admin token." : "The moderation queue is unavailable.");
       const data = await response.json();
+      houseRunList.replaceChildren(...(data.house_runs?.length
+        ? data.house_runs.map(renderHouseRun)
+        : [element("p", "No resident-critic runs recorded yet.", "empty-state")]));
       voiceList.replaceChildren(...(data.voices?.length
         ? data.voices.map(renderVoice)
-        : [element("p", "No Voices are waiting for moderation.", "empty-state")]));
+        : [element("p", "No Voices need review.", "empty-state")]));
       queue.hidden = false;
-      authStatus.textContent = `${data.voices?.length || 0} pending Voice${data.voices?.length === 1 ? "" : "s"}.`;
+      authStatus.textContent = `${data.voices?.length || 0} Voice${data.voices?.length === 1 ? "" : "s"} awaiting review.`;
     } catch (error) {
       state.token = "";
       queue.hidden = true;
@@ -135,13 +161,13 @@
 
   authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    state.token = tokenInput.value;
+    state.token = tokenInput.value.trim();
     tokenInput.value = "";
     await loadQueue();
   });
   refreshButton.addEventListener("click", loadQueue);
   commissionButton.addEventListener("click", async () => {
-    if (!state.token || !window.confirm("Commission one new house-critic Voice for your moderation queue?")) return;
+    if (!state.token || !window.confirm("Commission and automatically moderate one new house-critic Voice?")) return;
     commissionButton.disabled = true;
     commissionStatus.textContent = "Writing a new Voice…";
     try {
@@ -156,7 +182,9 @@
         if (response.status === 409) throw new Error("A house critic has already been commissioned in this 15-minute window.");
         throw new Error(data.message || "The house critic could not create a Voice.");
       }
-      commissionStatus.textContent = `Pending Voice created for ${data.song}.`;
+      commissionStatus.textContent = data.status === "approved"
+        ? `Voice created and automatically published for ${data.song}.`
+        : `Voice created and held for review for ${data.song}.`;
       await loadQueue();
     } catch (error) {
       commissionStatus.textContent = error.message;
