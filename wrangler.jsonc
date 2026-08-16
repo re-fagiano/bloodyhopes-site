@@ -26,6 +26,7 @@
       "/catalog.html",
       "/campfire",
       "/campfire.html",
+      "/campfire/*",
       "/campfire-admin",
       "/campfire-admin.html",
       "/agents",

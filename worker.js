@@ -56,6 +56,7 @@ const SONG_SLUGS = new Set([
   "the-elephant", "tim-and-jones", "waterloo-smile",
 ]);
 const SONG_VERSION = "2026-08-07.1";
+const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit"]);
 const SONG_TITLES = {
   "austerlitz-sun": "That Austerlitz Sun",
   "blood-for-blood": "Blood for Blood, Scar for Scar",
@@ -801,7 +802,8 @@ export default {
       let canonicalPath = null;
       if (url.pathname === "/index.html") {
         canonicalPath = "/";
-      } else if (/^\/(?:about|catalog|campfire|agents|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)) {
+      } else if (/^\/(?:about|catalog|campfire|agents|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
+        || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
       } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
         canonicalPath = url.pathname.slice(0, -5);
@@ -813,6 +815,33 @@ export default {
     }
 
     if (url.pathname === "/mcp") return handleMcp(request, env);
+
+    if (url.pathname === "/api/growth/summary") {
+      if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+      return storeStub(env).fetch(new Request("https://store/growth-summary"));
+    }
+
+    if (url.pathname === "/api/growth/event") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const fetchSite = request.headers.get("sec-fetch-site") || "";
+      if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "same-site") return json({ error: "forbidden" }, 403);
+      let body;
+      try {
+        const rawBody = await request.text();
+        if (rawBody.length > 512) return json({ error: "payload_too_large" }, 413);
+        body = JSON.parse(rawBody);
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      const event = cleanText(body.event, 40);
+      const path = cleanText(body.path, 160);
+      if (!GROWTH_EVENTS.has(event) || !/^\/[a-z0-9\-/]*$/.test(path)) return json({ error: "validation" }, 400);
+      return storeStub(env).fetch(new Request("https://store/growth-event", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ event, path }),
+      }));
+    }
 
     if (url.pathname === "/api/campfire/house-critic") {
       if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
@@ -1008,6 +1037,13 @@ export class CampfireStore extends DurableObject {
         consented_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS growth_metrics (
+        day TEXT NOT NULL,
+        event TEXT NOT NULL,
+        path TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(day, event, path)
+      );
     `);
     const columns = new Set([...this.sql.exec("PRAGMA table_info(voices)")].map((column) => column.name));
     const migrations = [
@@ -1089,6 +1125,35 @@ export class CampfireStore extends DurableObject {
         },
         embers,
         voices,
+      });
+    }
+
+    if (url.pathname === "/growth-event" && request.method === "POST") {
+      const body = await request.json();
+      const day = new Date().toISOString().slice(0, 10);
+      this.sql.exec(`
+        INSERT INTO growth_metrics (day, event, path, count) VALUES (?, ?, ?, 1)
+        ON CONFLICT(day, event, path) DO UPDATE SET count = count + 1
+      `, day, body.event, body.path);
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.pathname === "/growth-summary" && request.method === "GET") {
+      const since = new Date(Date.now() - 29 * 86_400_000).toISOString().slice(0, 10);
+      const byEvent = [...this.sql.exec(`
+        SELECT event, SUM(count) AS count FROM growth_metrics
+        WHERE day >= ? GROUP BY event ORDER BY count DESC
+      `, since)];
+      const topPaths = [...this.sql.exec(`
+        SELECT path, event, SUM(count) AS count FROM growth_metrics
+        WHERE day >= ? GROUP BY path, event ORDER BY count DESC LIMIT 40
+      `, since)];
+      return json({
+        period_days: 30,
+        privacy: "Aggregate counts only; no cookies, user identifiers, raw IP addresses, or per-visitor histories are stored.",
+        quality_notice: "Directional first-party measurements; automated traffic and client blocking may affect totals.",
+        by_event: byEvent,
+        top_paths: topPaths,
       });
     }
 

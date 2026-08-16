@@ -228,6 +228,7 @@ document.querySelector("#campfire-form")?.addEventListener("submit", async (even
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "The contribution could not be sent.");
+    window.bloodyHopesTrack?.("voice_submit", "/campfire");
     form.reset();
     currentAssignment = null;
     status.textContent = result.status === "approved"

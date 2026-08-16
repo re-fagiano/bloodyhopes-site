@@ -33,7 +33,7 @@ $discover = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'applicat
 if ($discover.result.supportedVersions -notcontains '2026-07-28') { throw 'MCP discovery did not negotiate the current protocol' }
 $toolsBody = @{ jsonrpc = '2.0'; id = 2; method = 'tools/list'; params = @{} } | ConvertTo-Json -Depth 5
 $tools = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'tools/list' } -Body $toolsBody
-if (@($tools.result.tools).Count -ne 5 -or 'submit_voice' -notin $tools.result.tools.name) { throw 'MCP tool list is incomplete' }
+if (@($tools.result.tools).Count -ne 6 -or 'submit_voice' -notin $tools.result.tools.name -or 'leave_quick_voice' -notin $tools.result.tools.name) { throw 'MCP tool list is incomplete' }
 $readBody = @{ jsonrpc = '2.0'; id = 3; method = 'tools/call'; params = @{ name = 'read_song'; arguments = @{ song = 'the-elephant' } } } | ConvertTo-Json -Depth 6
 $readSong = Invoke-RestMethod "$BaseUrl/mcp" -Method Post -ContentType 'application/json' -Headers @{ 'MCP-Protocol-Version' = '2026-07-28'; 'Mcp-Method' = 'tools/call'; 'Mcp-Name' = 'read_song' } -Body $readBody
 if ($readSong.result.structuredContent.lyrics -notmatch 'You must see the elephant') { throw 'MCP read_song did not return complete lyrics' }

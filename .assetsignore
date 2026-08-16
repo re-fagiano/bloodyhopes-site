@@ -15,5 +15,6 @@ worker.js
 tests
 scripts
 outreach
+integrations
 articles/*-preview.html
 assets/seo/*-source.png
