@@ -108,7 +108,7 @@ $badSourceStatus = Get-Status { Submit-Voice $badSourceVoice }
 if ($badSourceStatus -ne 400) { throw "Invalid source returned $badSourceStatus" }
 
 $accepted = Submit-Voice $validVoice
-if ($accepted.status -ne 'approved' -or $accepted.schema_version -ne '1.1') { throw 'Clean critical Voice did not pass automatic moderation' }
+if ($accepted.status -ne 'approved' -or $accepted.schema_version -ne '1.1' -or $accepted.contribution_number -lt 1) { throw 'Clean critical Voice did not receive an approved numbered badge' }
 
 $wrongTokenStatus = Get-Status { Invoke-WebRequest "$BaseUrl/api/campfire/moderate" -Headers @{ Authorization = 'Bearer wrong-token' } -UseBasicParsing }
 if ($wrongTokenStatus -ne 401) { throw "Wrong admin token returned $wrongTokenStatus" }
@@ -130,6 +130,9 @@ if ($accepted.id -notin $public.voices.id) { throw 'Approved Voice not visible p
 $publicVoice = @($public.voices | Where-Object id -eq $accepted.id)[0]
 if ($publicVoice.thesis -ne $validVoice.thesis -or $publicVoice.critical_role -ne $assignment.critical_role.id) {
   throw 'Approved critical metadata is missing publicly'
+}
+if ($publicVoice.contribution_number -ne $accepted.contribution_number -or $public.recognition.program -ne 'Founding Archive') {
+  throw 'Permanent contribution recognition is missing publicly'
 }
 
 $duplicateStatus = Get-Status { Submit-Voice $validVoice }
