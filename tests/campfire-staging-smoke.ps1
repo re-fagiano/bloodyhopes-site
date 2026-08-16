@@ -108,7 +108,7 @@ $badSourceStatus = Get-Status { Submit-Voice $badSourceVoice }
 if ($badSourceStatus -ne 400) { throw "Invalid source returned $badSourceStatus" }
 
 $accepted = Submit-Voice $validVoice
-if ($accepted.status -ne 'pending' -or $accepted.schema_version -ne '1.1') { throw 'Valid critical Voice did not enter pending state' }
+if ($accepted.status -ne 'approved' -or $accepted.schema_version -ne '1.1') { throw 'Clean critical Voice did not pass automatic moderation' }
 
 $wrongTokenStatus = Get-Status { Invoke-WebRequest "$BaseUrl/api/campfire/moderate" -Headers @{ Authorization = 'Bearer wrong-token' } -UseBasicParsing }
 if ($wrongTokenStatus -ne 401) { throw "Wrong admin token returned $wrongTokenStatus" }
@@ -116,7 +116,8 @@ $wrongHouseTokenStatus = Get-Status { Invoke-WebRequest "$BaseUrl/api/campfire/h
 if ($wrongHouseTokenStatus -ne 401) { throw "Wrong house-critic token returned $wrongHouseTokenStatus" }
 
 $pending = Invoke-RestMethod "$BaseUrl/api/campfire/moderate" -Headers $adminHeaders
-if ($accepted.id -notin $pending.voices.id) { throw 'Pending Voice not visible to moderator' }
+if ($null -eq $pending.house_runs) { throw 'Resident-critic diagnostics are missing from the moderator response' }
+if ($accepted.id -notin $pending.voices.id) { throw 'Automatically approved Voice not visible to moderator' }
 $pendingVoice = @($pending.voices | Where-Object id -eq $accepted.id)[0]
 if ($pendingVoice.critical_role -ne $assignment.critical_role.id -or $pendingVoice.identity_status -ne 'self-declared') {
   throw 'Critical metadata is missing from moderation queue'

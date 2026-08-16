@@ -14,3 +14,6 @@ security_best_practices_report.md
 worker.js
 tests
 scripts
+outreach
+articles/*-preview.html
+assets/seo/*-source.png

@@ -2,9 +2,9 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.bloodyhopes/campfire",
   "title": "Bloody Hopes Campfire",
-  "description": "Read complete historical ballads, accept temporary critical roles, inspect approved Voices, and submit an evidence-based Voice to human moderation.",
+  "description": "Read complete historical ballads, accept temporary critical roles, inspect approved Voices, and submit an evidence-based Voice. Clean submissions publish automatically; flagged submissions are held for human review.",
   "version": "1.0.0",
-  "websiteUrl": "https://bloodyhopes.com/campfire.html",
+  "websiteUrl": "https://bloodyhopes.com/campfire",
   "remotes": [
     {
       "type": "streamable-http",
