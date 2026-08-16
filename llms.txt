@@ -51,6 +51,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 ## Historical deep-dive articles (cross-era, not tied to a single song)
 
 - [What Did “Seeing the Elephant” Mean in the Civil War?](https://bloodyhopes.com/articles/seeing-the-elephant-civil-war): the pre-war origin and Civil War use of the expression for a soldier’s first combat, with First Bull Run examples and National Park Service sources.
+- [Why Is USS Constitution Called Old Ironsides?](https://bloodyhopes.com/articles/why-uss-constitution-called-old-ironsides): the documented 1812 battle, heavy oak hull and sailor’s cry behind the nickname, using official Naval History and Heritage Command sources.
 - [Battlefield Mercy: The History of the Coup de Grâce](https://bloodyhopes.com/articles/battlefield-mercy): the history of battlefield mercy killing, from the medieval misericorde dagger to the American Civil War.
 - [The Doomed Messenger: History's Ignored Warnings](https://bloodyhopes.com/articles/doomed-messengers): warnings heard and ignored, from Magellan's death at Mactan in 1521 to Custer's Little Bighorn in 1876.
 - [The Winter That Broke Armies: Valley Forge to Crimea](https://bloodyhopes.com/articles/winter-that-broke-armies): winter encampments and campaigns that devastated armies through cold, disease, and starvation.

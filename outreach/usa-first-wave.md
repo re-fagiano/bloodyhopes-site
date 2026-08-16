@@ -9,6 +9,7 @@ Sender: **bloodyhopesmusic@gmail.com**
 2. **Emerging Civil War** — accepts 800–1,500-word guest submissions and fresh perspectives at `emergingcivilwar@gmail.com`. Adapt one Civil War article to their rules before contacting them: https://emergingcivilwar.com/2024/03/27/writing-for-ecw/
 3. **American Battlefield Trust** — strong match for Manassas, Gettysburg, Shiloh and Revolutionary War material. Begin with a concise digital/editorial inquiry to `web@battlefields.org`; press contact is not the correct first route for an unsolicited project: https://www.battlefields.org/about/contact
 4. **American Civil War Museum** — education/public-program fit for songs paired with sourced interpretation. Use the official contact route: https://acwm.org/about/our-people/contact-us/
+5. **USS Constitution Museum** — strongest qualified audience for the Old Ironsides article and its distinction between documented history and comic invention. Check the museum’s current contact guidance before writing: https://ussconstitutionmuseum.org/contact/
 
 ## First message — museum/education
 
@@ -21,6 +22,23 @@ Bloody Hopes is an independent, AI-assisted and human-directed historical music 
 The article accompanies an original historical ballad and is intended as public history rather than a celebration of war. Because your institution works directly with this history, we would value a candid assessment of its accuracy and educational usefulness. If appropriate, we would also be glad to adapt the material into a short resource or discussion prompt for your audience.
 
 Article: https://bloodyhopes.com/articles/behind-the-army
+
+Thank you for your time,
+
+Bloody Hopes
+https://bloodyhopes.com/press
+
+## First message — naval museum/education
+
+**Subject:** A sourced public-history page on why Constitution became “Old Ironsides”
+
+Hello,
+
+Bloody Hopes is an independent, AI-assisted and human-directed historical music project. We have published a concise, sourced explainer on the origin of USS Constitution’s “Old Ironsides” nickname, using Naval History and Heritage Command material on the 1812 engagement with HMS *Guerriere*.
+
+The page accompanies a comic naval ballad, but explicitly separates the documented ship, battle and nickname from the invented inventory in the lyrics. We would value a candid factual correction if anything is imprecise, and would be glad to adapt the explainer into a short educational resource if useful.
+
+Article: https://bloodyhopes.com/articles/why-uss-constitution-called-old-ironsides
 
 Thank you for your time,
 
