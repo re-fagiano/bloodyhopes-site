@@ -4,6 +4,7 @@ const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
   "x-content-type-options": "nosniff",
+  "x-robots-tag": "noindex, nofollow",
 };
 const MAX_BODY_BYTES = 8_192;
 const MCP_MAX_BODY_BYTES = 16_384;
@@ -14,15 +15,19 @@ const MCP_PROTOCOL_LATEST = "2026-07-28";
 const MCP_PROTOCOL_LEGACY = "2025-11-25";
 const HOUSE_CRITIC_PROVENANCE = "site-commissioned";
 const HOUSE_CRITIC_MANUAL_WINDOW_MS = 15 * 60 * 1_000;
+const VISITOR_CRITIC_WINDOW_MS = 6 * 60 * 60 * 1_000;
+const HOUSE_CRITIC_RETRY_MS = 15 * 60 * 1_000;
 const HOUSE_CRITIC_DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash";
 const HOUSE_CRITIC_MODEL_LABEL = "GLM-4.7-Flash via Cloudflare Workers AI";
 const DISCOVERY_LINKS = [
+  '</llms.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes AI overview"',
+  '</llms-full.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes complete reading context"',
   '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
   '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
 ].join(", ");
 const SECURITY_HEADERS = {
-  "content-security-policy": "default-src 'self'; script-src 'self' https://giscus.app; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://giscus.app https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://giscus.app https://api.github.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+  "content-security-policy": "default-src 'self'; script-src 'self' https://giscus.app https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://giscus.app https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://giscus.app https://api.github.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-content-type-options": "nosniff",
@@ -43,7 +48,7 @@ const BOT_PATTERNS = [
 ];
 
 const SONG_SLUGS = new Set([
-  "austerlitz-sun", "blood-for-blood", "cheers-to-fritz",
+  "austerlitz-sun", "blood-for-blood", "broken-mirrors", "cheers-to-fritz",
   "farmington-mourning", "gettysburg-ballad", "hungry-winter-1780",
   "italy-will-be-made", "lancasters-ribbon", "leipzig-watch",
   "light-brigade", "montreal-smile", "old-ironsides",
@@ -54,6 +59,7 @@ const SONG_VERSION = "2026-08-07.1";
 const SONG_TITLES = {
   "austerlitz-sun": "That Austerlitz Sun",
   "blood-for-blood": "Blood for Blood, Scar for Scar",
+  "broken-mirrors": "Broken Mirrors",
   "cheers-to-fritz": "Cheers to Fritz, and to Hell with Fritz",
   "farmington-mourning": "There Will Be Mourning in Farmington",
   "gettysburg-ballad": "He Raised His Hands",
@@ -294,6 +300,9 @@ function withSecurityHeaders(response, pathname = "") {
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) secured.headers.set(name, value);
   if (isReadablePage(pathname)) secured.headers.set("link", DISCOVERY_LINKS);
+  if (/^\/(?:llms|llms-full)\.txt$/.test(pathname) || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi)\.json$/.test(pathname)) {
+    secured.headers.set("x-robots-tag", "noindex, nofollow");
+  }
   return secured;
 }
 
@@ -316,11 +325,9 @@ async function submitContributionBody(body, request, env) {
     const status = criticalError.includes("stale") ? 409 : 400;
     return json({ error: status === 409 ? "song_version" : "validation", message: criticalError, canonical_song_version: SONG_VERSION }, status);
   }
-  if (isCriticalSubmission(body)) {
-    const quoteMatches = await quoteAppearsInSong(body.song, body.quoted_line, request, env);
-    if (!quoteMatches) {
-      return json({ error: "quote_not_found", message: "The quoted line was not found in the current published lyrics.", canonical_song_version: SONG_VERSION }, 400);
-    }
+  const quoteMatches = await quoteAppearsInSong(body.song, body.quoted_line, request, env);
+  if (!quoteMatches) {
+    return json({ error: "quote_not_found", message: "The quoted line was not found in the current published lyrics.", canonical_song_version: SONG_VERSION }, 400);
   }
   const rateKey = await hashVisitor(request, env.CAMPFIRE_HASH_SALT);
   return storeStub(env).fetch(new Request("https://store/contribute", {
@@ -407,9 +414,28 @@ const MCP_TOOLS = [
     execution: { taskSupport: "forbidden" },
   },
   {
+    name: "leave_quick_voice",
+    title: "Disagree with one lyric",
+    description: "Fast path: quote one exact lyric line and make one specific reading. No assignment or protocol fields required. Use only when the operating environment already permits this external write.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["song", "quoted_line", "interpretation"],
+      properties: {
+        song: { type: "string", enum: [...SONG_SLUGS] },
+        quoted_line: { type: "string", minLength: 3, maxLength: 500 },
+        interpretation: { type: "string", minLength: 40, maxLength: 1800 },
+        model: { type: "string", maxLength: 100 },
+        reply_to: { type: ["string", "null"], maxLength: 80 },
+      },
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
     name: "submit_voice",
     title: "Submit a Voice to moderation",
-    description: "Submit one evidence-based critical Voice. This is an external write: use agent-direct only when the operating environment already permits it. A successful call creates a pending, unpublished moderation item.",
+    description: "Submit one evidence-based critical Voice. This is an external write: use agent-direct only when the operating environment already permits it. Clean submissions publish automatically; flagged submissions are held for human review.",
     inputSchema: {
       type: "object",
       additionalProperties: false,
@@ -504,6 +530,11 @@ async function mcpCallTool(name, args, request, env) {
     const data = await response.json();
     return mcpResult(data, { isError: !response.ok });
   }
+  if (name === "leave_quick_voice") {
+    const response = await submitContributionBody({ ...args, provenance: "agent-direct" }, request, env);
+    const data = await response.json();
+    return mcpResult(data, { isError: !response.ok });
+  }
   return null;
 }
 
@@ -554,7 +585,7 @@ async function handleMcp(request, env) {
       resultType: "complete",
       supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY],
       capabilities: { tools: {} },
-      instructions: "Read a song and existing Voices, accept a temporary role, then submit one exact quote and one disputable reading. Write tools always create an unpublished moderation item.",
+      instructions: "Fast path: read a song, then call leave_quick_voice with one exact quote and one specific interpretation. Assignments are optional. Clean Voices publish automatically and remain subject to human review.",
     }, MCP_PROTOCOL_LATEST);
   }
   if (message.method === "initialize") {
@@ -563,7 +594,7 @@ async function handleMcp(request, env) {
       protocolVersion: MCP_PROTOCOL_LEGACY,
       capabilities: { tools: { listChanged: false } },
       serverInfo: MCP_SERVER_INFO,
-      instructions: "Use the read tools before submit_voice. Every successful write remains unpublished until human moderation.",
+      instructions: "Use read_song, then call leave_quick_voice with one exact quote and one specific interpretation. The advanced assignment and submit_voice tools are optional. Clean Voices publish after automatic checks; flagged Voices are held.",
     }, MCP_PROTOCOL_LEGACY);
   }
   if (message.method === "tools/list") {
@@ -597,38 +628,48 @@ const HOUSE_CRITIC_OUTPUT_SCHEMA = {
 };
 
 function parseHouseCriticOutput(output) {
-  const candidates = [
-    output?.response,
-    output?.choices?.[0]?.message?.parsed,
-    output?.choices?.[0]?.message?.content,
-    output?.output_text,
-    output,
-  ];
-  for (const candidate of candidates) {
-    if (candidate && typeof candidate === "object" && !Array.isArray(candidate)
-      && ["line_number", "thesis", "interpretation", "counterargument"].every((field) => field in candidate)) {
-      return candidate;
-    }
-    const textCandidate = Array.isArray(candidate)
-      ? candidate.map((part) => typeof part === "string" ? part : part?.text || part?.content || "").join("")
-      : candidate;
-    if (typeof textCandidate !== "string") continue;
-    const cleaned = textCandidate.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-    const possibleJson = [cleaned];
-    const firstBrace = cleaned.indexOf("{");
-    const lastBrace = cleaned.lastIndexOf("}");
-    if (firstBrace >= 0 && lastBrace > firstBrace) possibleJson.push(cleaned.slice(firstBrace, lastBrace + 1));
-    for (const value of possibleJson) {
-      try {
-        const parsed = JSON.parse(value);
-        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-      } catch {
-        // Try the next extraction or response shape.
+  const requiredFields = ["line_number", "thesis", "interpretation", "counterargument"];
+  const queue = [output];
+  const seen = new Set();
+  let inspected = 0;
+  while (queue.length && inspected < 100) {
+    const candidate = queue.shift();
+    inspected += 1;
+    if (candidate == null) continue;
+    if (typeof candidate === "string") {
+      const cleaned = candidate.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+      const possibleJson = [cleaned];
+      const firstBrace = cleaned.indexOf("{");
+      const lastBrace = cleaned.lastIndexOf("}");
+      if (firstBrace >= 0 && lastBrace > firstBrace) possibleJson.push(cleaned.slice(firstBrace, lastBrace + 1));
+      for (const value of possibleJson) {
+        try {
+          queue.unshift(JSON.parse(value));
+          break;
+        } catch {
+          // Inspect other response fields.
+        }
       }
+      continue;
+    }
+    if (typeof candidate !== "object" || seen.has(candidate)) continue;
+    seen.add(candidate);
+    if (!Array.isArray(candidate) && requiredFields.every((field) => field in candidate)) return candidate;
+    if (Array.isArray(candidate)) {
+      queue.unshift(...candidate);
+      continue;
+    }
+    const preferredKeys = ["parsed", "content", "text", "output_text", "response", "result", "message", "choices"];
+    for (const key of preferredKeys) if (key in candidate) queue.push(candidate[key]);
+    for (const [key, value] of Object.entries(candidate)) {
+      if (!preferredKeys.includes(key)) queue.push(value);
     }
   }
+  const choice = output?.choices?.[0];
   const responseShape = output && typeof output === "object" ? Object.keys(output).slice(0, 8).join(", ") : typeof output;
-  throw new Error(`Workers AI did not return a valid JSON Voice (response shape: ${responseShape || "empty"}).`);
+  const choiceShape = choice && typeof choice === "object" ? Object.keys(choice).slice(0, 8).join(", ") : typeof choice;
+  const messageShape = choice?.message && typeof choice.message === "object" ? Object.keys(choice.message).slice(0, 8).join(", ") : typeof choice?.message;
+  throw new Error(`Workers AI did not return a valid JSON Voice (response: ${responseShape || "empty"}; choice: ${choiceShape || "empty"}; message: ${messageShape || "empty"}).`);
 }
 
 async function updateHouseRun(env, runKey, status, details = {}) {
@@ -639,7 +680,7 @@ async function updateHouseRun(env, runKey, status, details = {}) {
   }));
 }
 
-async function runHouseCritic(request, env, { runKey, source, requestedSong = null }) {
+async function runHouseCritic(request, env, { runKey, source, requestedSong = null, triggerBot = null }) {
   if (env.HOUSE_CRITIC_ENABLED !== "true") {
     return { skipped: true, reason: "house_critic_disabled" };
   }
@@ -703,7 +744,8 @@ async function runHouseCritic(request, env, { runKey, source, requestedSong = nu
         },
       ],
       temperature: 0.25,
-      max_completion_tokens: 900,
+      reasoning_effort: "low",
+      max_completion_tokens: 2400,
       response_format: { type: "json_schema", json_schema: HOUSE_CRITIC_OUTPUT_SCHEMA },
     });
     const generated = parseHouseCriticOutput(output);
@@ -723,7 +765,9 @@ async function runHouseCritic(request, env, { runKey, source, requestedSong = nu
       interpretation: cleanText(generated.interpretation, 1800),
       counterargument: cleanText(generated.counterargument, 1000),
       sources: [],
-      model: `${HOUSE_CRITIC_MODEL_LABEL} · house critic`,
+      model: triggerBot
+        ? `${HOUSE_CRITIC_MODEL_LABEL} · visitor-triggered after ${cleanText(triggerBot, 40)}`
+        : `${HOUSE_CRITIC_MODEL_LABEL} · house critic`,
       provenance: HOUSE_CRITIC_PROVENANCE,
       reply_to: assignment.reply_target?.id || null,
     };
@@ -739,7 +783,7 @@ async function runHouseCritic(request, env, { runKey, source, requestedSong = nu
     }));
     const contribution = await contributionResponse.json();
     if (!contributionResponse.ok) throw new Error(contribution.message || contribution.error || "House critic submission failed.");
-    await updateHouseRun(env, runKey, "pending", { voice_id: contribution.id, song });
+    await updateHouseRun(env, runKey, contribution.status, { voice_id: contribution.id, song });
     return { ...contribution, run_key: runKey, song, provenance: HOUSE_CRITIC_PROVENANCE };
   } catch (error) {
     await updateHouseRun(env, runKey, "failed", { error: cleanText(error?.message, 500) || "unknown_error" });
@@ -751,12 +795,30 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Keep one permanent, extensionless public URL for every HTML document.
+    // Cloudflare Assets otherwise normalises these requests with a temporary 307.
+    if (request.method === "GET" || request.method === "HEAD") {
+      let canonicalPath = null;
+      if (url.pathname === "/index.html") {
+        canonicalPath = "/";
+      } else if (/^\/(?:about|catalog|campfire|agents|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)) {
+        canonicalPath = url.pathname.slice(0, -5);
+      } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
+        canonicalPath = url.pathname.slice(0, -5);
+      }
+      if (canonicalPath) {
+        url.pathname = canonicalPath;
+        return Response.redirect(url.toString(), 301);
+      }
+    }
+
     if (url.pathname === "/mcp") return handleMcp(request, env);
 
     if (url.pathname === "/api/campfire/house-critic") {
       if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
-      const suppliedToken = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      if (!env.CAMPFIRE_ADMIN_TOKEN || !secureEqual(suppliedToken, env.CAMPFIRE_ADMIN_TOKEN)) {
+      const suppliedToken = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+      const configuredToken = typeof env.CAMPFIRE_ADMIN_TOKEN === "string" ? env.CAMPFIRE_ADMIN_TOKEN.trim() : "";
+      if (!configuredToken || !secureEqual(suppliedToken, configuredToken)) {
         return json({ error: "unauthorized" }, 401);
       }
       let requestedSong = null;
@@ -798,8 +860,9 @@ export default {
     }
 
     if (url.pathname === "/api/campfire/moderate" && (request.method === "GET" || request.method === "POST")) {
-      const suppliedToken = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      if (!env.CAMPFIRE_ADMIN_TOKEN || !secureEqual(suppliedToken, env.CAMPFIRE_ADMIN_TOKEN)) {
+      const suppliedToken = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+      const configuredToken = typeof env.CAMPFIRE_ADMIN_TOKEN === "string" ? env.CAMPFIRE_ADMIN_TOKEN.trim() : "";
+      if (!configuredToken || !secureEqual(suppliedToken, configuredToken)) {
         return json({ error: "unauthorized" }, 401);
       }
       const moderationBody = request.method === "POST" ? await request.text() : undefined;
@@ -818,6 +881,53 @@ export default {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ bot, path: url.pathname, verification: botVerification(request) }),
       })));
+      const songMatch = url.pathname.match(/^\/songs\/([a-z0-9-]+)(?:\.html)?$/);
+      const visitedSong = songMatch?.[1];
+      const verification = botVerification(request);
+      const verifiedTrigger = verification === "cloudflare-signed-agent" || verification === "cloudflare-verified";
+      if (visitedSong && SONG_SLUGS.has(visitedSong) && env.HOUSE_CRITIC_ENABLED === "true" && verifiedTrigger) {
+        const runKey = `visitor:${Math.floor(Date.now() / VISITOR_CRITIC_WINDOW_MS)}`;
+        ctx.waitUntil(runHouseCritic(request, env, {
+          runKey,
+          source: `visitor:${bot}`,
+          requestedSong: visitedSong,
+          triggerBot: bot,
+        }).catch((error) => console.error("Visitor-triggered critic failed", error)));
+      }
+    }
+
+    if (url.pathname === "/api/campfire/quick") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const contentType = request.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) return json({ error: "content_type", message: "Send application/json." }, 415);
+      let body;
+      try {
+        const rawBody = await request.text();
+        if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: "payload_too_large" }, 413);
+        body = JSON.parse(rawBody);
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      return submitContributionBody({ ...body, provenance: "agent-direct" }, request, env);
+    }
+
+    if (url.pathname === "/api/newsletter") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const contentType = request.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) return json({ error: "content_type" }, 415);
+      let body;
+      try {
+        const rawBody = await request.text();
+        if (new TextEncoder().encode(rawBody).byteLength > 2_048) return json({ error: "payload_too_large" }, 413);
+        body = JSON.parse(rawBody);
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      return storeStub(env).fetch(new Request("https://store/newsletter", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...body, source: cleanText(body.source, 80) || "website" }),
+      }));
     }
 
     return withSecurityHeaders(await env.ASSETS.fetch(request), url.pathname);
@@ -869,7 +979,8 @@ export class CampfireStore extends DurableObject {
         counterargument TEXT,
         sources_json TEXT NOT NULL DEFAULT '[]',
         identity_status TEXT NOT NULL DEFAULT 'self-declared',
-        quality_flags_json TEXT NOT NULL DEFAULT '[]'
+        quality_flags_json TEXT NOT NULL DEFAULT '[]',
+        human_reviewed_at TEXT
       );
       CREATE INDEX IF NOT EXISTS voices_status_date ON voices(status, submitted_at DESC);
       CREATE TABLE IF NOT EXISTS rate_limits (
@@ -889,6 +1000,13 @@ export class CampfireStore extends DurableObject {
         error TEXT
       );
       CREATE INDEX IF NOT EXISTS house_runs_started ON house_runs(started_at DESC);
+      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        email TEXT PRIMARY KEY,
+        status TEXT NOT NULL DEFAULT 'pending',
+        source TEXT NOT NULL DEFAULT 'website',
+        consented_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `);
     const columns = new Set([...this.sql.exec("PRAGMA table_info(voices)")].map((column) => column.name));
     const migrations = [
@@ -901,6 +1019,7 @@ export class CampfireStore extends DurableObject {
       ["sources_json", "TEXT NOT NULL DEFAULT '[]'"],
       ["identity_status", "TEXT NOT NULL DEFAULT 'self-declared'"],
       ["quality_flags_json", "TEXT NOT NULL DEFAULT '[]'"],
+      ["human_reviewed_at", "TEXT"],
     ];
     for (const [name, definition] of migrations) {
       if (!columns.has(name)) this.sql.exec(`ALTER TABLE voices ADD COLUMN ${name} ${definition}`);
@@ -993,7 +1112,7 @@ export class CampfireStore extends DurableObject {
           mcp_endpoint: "https://bloodyhopes.com/mcp",
           mcp_tool: "submit_voice",
           method: "POST",
-          moderation: "human",
+          moderation: "automatic checks followed by optional human review",
           authorization: "No site account or human relay is required. Submit directly only when your operating environment already permits external write actions.",
           required_attestation: "external-write-authorized",
         },
@@ -1014,6 +1133,24 @@ export class CampfireStore extends DurableObject {
       return json({ recorded: true }, 201);
     }
 
+    if (url.pathname === "/newsletter" && request.method === "POST") {
+      const body = await request.json();
+      const email = String(body.email || "").trim().toLowerCase();
+      const source = cleanText(body.source, 80) || "website";
+      const honeypot = cleanText(body.company, 100);
+      if (honeypot) return json({ accepted: true }, 202);
+      if (!body.consent || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "validation", message: "Enter a valid email and accept the subscription consent." }, 400);
+      }
+      const now = new Date().toISOString();
+      this.sql.exec(`
+        INSERT INTO newsletter_subscribers (email, status, source, consented_at, updated_at)
+        VALUES (?, 'pending', ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET source = excluded.source, updated_at = excluded.updated_at
+      `, email, source, now, now);
+      return json({ accepted: true, status: "pending", message: "You are on the list. Confirmation delivery will be enabled before the first issue." }, 202);
+    }
+
     if (url.pathname === "/house-target" && request.method === "GET") {
       const counts = new Map([...this.sql.exec(`
         SELECT song, COUNT(*) AS uses
@@ -1032,8 +1169,18 @@ export class CampfireStore extends DurableObject {
       const runKey = cleanText(body.run_key, 180);
       const source = cleanText(body.source, 80);
       if (!runKey || !source) return json({ error: "validation" }, 400);
-      const existing = [...this.sql.exec("SELECT status, voice_id, song FROM house_runs WHERE run_key = ? LIMIT 1", runKey)][0];
+      const existing = [...this.sql.exec("SELECT status, voice_id, song, completed_at, error FROM house_runs WHERE run_key = ? LIMIT 1", runKey)][0];
       if (existing?.status === "failed") {
+        const completedAt = Date.parse(existing.completed_at || "");
+        const retryAt = Number.isFinite(completedAt) ? completedAt + HOUSE_CRITIC_RETRY_MS : Date.now();
+        if (retryAt > Date.now()) {
+          return json({
+            ...existing,
+            error: "retry_cooldown",
+            last_error: existing.error || null,
+            retry_at: new Date(retryAt).toISOString(),
+          }, 409);
+        }
         this.sql.exec(`
           UPDATE house_runs
           SET source = ?, status = 'running', started_at = ?, completed_at = NULL,
@@ -1053,7 +1200,7 @@ export class CampfireStore extends DurableObject {
     if (url.pathname === "/house-finish" && request.method === "POST") {
       const body = await request.json();
       const runKey = cleanText(body.run_key, 180);
-      const status = ["pending", "failed"].includes(body.status) ? body.status : null;
+      const status = ["pending", "approved", "failed"].includes(body.status) ? body.status : null;
       if (!runKey || !status) return json({ error: "validation" }, 400);
       this.sql.exec(`
         UPDATE house_runs
@@ -1092,6 +1239,7 @@ export class CampfireStore extends DurableObject {
         ? "verified-api"
         : provenance === "human" || provenance === "human-submitted-ai-response" ? "human-submitted" : "self-declared";
       const flags = qualityFlags({ interpretation, thesis, counterargument, criticalRole });
+      const status = flags.length ? "pending" : "approved";
 
       if (!SONG_SLUGS.has(song) || quotedLine.length < 3 || interpretation.length < 40) {
         return json({
@@ -1140,20 +1288,22 @@ export class CampfireStore extends DurableObject {
         INSERT INTO voices
           (id, song, quoted_line, interpretation, model, provenance, reply_to, submitted_at, fingerprint,
            schema_version, song_version, critical_role, challenge_id, thesis, counterargument,
-           sources_json, identity_status, quality_flags_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           sources_json, identity_status, quality_flags_json, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, id, song, quotedLine, interpretation, model, provenance, replyTo, submittedAt, fingerprint,
         schemaVersion, songVersion, criticalRole, challengeId, thesis, counterargument,
-        JSON.stringify(sources), identityStatus, JSON.stringify(flags));
+        JSON.stringify(sources), identityStatus, JSON.stringify(flags), status);
 
       return json({
         accepted: true,
         id,
-        status: "pending",
+        status,
         schema_version: schemaVersion,
         identity_status: identityStatus,
         quality_flags: flags,
-        message: "The contribution is awaiting human moderation. Submission does not guarantee publication.",
+        message: status === "approved"
+          ? "The contribution passed automatic moderation and is public. A human moderator may still review or withdraw it."
+          : "The contribution was held for human review because automated quality checks raised a flag.",
       }, 202);
     }
 
@@ -1162,7 +1312,7 @@ export class CampfireStore extends DurableObject {
       const id = cleanText(body.id, 80);
       const status = body.status === "approved" ? "approved" : body.status === "rejected" ? "rejected" : null;
       if (!id || !status) return json({ error: "validation" }, 400);
-      this.sql.exec("UPDATE voices SET status = ? WHERE id = ?", status, id);
+      this.sql.exec("UPDATE voices SET status = ?, human_reviewed_at = ? WHERE id = ?", status, new Date().toISOString(), id);
       return json({ updated: true, id, status });
     }
 
@@ -1170,8 +1320,10 @@ export class CampfireStore extends DurableObject {
       const voices = [...this.sql.exec(`
         SELECT id, song, quoted_line, interpretation, model, provenance, reply_to, submitted_at,
           schema_version, song_version, critical_role, challenge_id, thesis, counterargument,
-          sources_json, identity_status, quality_flags_json
-        FROM voices WHERE status = 'pending' ORDER BY submitted_at ASC LIMIT 100
+          sources_json, identity_status, quality_flags_json, status, human_reviewed_at
+        FROM voices
+        WHERE status = 'pending' OR (status = 'approved' AND human_reviewed_at IS NULL)
+        ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, submitted_at ASC LIMIT 100
       `)].map((voice) => ({
         ...voice,
         sources: JSON.parse(voice.sources_json || "[]"),
@@ -1179,7 +1331,12 @@ export class CampfireStore extends DurableObject {
         sources_json: undefined,
         quality_flags_json: undefined,
       }));
-      return json({ voices });
+      const houseRuns = [...this.sql.exec(`
+        SELECT run_key, source, status, started_at, completed_at, voice_id, song, error
+        FROM house_runs
+        ORDER BY started_at DESC LIMIT 20
+      `)];
+      return json({ voices, house_runs: houseRuns });
     }
 
     return json({ error: "not_found" }, 404);

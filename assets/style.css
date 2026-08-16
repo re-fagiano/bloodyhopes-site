@@ -199,6 +199,26 @@ blockquote.pull {
   margin: 2rem 0;
 }
 
+/* ---------- Article body lists ---------- */
+.article-points,
+.source-list {
+  padding-left: 1.25rem;
+  margin: 1.1rem 0 1.6rem;
+}
+.article-points li {
+  margin-bottom: 0.85rem;
+  color: var(--ink-dim);
+}
+.article-points li::marker { color: var(--accent-bright); }
+.article-points strong { color: var(--ink); font-weight: 600; }
+
+.source-list li {
+  margin-bottom: 0.6rem;
+  color: var(--ink-dim);
+  font-size: 0.95rem;
+}
+.source-list li::marker { color: var(--gold); }
+
 /* ---------- Lyric excerpt ---------- */
 .lyric {
   font-family: var(--serif);
@@ -295,6 +315,20 @@ footer.site {
 footer.site .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
 footer.site a { color: var(--ink-dim); }
 footer.site a:hover { color: var(--gold); }
+
+/* ---------- Newsletter ---------- */
+.newsletter-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(320px, 1.1fr); gap: clamp(2rem, 7vw, 6rem); align-items: center; }
+.newsletter-layout h2 { max-width: 680px; }
+.newsletter-form { border-top: 1px solid var(--gold); padding-top: 1.4rem; }
+.newsletter-form > label:first-child { display: block; margin-bottom: .55rem; color: var(--ink-dim); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+.newsletter-row { display: grid; grid-template-columns: 1fr auto; gap: .75rem; }
+.newsletter-row input { min-width: 0; border: 1px solid var(--line); background: #080706; color: var(--ink); padding: .85rem 1rem; font: inherit; }
+.newsletter-row input:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+.newsletter-row .btn { background: transparent; cursor: pointer; white-space: nowrap; }
+.newsletter-row .btn:disabled { opacity: .55; cursor: wait; }
+.newsletter-consent { display: flex; gap: .6rem; align-items: flex-start; margin-top: .85rem; color: var(--ink-dim); font-size: .78rem; line-height: 1.5; }
+.newsletter-consent input { margin-top: .25rem; accent-color: var(--accent); }
+.human-entry { background: linear-gradient(90deg, rgba(121,24,18,.1), transparent 70%); }
 
 /* ---------- Campfire / AI challenge ---------- */
 .challenge-box {
@@ -450,6 +484,7 @@ footer.site a:hover { color: var(--gold); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .live-mark::before { animation: none; } }
 
 @media (max-width: 640px) {
+  .newsletter-layout, .newsletter-row { grid-template-columns: 1fr; }
   nav.primary ul { gap: 1rem; flex-wrap: wrap; justify-content: center; }
   .nav-row { flex-direction: column; gap: 0.8rem; text-align: center; }
   .campfire-principle { grid-template-columns: 1fr; gap: 0.7rem; }
@@ -473,3 +508,54 @@ footer.site a:hover { color: var(--gold); }
   .lyrics-heading { position: static; }
   .lyrics-text { padding-left: 1rem; }
 }
+.article-nav{margin:2rem 0 3.5rem;padding:1.25rem 0;border-top:1px solid #3a3029;border-bottom:1px solid #3a3029}.article-nav .label{display:block;margin-bottom:.75rem;color:#c69a49;font:600 .75rem/1 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase}.article-nav ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem 1.25rem;margin:0;padding:0;list-style:none}.article-nav a{color:#ded5c9;font-size:.9rem;text-decoration:none}.article-nav a:hover,.article-nav a:focus{color:#fff;text-decoration:underline;text-underline-offset:.25rem}
+.song-bridge{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.5rem;align-items:center;margin:2.75rem 0;padding:1.6rem 0;border-top:1px solid #5d4835;border-bottom:1px solid #5d4835}.song-bridge .eyebrow{margin-bottom:.55rem}.song-bridge blockquote{margin:0;color:#f1e8dc;font:600 clamp(1.2rem,2vw,1.65rem)/1.35 "Playfair Display",serif}.song-bridge p{margin:.6rem 0 0;color:#bcb0a3;font-size:.9rem}.listen-link{display:inline-flex;align-items:center;gap:.55rem;padding:.75rem 1rem;border:1px solid #9e2727;color:#fff;text-decoration:none;white-space:nowrap;transition:background .18s ease,transform .18s ease}.listen-link:hover,.listen-link:focus{background:#8f1f1f;transform:translateY(-2px)}
+.field-figure{margin:3rem 0}.field-figure figcaption{margin-top:.85rem;color:#a99d90;font-size:.84rem;line-height:1.5}.battle-map{display:block;width:100%;height:auto;background:#12100e;border:1px solid #3a3029}.battle-map text{font-family:Inter,sans-serif}.map-ground{fill:#191612}.map-road{fill:none;stroke:#6a6054;stroke-width:2;stroke-dasharray:7 7}.map-union{fill:none;stroke:#d9d2c7;stroke-width:8;stroke-linecap:round}.map-confed{fill:none;stroke:#9e2727;stroke-width:8;stroke-linecap:round}.map-attack{fill:none;stroke:#c69a49;stroke-width:3;marker-end:url(#arrow)}.map-label{fill:#e7ded2;font-size:16px}.map-note{fill:#b7aa9c;font-size:13px}.map-water{fill:none;stroke:#526878;stroke-width:2}
+.campaign-timeline{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin:2.5rem 0 3rem;border-top:2px solid #6f5940}.campaign-step{position:relative;padding:1.35rem .9rem 0 0}.campaign-step:before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:#c69a49}.campaign-step time{display:block;color:#c69a49;font:600 .72rem/1.3 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase}.campaign-step strong{display:block;margin:.35rem 0;color:#f0e7dc;font-family:"Playfair Display",serif}.campaign-step span{display:block;color:#a99d90;font-size:.78rem;line-height:1.45}
+@media(max-width:760px){.article-nav ol{grid-template-columns:repeat(2,minmax(0,1fr))}.song-bridge{grid-template-columns:1fr}.listen-link{justify-self:start}.campaign-timeline{grid-template-columns:1fr;border-top:0;border-left:2px solid #6f5940;margin-left:.35rem}.campaign-step{padding:0 0 1.5rem 1.3rem}.campaign-step:before{top:.25rem;left:-7px}.battle-map .map-label{font-size:13px}.battle-map .map-note{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.listen-link{transition:none}}
+.evidence-strip{display:grid;grid-template-columns:repeat(var(--steps,3),minmax(0,1fr));margin:2.5rem 0 3rem;border-top:2px solid #6f5940}.evidence-step{position:relative;padding:1.35rem 1.1rem 0 0}.evidence-step:before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:#c69a49}.evidence-step time,.evidence-step .step-label{display:block;color:#c69a49;font:600 .72rem/1.3 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase}.evidence-step strong{display:block;margin:.35rem 0;color:#f0e7dc;font-family:"Playfair Display",serif}.evidence-step span{display:block;color:#a99d90;font-size:.82rem;line-height:1.5}
+.signal-flow{display:grid;grid-template-columns:repeat(var(--stages,4),minmax(0,1fr));align-items:stretch;margin:2.5rem 0 3rem;border-top:1px solid #4a3b30;border-bottom:1px solid #4a3b30}.signal-stage{position:relative;padding:1.4rem 2rem 1.4rem 0}.signal-stage:not(:last-child):after{content:"→";position:absolute;right:.65rem;top:50%;color:#9e2727;font-size:1.35rem}.signal-stage small{display:block;color:#c69a49;letter-spacing:.1em;text-transform:uppercase}.signal-stage strong{display:block;margin:.4rem 0;color:#f0e7dc;font-family:"Playfair Display",serif}.signal-stage span{color:#a99d90;font-size:.82rem;line-height:1.45}
+.listen-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.65rem}
+@media(max-width:760px){.evidence-strip{grid-template-columns:1fr;border-top:0;border-left:2px solid #6f5940;margin-left:.35rem}.evidence-step{padding:0 0 1.5rem 1.3rem}.evidence-step:before{top:.25rem;left:-7px}.signal-flow{grid-template-columns:1fr}.signal-stage{padding:1.1rem 0}.signal-stage:not(:last-child):after{content:"↓";right:.25rem;top:auto;bottom:-.8rem}.listen-actions{justify-content:flex-start}}
+/* From Lance to Repeater — image-led cavalry feature */
+.cavalry-hero{position:relative;min-height:min(84svh,860px);display:grid;align-items:end;overflow:hidden;background:#191612 url('article-images/from-lance-to-repeater/cavalry-charge-edwin-forbes.jpg') center 43%/cover no-repeat;color:#fff}
+.cavalry-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,10,8,.12) 12%,rgba(12,10,8,.54) 58%,rgba(12,10,8,.94) 100%),linear-gradient(90deg,rgba(12,10,8,.65),transparent 70%)}
+.cavalry-hero .container{position:relative;padding-top:clamp(8rem,18vw,14rem);padding-bottom:clamp(3rem,7vw,6rem)}
+.cavalry-hero h1{max-width:920px;margin:.25rem 0 1rem;font-size:clamp(3.25rem,8vw,7.5rem);line-height:.88;letter-spacing:-.045em;color:#fff;text-wrap:balance}
+.cavalry-hero .lede{max-width:760px;margin:0;color:rgba(255,255,255,.88);font-size:clamp(1.05rem,2vw,1.34rem)}
+.hero-credit{position:absolute;right:1rem;bottom:1rem;z-index:1;margin:0;font-size:.68rem;color:rgba(255,255,255,.7);writing-mode:vertical-rl;transform:rotate(180deg)}
+.hero-credit a{color:inherit}.archive-figure{margin:clamp(2.5rem,6vw,5rem) 0;background:#171410;color:#eee}
+.archive-figure img{display:block;width:100%;max-height:78vh;object-fit:cover}.archive-figure--portrait img{object-position:center 26%}
+.archive-figure figcaption{padding:.8rem 1rem 1rem;font-size:.78rem;line-height:1.55;color:#c8c0b5}.archive-figure figcaption strong{color:#fff}.archive-figure figcaption a{color:#e4b38a}
+.source-window{margin:3rem 0;padding:clamp(1.5rem,4vw,2.5rem);border:1px solid rgba(118,28,28,.32);background:linear-gradient(135deg,#f3eee5,#fff 68%)}
+.source-window h2{margin-top:0}.source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(118,28,28,.22);border:1px solid rgba(118,28,28,.22)}
+.source-card{padding:1.35rem;background:#fff}.source-card time{display:block;margin-bottom:.4rem;color:#8b1f1f;font:600 .74rem/1.2 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.source-card h3{margin:.1rem 0 .55rem;font-size:1.08rem}.source-card p{margin:.4rem 0;font-size:.92rem}.source-card a{font-weight:600}
+@media(max-width:700px){.cavalry-hero{min-height:72svh}.hero-credit{display:none}.source-grid{grid-template-columns:1fr}.archive-figure{margin-inline:-1rem}.archive-figure img{max-height:62vh}}
+/* Bred for Battle — military horsemanship feature */
+.horse-hero{position:relative;min-height:min(84svh,860px);display:grid;align-items:end;overflow:hidden;background:#17130f url('article-images/bred-for-battle/pluvinel-riding-school.jpg') center 45%/cover no-repeat;color:#fff}
+.horse-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,11,8,.08) 8%,rgba(14,11,8,.36) 46%,rgba(14,11,8,.95) 100%),linear-gradient(90deg,rgba(20,14,10,.62),transparent 72%)}
+.horse-hero .container{position:relative;padding-top:clamp(8rem,18vw,14rem);padding-bottom:clamp(3rem,7vw,6rem)}
+.horse-hero h1{max-width:920px;margin:.25rem 0 1rem;font-size:clamp(3.3rem,8.4vw,7.8rem);line-height:.88;letter-spacing:-.045em;color:#fff;text-wrap:balance}
+.horse-hero .lede{max-width:780px;margin:0;color:rgba(255,255,255,.9);font-size:clamp(1.05rem,2vw,1.34rem)}
+.horse-strip{--steps:5}.horse-type-table{margin:2.5rem 0;border-top:2px solid #7d2424;border-bottom:1px solid rgba(80,55,40,.25)}
+.horse-type-row{display:grid;grid-template-columns:.75fr 1.25fr 1.4fr;gap:1.2rem;padding:1rem .2rem;border-top:1px solid rgba(80,55,40,.18);align-items:start}
+.horse-type-row:first-child{border-top:0}.horse-type-head{font:600 .74rem/1.2 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8b1f1f}
+.horse-type-row b{font-family:'Playfair Display',serif;font-size:1rem}.pluvinel-figure img{object-position:center}.formation-figure img{filter:contrast(1.05)}
+@media(max-width:700px){.horse-hero{min-height:72svh}.horse-type-head{display:none}.horse-type-row{grid-template-columns:1fr;gap:.35rem;padding:1.15rem 0}.horse-type-row span{font-size:.92rem}}
+/* History & Songs redesign preview */
+.history-preview-page{background:#0b0908;color:#eee8df}.history-preview-page section{padding:0}.history-cover{position:relative;min-height:calc(100svh - 74px);display:grid;align-items:center;overflow:hidden;background:#17130f url('article-images/from-lance-to-repeater/cavalry-charge-edwin-forbes.jpg') center 43%/cover no-repeat}
+.history-cover::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,6,5,.88),rgba(8,6,5,.34) 66%,rgba(8,6,5,.15)),linear-gradient(0deg,rgba(8,6,5,.96),transparent 58%)}
+.history-cover-inner{position:relative;width:min(1180px,calc(100% - 3rem));margin:auto;padding:clamp(5rem,10vw,8rem) 0;text-align:center}
+.history-cover h1{max-width:1080px;margin:.55rem auto 1.25rem;color:#fff;font-size:clamp(4rem,9.4vw,8.5rem);line-height:.84;letter-spacing:-.052em;text-wrap:balance}
+.history-cover p{max-width:680px;margin:0 auto;color:#e0d7cc;font-size:clamp(1.05rem,2vw,1.25rem)}.history-cover-actions{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:2rem}.history-cover .text-link{color:#eee8df;font:600 .75rem/1 Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.history-start{padding:clamp(5rem,10vw,9rem) 0;background:#eee8df;color:#1c1713}.history-section-head{display:grid;grid-template-columns:.55fr 1.15fr 1fr;gap:3rem;align-items:start;margin-bottom:3.5rem}.history-section-head h2{margin:0;font-size:clamp(2.5rem,5vw,4.5rem);line-height:.96;color:#211a15}.history-section-head p{margin:.35rem 0 0;color:#665b51}.history-leads{display:grid;grid-template-columns:1fr 1fr;min-height:680px}.history-lead{position:relative;display:grid;place-items:center;overflow:hidden;padding:clamp(2rem,4vw,3.5rem);color:#fff;background-position:center;background-size:cover;text-align:center;text-decoration:none}.history-lead::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,8,7,.75),rgba(10,8,7,.16) 72%),linear-gradient(90deg,rgba(10,8,7,.3),rgba(10,8,7,.08),rgba(10,8,7,.3));transition:background .4s}.history-lead::after{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.18);pointer-events:none}.history-lead>*{position:relative}.history-lead>div{max-width:500px}.history-lead-cavalry{background-image:url('article-images/from-lance-to-repeater/cavalry-charge-edwin-forbes.jpg')}.history-lead-horse{background-image:url('article-images/bred-for-battle/pluvinel-riding-school.jpg')}.history-lead-number{position:absolute;top:clamp(2rem,4vw,3.5rem);left:clamp(2rem,4vw,3.5rem);color:rgba(255,255,255,.7);font:500 .72rem/1 Inter,sans-serif;letter-spacing:.12em}.history-lead h3{margin:.5rem 0 1rem;color:#fff;font-size:clamp(3rem,5vw,5.2rem);line-height:.86}.history-lead p{max-width:430px;margin-inline:auto;color:#ddd2c6}.history-lead-action{display:inline-block;margin-top:1rem;color:#e1b261;font:600 .75rem/1.2 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase}.history-lead:hover{text-decoration:none}.history-lead:hover::before{background:linear-gradient(0deg,rgba(10,8,7,.82),rgba(10,8,7,.26) 80%)}
+.history-chronology{padding:clamp(6rem,11vw,10rem) 0 0;background:#0b0908}.history-section-head-light{color:#eee8df}.history-section-head-light h2{color:#f4eee7}.history-section-head-light p{color:#b6aa9d}.history-row{display:grid;grid-template-columns:1.18fr .82fr;min-height:680px;border-top:1px solid #2c2420}.history-row-reverse{grid-template-columns:.82fr 1.18fr}.history-row-reverse .history-row-image{order:2}.history-row-image{min-height:600px;background-position:center;background-size:cover;filter:grayscale(.45) sepia(.18);transition:filter .5s ease,background-size 1.2s ease}.history-row:hover .history-row-image{filter:grayscale(.05) sepia(.08)}.history-row-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,7vw,7rem)}.history-row-copy time{margin-bottom:2.5rem;color:#d4a654;font:600 .73rem/1 Inter,sans-serif;letter-spacing:.13em;text-transform:uppercase}.history-row-copy h3{margin:.45rem 0 1rem;color:#f5eee6;font-size:clamp(2.7rem,5vw,5.3rem);line-height:.9}.history-row-copy p{max-width:550px;color:#bcb0a4}.history-row-links{display:flex;flex-wrap:wrap;gap:1.4rem;margin-top:1.5rem}.history-row-links a{padding-bottom:.35rem;border-bottom:1px solid #7e2825;color:#e0b263;font:600 .73rem/1.2 Inter,sans-serif;letter-spacing:.07em;text-transform:uppercase}.history-row-winter .history-row-image{background-image:url('article-images/behind-the-army/city-point-wagon-park-1863.jpg')}.history-row-austerlitz .history-row-image{background-image:url('article-images/from-lance-to-repeater/armor-man-horse-1548.jpg');background-position:center 24%}.history-row-balaclava .history-row-image{background-image:url('article-images/from-lance-to-repeater/cavalry-charge-edwin-forbes.jpg')}.history-row-civil-war .history-row-image{background-image:url('article-images/behind-the-army/city-point-military-railroad.jpg')}
+.history-exit{padding:clamp(6rem,11vw,10rem) 0;background:#e9e1d7;color:#1f1915}.history-exit .container{display:grid;grid-template-columns:.55fr 1.15fr 1fr;gap:3rem;align-items:end}.history-exit h2{margin:0;color:#1f1915;font-size:clamp(2.7rem,5vw,4.8rem);line-height:.95}.history-exit .btn{margin:.4rem .5rem .4rem 0}.history-exit .ghost{color:#1f1915;border-color:#7d6e61}
+@media(max-width:800px){.history-cover{min-height:calc(100svh - 146px);background-position:58% center}.history-cover-inner{width:calc(100% - 2rem);padding:4rem 0}.history-cover h1{font-size:clamp(3.8rem,17vw,6rem)}.history-cover-actions{flex-direction:column}.history-section-head,.history-exit .container{grid-template-columns:1fr;gap:1.1rem}.history-leads{grid-template-columns:1fr;min-height:auto}.history-lead{min-height:78svh}.history-row,.history-row-reverse{grid-template-columns:1fr}.history-row-reverse .history-row-image{order:0}.history-row-image{min-height:60vw}.history-row-copy{padding:3.5rem 1.25rem 5rem}.history-start,.history-chronology{padding-top:5rem}}
+@media(prefers-reduced-motion:reduce){.history-lead::before,.history-row-image{transition:none}}
+.history-row-austerlitz .history-row-image{background-image:url('article-images/austerlitz/russian-troops-1802-1805-nypl.jpg');background-position:center center}
+.history-image-credit{display:block;margin-top:1.6rem;color:#786e65;font:500 .68rem/1.45 Inter,sans-serif;letter-spacing:.045em}
+.history-exit .btn{color:#1f1915;background:transparent;border-color:#9e2727}
+.history-exit .btn:hover,.history-exit .btn:focus{color:#fff;background:#8f1f1f;border-color:#8f1f1f}

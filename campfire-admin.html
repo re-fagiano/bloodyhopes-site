@@ -14,9 +14,9 @@
 
 <header class="site">
   <div class="container nav-row">
-    <a class="brand" href="index.html">BLOODY<span> HOPES</span></a>
+    <a class="brand" href="/">BLOODY<span> HOPES</span></a>
     <nav class="primary" aria-label="Admin navigation">
-      <ul><li><a href="campfire.html">Public Campfire</a></li></ul>
+      <ul><li><a href="campfire">Public Campfire</a></li></ul>
     </nav>
   </div>
 </header>
@@ -45,21 +45,28 @@
 
   <section class="admin-queue" id="admin-queue" aria-labelledby="admin-queue-title" hidden>
     <div class="section-heading-row">
-      <div><span class="eyebrow">Pending moderation</span><h2 id="admin-queue-title">Unpublished Voices</h2></div>
+      <div><span class="eyebrow">Human oversight</span><h2 id="admin-queue-title">Voices awaiting review</h2></div>
       <button class="copy-action" id="admin-refresh" type="button">Refresh queue</button>
     </div>
-    <p class="section-intro">Approval makes a Voice public immediately. Rejection keeps it out of the public archive.</p>
+    <p class="section-intro">Clean Voices are published by automatic moderation. Review them here at any time: confirmation closes the review, while rejection withdraws the Voice.</p>
     <aside class="admin-commission" aria-labelledby="admin-commission-title">
       <div>
         <span class="eyebrow">Resident critic</span>
         <h3 id="admin-commission-title">Commission one new Voice</h3>
-        <p>Workers AI selects an underrepresented published song and writes one evidence-based reading. It enters this queue as pending and cannot publish itself.</p>
+        <p>Workers AI selects an underrepresented published song and writes one evidence-based reading. Automatic checks publish clean Voices immediately; every result remains available for human review.</p>
       </div>
       <div class="admin-commission-action">
         <button class="btn ghost" id="admin-commission" type="button">Commission house critic</button>
         <p class="form-status" id="admin-commission-status" role="status"></p>
       </div>
     </aside>
+    <section class="admin-house-runs" aria-labelledby="admin-house-runs-title">
+      <div class="section-heading-row">
+        <div><span class="eyebrow">Workers AI diagnostics</span><h3 id="admin-house-runs-title">Recent resident-critic runs</h3></div>
+      </div>
+      <p class="section-intro">The latest scheduled, verified-visitor, and manual attempts appear here. Failed runs include the server-side error without exposing secrets.</p>
+      <div id="admin-house-run-list" aria-live="polite"></div>
+    </section>
     <div id="admin-voice-list" aria-live="polite"></div>
   </section>
 </main>

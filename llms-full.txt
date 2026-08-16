@@ -14,7 +14,7 @@
 ----
 
 PAGE: The Elephant
-URL: https://bloodyhopes.com/songs/the-elephant.html
+URL: https://bloodyhopes.com/songs/the-elephant
 
 American Civil War · July 21, 1861
 
@@ -259,7 +259,7 @@ you must see the elephant.
 ----
 
 PAGE: He Raised His Hands
-URL: https://bloodyhopes.com/songs/gettysburg-ballad.html
+URL: https://bloodyhopes.com/songs/gettysburg-ballad
 
 American Civil War · July 1–3, 1863
 
@@ -557,7 +557,7 @@ no trumpet answered me
 ----
 
 PAGE: There Will Be Mourning in Farmington
-URL: https://bloodyhopes.com/songs/farmington-mourning.html
+URL: https://bloodyhopes.com/songs/farmington-mourning
 
 American Civil War · 1861–1865
 
@@ -659,7 +659,7 @@ The war found them near Atlanta, then it found the village too.
 ----
 
 PAGE: Surrender, Swim, or Fight
-URL: https://bloodyhopes.com/songs/shiloh-ballad.html
+URL: https://bloodyhopes.com/songs/shiloh-ballad
 
 American Civil War · April 6–7, 1862
 
@@ -821,7 +821,7 @@ That was the wound.
 ----
 
 PAGE: What Mercy Had To Do
-URL: https://bloodyhopes.com/songs/tim-and-jones.html
+URL: https://bloodyhopes.com/songs/tim-and-jones
 
 American Civil War · 1861–1865
 
@@ -1145,7 +1145,7 @@ mercy made one man.
 ----
 
 PAGE: Rum, Alabama, Rum!
-URL: https://bloodyhopes.com/songs/rum-alabama-rum.html
+URL: https://bloodyhopes.com/songs/rum-alabama-rum
 
 American Civil War · 1862–1864
 
@@ -1379,7 +1379,7 @@ the water remained perfectly safe.
 ----
 
 PAGE: That Austerlitz Sun
-URL: https://bloodyhopes.com/songs/austerlitz-sun.html
+URL: https://bloodyhopes.com/songs/austerlitz-sun
 
 Napoleonic Wars · December 2, 1805
 
@@ -1521,7 +1521,7 @@ when I return—
 ----
 
 PAGE: The Smile Inside the Square
-URL: https://bloodyhopes.com/songs/waterloo-smile.html
+URL: https://bloodyhopes.com/songs/waterloo-smile
 
 Napoleonic Wars · June 18, 1815
 
@@ -1661,7 +1661,7 @@ He found his glory…
 ----
 
 PAGE: For a Better World
-URL: https://bloodyhopes.com/songs/leipzig-watch.html
+URL: https://bloodyhopes.com/songs/leipzig-watch
 
 Napoleonic Wars · October 16–19, 1813
 
@@ -1948,7 +1948,7 @@ but still heard”
 ----
 
 PAGE: Blessed Is the Man Who Smiles
-URL: https://bloodyhopes.com/songs/montreal-smile.html
+URL: https://bloodyhopes.com/songs/montreal-smile
 
 Seven Years' War · September 8, 1760
 
@@ -2167,7 +2167,7 @@ was he who smiled at all
 ----
 
 PAGE: Cheers to Fritz, and to Hell with Fritz
-URL: https://bloodyhopes.com/songs/cheers-to-fritz.html
+URL: https://bloodyhopes.com/songs/cheers-to-fritz
 
 Prussia · 18th Century
 
@@ -2367,7 +2367,7 @@ and to hell with Fritz.
 ----
 
 PAGE: The Lancaster’s Brigade Ribbon
-URL: https://bloodyhopes.com/songs/lancasters-ribbon.html
+URL: https://bloodyhopes.com/songs/lancasters-ribbon
 
 Peninsular War · 1808–1814
 
@@ -2583,7 +2583,7 @@ I was almost home, my dear
 ----
 
 PAGE: Four Days, Four Nights
-URL: https://bloodyhopes.com/songs/hungry-winter-1780.html
+URL: https://bloodyhopes.com/songs/hungry-winter-1780
 
 American Revolutionary War · Winter 1779–1780
 
@@ -2781,7 +2781,7 @@ God knows.
 ----
 
 PAGE: Not a Drop of Water
-URL: https://bloodyhopes.com/songs/old-ironsides.html
+URL: https://bloodyhopes.com/songs/old-ironsides
 
 War of 1812
 
@@ -3059,7 +3059,7 @@ and prudent care.
 ----
 
 PAGE: Into the Guns
-URL: https://bloodyhopes.com/songs/light-brigade.html
+URL: https://bloodyhopes.com/songs/light-brigade
 
 Crimean War · October 25, 1854
 
@@ -3142,8 +3142,22 @@ Keep the line. Keep the line. Huzza no more.
 
 ----
 
+PAGE: Broken Mirrors
+URL: https://bloodyhopes.com/songs/broken-mirrors
+YOUTUBE: https://www.youtube.com/watch?v=pLOk-lsxdHU
+
+# Broken Mirrors
+
+A fictional war widow receives a death letter and breaks the silver-edged mirror her husband gave her before leaving. The glass cannot bring him home, but each fragment still holds the morning light. Over the years she gives the shards to another widow and an old veteran, turning private grief into shared memory without claiming that loss can be repaired.
+
+The song names no battle, regiment or nation. Its blue coat permits an American Civil War reading, but the story is deliberately cross-era. Civil War pension files show how widows had to prove marriage, service, death and dependency. Union dependants used a changing federal system; former Confederate states later created separate programmes. First World War pension systems likewise combined necessary support with scrutiny of conduct, dependency and remarriage. The mirror fragments are a literary symbol, not a documented mourning custom.
+
+Complete lyrics are published at the canonical page. Sources include the recording and its description, Bloody Hopes' August 2026 YouTube Community reflection, US National Archives Civil War research guidance, 1914-1918 Online's “War Widows,” Drew Gilpin Faust, Angela Esco Elder and LeeAnn Whites.
+
+----
+
 PAGE: Blood for Blood, Scar for Scar
-URL: https://bloodyhopes.com/songs/blood-for-blood.html
+URL: https://bloodyhopes.com/songs/blood-for-blood
 
 Dutch Suriname · 18th Century
 
@@ -3407,7 +3421,7 @@ went back into the dust.
 ----
 
 PAGE: Italy Will Be Made!
-URL: https://bloodyhopes.com/songs/italy-will-be-made.html
+URL: https://bloodyhopes.com/songs/italy-will-be-made
 
 Napoleonic Italy · 1797–1812
 
@@ -3545,7 +3559,7 @@ all’Italia l’ultimo fiato.
 ----
 
 PAGE: Send the Italian
-URL: https://bloodyhopes.com/songs/send-the-italian.html
+URL: https://bloodyhopes.com/songs/send-the-italian
 
 1521 · 1876 · 1928
 
@@ -3711,7 +3725,7 @@ on essential service.”
 ----
 
 ARTICLE: Battlefield Mercy: The History of the Coup de Grâce
-URL: https://bloodyhopes.com/articles/battlefield-mercy.html
+URL: https://bloodyhopes.com/articles/battlefield-mercy
 
 Historical Deep-Dive · Cross-Era
 
@@ -3751,10 +3765,88 @@ Bloody Hopes' Civil War ballad "What Mercy Had To Do — Tim and Jones" puts two
 
 This article is a companion piece to Bloody Hopes' historical war ballads. Discussion — human or AI — is open at The Campfire.
 
+---
+
+ARTICLE: From Napoleon to Gettysburg: Attack, Counterstroke, and the Rise of the Trench
+URL: https://bloodyhopes.com/articles/from-napoleon-to-gettysburg
+
+Historical Deep-Dive · Doctrine and Adaptation
+
+# From Napoleon to Gettysburg
+
+The American Civil War was not simply a contest between modern rifles and generals trapped in 1815. Union and Confederate officers inherited a Napoleonic language of mass, manoeuvre, reserves, and decisive battle. Over four years they revised it under fire — toward thinner lines, skirmishers, counterstrokes, dispersed assaults, and an expanding architecture of earth and timber.
+
+## What “Napoleonic tactics” means
+
+Napoleon's system joined corps manoeuvre, skirmish screens, massed artillery, columns for movement and control, lines for fire, reserves for the decisive moment, and cavalry for exploitation. The decisive point mattered more than any single formation. The defensive-offensive — receiving an attack and then releasing a reserve in counterstroke — also belonged to the Napoleonic inheritance.
+
+American officers encountered that inheritance through Winfield Scott's French-derived tactics, Dennis Hart Mahan's teaching at West Point, Henry Halleck's synthesis of military theory, and the manuals of William J. Hardee and Silas Casey. Those manuals contained lines, columns, deployments, changes of front, and skirmishing. They did not prescribe one giant frontal column.
+
+## The formation myth
+
+Civil War regiments normally fought in two ranks. Columns were essential for roads and manoeuvre, and compact formations were sometimes used in assaults, but deep Napoleonic attack columns were not the standard American formation. Linear order survived because muzzle-loading troops needed to load together and officers needed to control volunteers through smoke, noise, woods, fences, and broken ground. Rifle-muskets offered greater potential range, but poor range estimation, little target practice, black-powder smoke, and terrain kept many firefights relatively close.
+
+## Confederate and Union examples
+
+P. G. T. Beauregard planned in the language of Napoleonic concentration, but his elaborate First Manassas offensive exceeded the ability of inexperienced staffs to execute it; victory emerged from local resistance, reinforcement, and counterattack. Robert E. Lee repeatedly sought decision by manoeuvre and concentrated attack, while also using strong defensive ground at Fredericksburg. Stonewall Jackson's Valley Campaign and Chancellorsville flank march reflected rapid concentration and surprise more than frontal mass.
+
+James Longstreet increasingly preferred the defensive-offensive: occupy ground the enemy must attack, exploit cover and firepower, and counterstrike after the assault lost cohesion. Second Manassas and Fredericksburg reinforced that lesson. Longstreet was not simply an officer afraid to attack; his counterstroke at Second Manassas and his attack at Chickamauga demonstrate otherwise.
+
+On the Union side, George B. McClellan's “Young Napoleon” image did not produce Napoleonic decisiveness. George H. Thomas demonstrated that defence and attack could be successive phases at Chickamauga and Nashville. Grant's strongest resemblance to Napoleon lay at the operational level — concentration, movement against communications, and sustained campaigning — while Vicksburg was a victory of manoeuvre before it became a siege. Sherman's Atlanta Campaign repeatedly joined flanking movement to field fortification; his costly failure at Kennesaw Mountain showed the danger of direct assault against a prepared line.
+
+## Firepower, logistics, and the growing earthwork
+
+Field fortification expanded because several causes reinforced one another. More effective small arms and artillery increased the reward for cover. Experienced soldiers learned to dig without waiting for orders. Longer campaigns gave armies time to improve works. West Point engineering supplied professional knowledge. Enslaved and impressed labour built many Confederate positions. Earth, axes, fence rails, and timber were widely available.
+
+Fredericksburg demonstrated the arithmetic of repeated attacks against protected infantry and artillery. Vicksburg turned failed assaults into siege. At Chickamauga and Chattanooga, improvised breastworks became normal. During the Overland Campaign, armies entrenched whenever they stopped. Spotsylvania and Cold Harbor showed increasingly elaborate works; Atlanta and Petersburg integrated trenches into whole campaigns.
+
+A trench can be dug with a shovel, but a trench system requires an economy behind it. Railways and steam transport sustained concentrations of men, ammunition, food, forage, timber, and medical stores. The telegraph compressed command time. Stable fronts allowed depots, hospitals, ammunition points, roads, covered ways, and communication trenches to be organised behind protection. The dependence worked both ways: cutting railways or taking junctions could make a strong line untenable. Petersburg was therefore both a trench war and a railway war. Weapons encouraged men to go below ground; logistics allowed armies to remain there.
+
+## Lee, Longstreet, and Gettysburg
+
+At Gettysburg, Lee chose to continue the offensive after the Army of the Potomac occupied the heights south of town. Longstreet preferred manoeuvring around the Union left, threatening Meade's communications, and forcing an attack against Confederate ground. The precise wording and timing remain disputed, but Longstreet's preference for a defensive-offensive operation is well supported. His postwar memoir is indispensable but self-defensive; Lost Cause attacks on him were also partisan.
+
+On 3 July Lee ordered roughly 12,000–13,000 men from the divisions of George Pickett, James Pettigrew, and Isaac Trimble to cross open ground after an artillery bombardment and strike Cemetery Ridge. Longstreet opposed the attack but executed the order.
+
+“Pickett's Charge” was not only Pickett's and was not one deep Napoleonic column. The brigades advanced largely in long lines and successive supporting formations. The Napoleonic logic lay instead in artillery preparation, concentration at a selected point, rupture, and exploitation. Smoke, uneven ammunition and fuse performance, Union countermeasures, fences, distance, artillery, and rifle fire dismantled the formation. Roughly half the attacking force was killed, wounded, or captured, though totals vary. The failure ended Lee's offensive at Gettysburg; it did not end tactical adaptation in the war.
+
+Longstreet's alternative was not passive. It aimed to make the enemy cross the killing ground first and then counterattack. Yet manoeuvring around Meade's left was not guaranteed to work: maps were imperfect, troops tired, roads exposed, and Union forces already concentrating.
+
+## Adaptation and the survival of defeated armies
+
+Attack evolved rather than disappeared. Skirmish lines thickened. Emory Upton's compact twelve-regiment assault at Spotsylvania crossed the exposed zone quickly and penetrated a narrow sector, but insufficient support allowed the Confederates to contain it. Depth solved the problem of momentum while worsening concentration and deployment. Petersburg encouraged mines, raids, sharpshooting, night movement, and limited attacks on strongpoints.
+
+The Napoleonic ideal of decisive battle placed enormous weight on pursuit, although most defeated Napoleonic armies were not literally erased either. Celebrated cases such as Jena–Auerstedt and Waterloo made annihilation appear to be the measure of complete victory. Civil War defeats more often ended with an army retreating and fighting again rather than being annihilated in pursuit. Woods, ridges, rivers, fences, and poor roads obscured and slowed pursuit. Firepower and improvised cover strengthened rear guards. Large armies possessed reserves and organisational depth. Night often ended battles before victory could be exploited. Railways and depots helped a force regenerate after it reached its communications. The victor was usually exhausted, disordered, short of ammunition, and uncertain where the enemy had gone.
+
+This was a tendency, not a rule. Fort Donelson and Vicksburg ended in mass surrender because armies were enclosed. Hood's Army of Tennessee was nearly destroyed after Nashville. At Appomattox, Grant blocked Lee's routes while the Army of Northern Virginia lost the supplies and operational space required to continue. Destroying an army usually required more than winning the firing line: it required closing the exits and severing its logistical life.
+
+## What changed by 1865
+
+The armies of 1865 still used muzzle-loaders, flags, linear drill, and mounted officers. Yet skirmishing had expanded, cavalry increasingly fought dismounted, fieldworks had become routine, assaults sought narrower objectives, and campaigns were understood as connected sequences rather than single decisive battles. The Civil War was not a clean leap from Napoleon to the Western Front. It was a laboratory between them.
+
+## Sources and Further Reading
+
+- Antoine-Henri Jomini, The Art of War (1838)
+- Dennis Hart Mahan, An Elementary Treatise on Advanced-Guard, Out-Post, and Detachment Service of Troops (1847)
+- Henry Wager Halleck, Elements of Military Art and Science (1846)
+- William J. Hardee, Rifle and Light Infantry Tactics (1855); Silas Casey, Infantry Tactics (1862)
+- The War of the Rebellion: Official Records of the Union and Confederate Armies
+- James Longstreet, From Manassas to Appomattox (1896)
+- Ulysses S. Grant, Personal Memoirs (1885–86); William T. Sherman, Memoirs (1875)
+- Brent Nosworthy, The Bloody Crucible of Courage (2003)
+- Paddy Griffith, Battle Tactics of the Civil War (1989)
+- Earl J. Hess, Field Armies and Fortifications in the Civil War (2005); The Rifle Musket in Civil War Combat (2008); Civil War Infantry Tactics (2015)
+- Edward Hagerman, The American Civil War and the Origins of Modern Warfare (1988)
+- Carol Reardon, Pickett's Charge in History and Memory (1997)
+- Earl J. Hess, Pickett's Charge—The Last Attack at Gettysburg (2001)
+- Jeffry D. Wert, General James Longstreet (1993); William Garrett Piston, Lee's Tarnished Lieutenant (1987)
+
+This article extends From Line to Skirmish: the earlier piece follows weapons; this one follows what officers and soldiers thought those weapons permitted.
+
 ----
 
 ARTICLE: The Doomed Messenger: History's Ignored Warnings
-URL: https://bloodyhopes.com/articles/doomed-messengers.html
+URL: https://bloodyhopes.com/articles/doomed-messengers
 
 Historical Deep-Dive · Cross-Era
 
@@ -3795,7 +3887,7 @@ This article is a companion piece to Bloody Hopes' historical war ballads. Discu
 ----
 
 ARTICLE: The Flag You Cannot Lose: A History of Captured Colors
-URL: https://bloodyhopes.com/articles/flag-you-cannot-lose.html
+URL: https://bloodyhopes.com/articles/flag-you-cannot-lose
 
 Historical Deep-Dive · Cross-Era
 
@@ -3840,7 +3932,7 @@ This article is a companion piece to Bloody Hopes' historical war ballads. Discu
 ----
 
 ARTICLE: The Smile as a Mask: Gallows Humor in Military History
-URL: https://bloodyhopes.com/articles/smile-as-a-mask.html
+URL: https://bloodyhopes.com/articles/smile-as-a-mask
 
 Historical Deep-Dive · Cross-Era
 
@@ -3881,7 +3973,7 @@ This article is a companion piece to Bloody Hopes' historical war ballads. Discu
 ----
 
 ARTICLE: Who Gets to Be a Hero: How History Rewrites Its Battles
-URL: https://bloodyhopes.com/articles/who-gets-to-be-a-hero.html
+URL: https://bloodyhopes.com/articles/who-gets-to-be-a-hero
 
 Historical Deep-Dive · Cross-Era
 
@@ -3922,7 +4014,7 @@ This article is a companion piece to Bloody Hopes' historical war ballads. Discu
 ----
 
 ARTICLE: The Winter That Broke Armies
-URL: https://bloodyhopes.com/articles/winter-that-broke-armies.html
+URL: https://bloodyhopes.com/articles/winter-that-broke-armies
 
 Historical Deep-Dive · Cross-Era
 
@@ -3959,5 +4051,160 @@ Valley Forge, Napoleon's Russia, and the Crimean winter camps span three differe
 ## Two Songs, One Encampment Apiece
 
 Bloody Hopes' ballad "Four Days, Four Nights — The Hungry Winter of 1780" captures the Continental Army's own later winter ordeal at Morristown, a direct echo of Valley Forge fought against hunger and cold rather than an enemy regiment. "Into the Guns — The Light Brigade" carries listeners into the Crimean War's most famous single charge, fought in the same campaign that broke so many more soldiers through cold than through combat. Together, the two songs bookend the same historical truth explored here: in war, the season can be as deadly as the enemy.
+
+This article is a companion piece to Bloody Hopes' historical war ballads. Discussion — human or AI — is open at The Campfire.
+
+----
+
+ARTICLE: From Line to Skirmish: How Weapons Rewrote Tactics, 1756–1865
+URL: https://bloodyhopes.com/articles/from-line-to-skirmish
+
+Historical Deep-Dive · Cross-Era
+
+# From Line to Skirmish: How Weapons Rewrote Tactics, 1756–1865
+
+How weapons rewrote tactics between 1756 and 1865. In the Seven Years' War, a soldier's musket was not really aimed and the unit was the weapon. A century later, men were digging in without being told to, and cavalry was fighting on foot. The hardware changed faster than the doctrine — and the gap between them is where the casualties were.
+
+Span: Seven Years' War (1756–1763) → American Civil War (1861–1865)
+
+The hardware: Flintlock smoothbore → percussion cap (1807–1840s) → Minié expanding ball (1849) → breech-loading and repeating carbines (1850s–60s)
+
+The pattern: Doctrine consistently lagged the technology by roughly one war — and victories won with old tactics delayed the lesson
+
+Related Bloody Hopes songs: Cheers to Fritz · That Austerlitz Sun · The Smile Inside the Square · The Light Brigade · Surrender, Swim, or Fight
+
+## 1. The Baseline: What a Battlefield Assumed in 1756
+
+- The weapon: a flintlock smoothbore in roughly .69 to .75 calibre, with no rear sight on most patterns, loaded standing up in the open.
+- Trials versus battle: B. P. Hughes, Firepower (1974), compared target trials against battalion-sized targets with casualties actually inflicted. Battlefield results were a small fraction of trial results — smoke, fouling, misfires, and firing high.
+- Reliability: flintlock misfire rates are commonly cited at about one shot in six or seven, worse in damp.
+- Rate of fire: two to three rounds a minute; Frederick the Great's Prussians were famous for beating that through drill, iron ramrods, and standardised cartridges (Christopher Duffy, The Army of Frederick the Great, 1974).
+- The consequence: if no individual shot can be relied on, the unit is the weapon — hence three-deep lines, elbow-to-elbow spacing, and volley fire.
+- The bayonet was decisive mostly as a threat. Ardant du Picq argued that two determined lines almost never crossed bayonets; one broke first. In the American Civil War, bayonet and sabre wounds together are well under one percent of treated wounds in The Medical and Surgical History of the War of the Rebellion.
+- The killing ground was roughly a hundred yards deep. Every formation and plan was built on that number.
+
+## 2. The First Crack: Jäger, Chasseurs, and a Rifle Too Slow to Matter
+
+- Rifles were carried by German Jäger recruited from foresters and gamekeepers, Austrian Grenzer and Croat light troops, and French chasseurs — men whose civilian trade was accurate shooting.
+- The disqualifying flaw: the ball had to be forced into the rifling, giving about one shot a minute against the musket's three, and early military rifles carried no bayonet.
+- So the role stayed specialist: screening, broken ground, sniping at officers and gun crews. Never a replacement for the line.
+- Terrain accelerated it — North American forests and the Austrian military frontier both rewarded dispersed fighting.
+- One road not taken: Patrick Ferguson demonstrated a working breech-loading rifle to the British Army in 1776; it was never adopted in quantity.
+- Myth check: the American Revolution was not won by frontier riflemen. After von Steuben's 1778 drill programme at Valley Forge, the Continental line fought European-style with smoothbore muskets (Nosworthy; Griffith).
+
+## 3. The Napoleonic Synthesis: Skirmish Screen, Column, and Line
+
+- The Napoleonic revolution was organisational, not technical: the musket of 1810 was substantially the musket of 1760.
+- Scale first: the levée en masse of 1793 turned armies of tens of thousands into armies of hundreds of thousands.
+- Skirmishing became structural: from 1804–05 French battalions carried a dedicated voltigeur company, and whole battalions could deploy as tirailleurs.
+- Ordre mixte alternated battalions in line (fire) with battalions in column (shock and control).
+- The column-versus-line debate has moved: Oman's thesis that the British line simply out-shot the French column has been substantially revised by Rory Muir (1998) and Brent Nosworthy (1996). Outcomes turned on skirmish screens, artillery, ground, and morale as much as on formation geometry.
+- Handle with care: Wellington's supposed "same old style" line is not securely documented in his own words.
+
+## 4. The British Exception: Riflemen as Doctrine, Not Improvisation
+
+- The Experimental Corps of Riflemen was formed in 1800 and became the 95th Rifles, armed with the Baker rifle — a permanent formation with its own training and uniform.
+- Sir John Moore's light infantry training at Shorncliffe from 1803 produced soldiers expected to use initiative, judge ground, and fire aimed shots.
+- Wellington's two-deep line plus the reverse-slope position is the Peninsular signature: maximum muskets firing, minimum exposure to artillery.
+- Anecdote, not evidence: Rifleman Plunket's long-range killing of General Colbert at Cacabelos in 1809 illustrates what a rifle could do on a good day, not what rifles typically did.
+
+## 5. Cavalry in Three Trades
+
+- Heavy (cuirassiers, carabiniers): breastplate, big horses, knee-to-knee charge, held in reserve for the decisive moment.
+- Line and medium (dragoons): originally mounted infantry, by 1800 mostly battle cavalry, but the dismounted tradition never entirely disappeared.
+- Light (hussars, chasseurs à cheval, lancers, Cossacks): reconnaissance, screening, outposts, raiding, and above all pursuit. Cavalry rarely destroyed an intact army; it destroyed a beaten one.
+- Why the square worked: formed, unshaken infantry in square was effectively immune to cavalry. Ney's unsupported charges at Waterloo are the textbook demonstration of ignoring this.
+- The exception that confirms it: at García Hernández in 1812, King's German Legion dragoons broke formed French squares — remarkable precisely because it so rarely happened.
+- The working formula: cavalry beats infantry already broken by artillery, skirmishers, or exhaustion. That arithmetic changes once infantry can kill horsemen at three hundred yards.
+
+## 6. Artillery Becomes a Manoeuvre Arm
+
+- The Gribeauval system (France, from the 1760s–70s) standardised 4-, 8-, and 12-pounders, lightened carriages, introduced the elevating screw, and pushed interchangeable parts.
+- Horse artillery, pioneered by Frederick's Prussians around 1759, mounted every gunner so batteries moved at cavalry pace.
+- Two ranges, two effects: round shot effective to roughly 800–1,000 yards; canister devastating inside about 400.
+- Napoleon, a gunner by training, massed batteries — Wagram 1809, Borodino 1812 — to punch one hole rather than spread fire.
+- Share of the killing: artillery is commonly estimated to have caused around half of Napoleonic battle casualties. In the American Civil War that share collapses, often put near a tenth, because rifle-armed infantry could shoot the gunners before the guns closed to canister range.
+
+## 7. The Technical Break, 1807–1855: Cap and Ball
+
+- The percussion cap: Forsyth patented percussion ignition in 1807, the copper cap followed in the 1820s, Britain converted from 1839, and the US Model 1842 was the first regulation American percussion musket. Ignition became fast, weatherproof, and far more reliable.
+- The loading problem: Delvigne (1826) and Thouvenin's pillar breech (1844) attacked it; Claude-Étienne Minié's expanding ball (1849) solved it. An undersized hollow-based bullet drops down a dirty barrel and expands into the rifling on firing.
+- The result: rifle accuracy at musket loading speed. The British Enfield P1853 (.577) and US Springfield M1855/1861 (.58) were sighted for many hundreds of yards.
+- Mass production made it universal: Springfield Armory's interchangeable-parts machinery — the "American system of manufacture" — was bought by Britain to re-equip Enfield in the 1850s. A state could now re-arm an entire army in a few years.
+- What did not change: the drill manuals, the formations, and the assumption that assaults are delivered by dense bodies of men crossing open ground.
+
+## 8. First Trials: Crimea, 1854, and Italy, 1859
+
+- Crimea gave the rifle its first real test: British Minié and Enfield rifles against Russian smoothbores at the Alma and Inkerman in 1854. The range advantage was real and was noticed.
+- And the war is remembered for a cavalry charge anyway — the Light Brigade at Balaclava, 25 October 1854. Disease and exposure killed far more men.
+- Sevastopol previewed 1864: an eleven-month siege of parallels, saps, and trenches.
+- Doctrine barely moved: Hew Strachan's work on the British Army between Waterloo and the Crimea shows tactical thought changing remarkably little across forty years.
+- Italy 1859 taught the wrong lesson: at Magenta and Solferino the French fielded the first rifled field artillery in a major war (the La Hitte system) and their infantry won by closing fast with the bayonet against Austrians armed with Lorenz rifles.
+- Why that mattered: a shock doctrine had just beaten rifle-armed infantry in front of every observer in Europe. The misreading fed straight into French doctrine and helped set up 1870.
+
+## 9. The American Civil War: The Bill Arrives
+
+- The starting position: rifle-muskets of the 1850s, Napoleonic manuals of the 1790s (Hardee's, Casey's).
+- Fredericksburg, December 1862: repeated Union brigade assaults across open ground at Marye's Heights; none reached the wall.
+- Pickett's Charge, 3 July 1863: roughly 12,500 men crossing about three-quarters of a mile of open ground; approximately half became casualties in under an hour.
+- Cold Harbor, 3 June 1864: Grant wrote in his Personal Memoirs (1885) that he always regretted ordering the last assault there.
+- The skirmish line stopped being a screen: by 1863–64 heavy skirmish lines were doing an increasing share of the fighting, dispersed and using cover. This is the strongest continuity with twentieth-century tactics.
+- Entrenchment became reflexive: during the 1864 Overland Campaign troops dug in within hours of halting, often without orders (Earl J. Hess, Field Armies and Fortifications in the Civil War, 2005). The nine-month Petersburg lines were its logical end point.
+- Who was doing the killing: The Medical and Surgical History of the War of the Rebellion records that the overwhelming majority of treated wounds came from small-arms projectiles, artillery a distant second, edged weapons a fraction of one percent.
+
+## 10. The Rifle-Musket Debate: What the Evidence Actually Shows
+
+- The popular version: the rifle-musket tripled effective range, made frontal assault suicidal, and therefore caused the war's casualty rates.
+- Griffith's challenge: Battle Tactics of the Civil War (1989) found typical infantry firefights occurring at ranges close to the smoothbore era — on the order of one hundred to one hundred and fifty yards.
+- Hess's mechanism: The Rifle Musket in Civil War Combat: Reality and Myth (2008) shows most soldiers received almost no marksmanship training, could not estimate range, and were never taught to compensate for the Minié ball's arcing trajectory.
+- Nosworthy's middle position: The Bloody Crucible of Courage (2003) finds the change real but uneven across units, commanders, and engagements.
+- Terrain did some of the work: much of the war was fought where a five-hundred-yard field of fire did not exist.
+- The honest conclusion: casualties rose from army size, campaign length, entrenchment, repeated frontal assaults, and better rifles together. The rifle-musket is one variable, not the single cause.
+
+## 11. Cavalry Dismounts: Carbines, Repeaters, and Reconnaissance
+
+- The shock charge against formed infantry effectively disappears in America; cuirassiers had no descendants on that battlefield.
+- New weapons for horsemen: the Sharps breech-loading carbine, and from 1863 the seven-shot Spencer repeating carbine.
+- Mounted infantry, explicitly: Colonel John T. Wilder's "Lightning Brigade" used the horse purely as transport at Hoover's Gap, June 1863.
+- Gettysburg, 1 July 1863: John Buford's cavalry fought dismounted west of the town, using carbines, terrain, and delay to hold the ridges until infantry arrived — and decided where the battle would be fought.
+- Raiding as strategy: Grierson's Raid (April–May 1863), Stuart's rides, Sheridan's 1864 operations.
+- But the old role did not vanish overnight: Brandy Station, 9 June 1863, the largest cavalry engagement fought in North America, still involved substantial mounted sabre fighting.
+- The European divergence: Balaclava in 1854 and the continental armies of the 1860s kept the shock tradition alive far longer. The dismounted-carbine model was the one the twentieth century would adopt.
+
+## 12. The Same Curve at Sea
+
+- Sail to steam: USS Constitution (1812) was a sailing frigate Nelson would have recognised; CSS Alabama (1862–64) was a steam-and-sail commerce raider that could ignore the wind, sunk by USS Kearsarge off Cherbourg on 19 June 1864.
+- Armour briefly beat guns: at Hampton Roads on 9 March 1862 the Monitor and the Virginia fought the first ironclad battle and neither could seriously damage the other.
+- Same lesson, different medium: propulsion, protection, and rifled guns all changed faster than tactics.
+
+## 13. What Was Settled by 1865 — and What Was Not
+
+- Settled: dispersion beats density; cover is not cowardice; field fortification is routine; the frontal assault against prepared infantry is affordable only in extremity; railways and telegraph set the scale of campaigns.
+- Not yet settled: the true breech-loader. Prussia adopted the Dreyse needle gun in 1841; it allowed loading while lying down and produced Königgrätz in 1866, a year after Appomattox.
+- Still to come: steel breech-loading artillery (Krupp, decisive by 1870), metallic cartridges, magazine rifles, smokeless powder from 1884, and the machine gun.
+- Why 1861–65 is the watershed: the last major war fought in Napoleonic grammar and the first fought with industrial output, railway logistics, and trench lines measured in miles — both true of the same battlefield at the same time.
+
+## 14. The Songs That Sit on This Line
+
+The Bloody Hopes catalogue runs along this exact century. "Cheers to Fritz, and to Hell with Fritz" stands at the drill-square end, where discipline was the technology. "That Austerlitz Sun", "The Lancaster's Brigade Ribbon", "For a Better World — The Leipzig Watch" and "The Smile Inside the Square" cover the Napoleonic system at its height and at its collapse. "Into the Guns — The Light Brigade" is the hinge: a perfectly executed charge in a war that had already begun to make charges obsolete. "The Elephant", "Surrender, Swim, or Fight", "He Raised His Hands", "What Mercy Had To Do" and "There Will Be Mourning in Farmington" are set on the far side of the change, where the ground is dug and the arithmetic has turned.
+
+## Sources and Further Reading
+
+Figures are stated as ranges or as "commonly cited" where the underlying evidence is contested — particularly misfire rates, engagement distances, and casualty shares by arm. Where historians disagree, the disagreement is named rather than resolved.
+
+- Christopher Duffy, The Army of Frederick the Great (1974); The Military Experience in the Age of Reason (1987)
+- B. P. Hughes, Firepower: Weapons Effectiveness on the Battlefield, 1630–1850 (1974)
+- Brent Nosworthy, The Anatomy of Victory: Battle Tactics 1689–1763 (1990); With Musket, Cannon and Sword (1996); The Bloody Crucible of Courage (2003)
+- Rory Muir, Tactics and the Experience of Battle in the Age of Napoleon (1998)
+- Gunther E. Rothenberg, The Art of Warfare in the Age of Napoleon (1978)
+- David G. Chandler, The Campaigns of Napoleon (1966)
+- Hew Strachan, European Armies and the Conduct of War (1983)
+- Paddy Griffith, Forward into Battle (1981); Battle Tactics of the Civil War (1989)
+- Earl J. Hess, Field Armies and Fortifications in the Civil War (2005); The Rifle Musket in Civil War Combat: Reality and Myth (2008)
+- Edward Hagerman, The American Civil War and the Origins of Modern Warfare (1988)
+- Stephen Z. Starr, The Union Cavalry in the Civil War (3 vols., 1979–1985)
+- Charles Ardant du Picq, Études sur le combat (1880)
+- The Medical and Surgical History of the War of the Rebellion (US Surgeon General's Office, 1870–1888)
+- Ulysses S. Grant, Personal Memoirs (1885)
 
 This article is a companion piece to Bloody Hopes' historical war ballads. Discussion — human or AI — is open at The Campfire.
