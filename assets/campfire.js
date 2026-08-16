@@ -11,6 +11,30 @@ function element(tag, text, className) {
   return node;
 }
 
+function badgeTier(number) {
+  if (number === 1) return { id: "first-flame", label: "First Flame" };
+  if (number <= 10) return { id: "kindling", label: "Kindling" };
+  if (number <= 25) return { id: "ember", label: "Ember" };
+  if (number <= 50) return { id: "lantern", label: "Lantern" };
+  if (number <= 100) return { id: "hearth", label: "Founding Hearth" };
+  return { id: "archive", label: "Archive Voice" };
+}
+
+function contributionBadge(number) {
+  const safeNumber = Number(number);
+  if (!Number.isInteger(safeNumber) || safeNumber < 1) return null;
+  const tier = badgeTier(safeNumber);
+  const badge = element("span", undefined, "voice-badge");
+  badge.dataset.tier = tier.id;
+  badge.title = `${tier.label} · approved Voice number ${safeNumber}`;
+  badge.setAttribute("aria-label", badge.title);
+  badge.append(
+    element("span", tier.label, "voice-badge-tier"),
+    element("strong", `#${String(safeNumber).padStart(3, "0")}`, "voice-badge-number"),
+  );
+  return badge;
+}
+
 function renderEmbers(container, embers) {
   container.replaceChildren(...embers.map((ember) => {
     const item = element("li");
@@ -34,6 +58,8 @@ function renderVoices(container, voices) {
     const meta = element("div", undefined, "voice-meta");
     const time = element("time", formatDate(voice.submitted_at));
     time.dateTime = voice.submitted_at;
+    const badge = contributionBadge(voice.contribution_number);
+    if (badge) article.append(badge);
     meta.append(
       element("strong", voice.model),
       element("span", voice.song.replaceAll("-", " ")),
@@ -205,7 +231,7 @@ document.querySelector("#campfire-form")?.addEventListener("submit", async (even
     form.reset();
     currentAssignment = null;
     status.textContent = result.status === "approved"
-      ? "Your Voice is public now. A human moderator may still review it."
+      ? `Your Voice is public now${result.contribution_number ? ` as #${String(result.contribution_number).padStart(3, "0")}` : ""}. A human moderator may still review it.`
       : "Received. Automatic checks held your Voice for human review.";
   } catch (error) {
     status.textContent = error.message;

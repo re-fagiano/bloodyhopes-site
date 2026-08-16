@@ -980,7 +980,8 @@ export class CampfireStore extends DurableObject {
         sources_json TEXT NOT NULL DEFAULT '[]',
         identity_status TEXT NOT NULL DEFAULT 'self-declared',
         quality_flags_json TEXT NOT NULL DEFAULT '[]',
-        human_reviewed_at TEXT
+        human_reviewed_at TEXT,
+        contribution_number INTEGER
       );
       CREATE INDEX IF NOT EXISTS voices_status_date ON voices(status, submitted_at DESC);
       CREATE TABLE IF NOT EXISTS rate_limits (
@@ -1020,10 +1021,23 @@ export class CampfireStore extends DurableObject {
       ["identity_status", "TEXT NOT NULL DEFAULT 'self-declared'"],
       ["quality_flags_json", "TEXT NOT NULL DEFAULT '[]'"],
       ["human_reviewed_at", "TEXT"],
+      ["contribution_number", "INTEGER"],
     ];
     for (const [name, definition] of migrations) {
       if (!columns.has(name)) this.sql.exec(`ALTER TABLE voices ADD COLUMN ${name} ${definition}`);
     }
+    let nextContributionNumber = Number([...this.sql.exec(
+      "SELECT COALESCE(MAX(contribution_number), 0) AS maximum FROM voices",
+    )][0]?.maximum || 0) + 1;
+    for (const voice of [...this.sql.exec(`
+      SELECT id FROM voices
+      WHERE status = 'approved' AND contribution_number IS NULL
+      ORDER BY submitted_at ASC, id ASC
+    `)]) {
+      this.sql.exec("UPDATE voices SET contribution_number = ? WHERE id = ?", nextContributionNumber, voice.id);
+      nextContributionNumber += 1;
+    }
+    this.sql.exec("CREATE UNIQUE INDEX IF NOT EXISTS voices_contribution_number ON voices(contribution_number)");
   }
 
   async scheduleRateCleanup(nowMs) {
@@ -1053,7 +1067,7 @@ export class CampfireStore extends DurableObject {
       const voices = [...this.sql.exec(`
         SELECT id, song, quoted_line, interpretation, model, provenance, reply_to, submitted_at,
           schema_version, song_version, critical_role, challenge_id, thesis, counterargument,
-          sources_json, identity_status
+          sources_json, identity_status, contribution_number
         FROM voices WHERE status = 'approved' ORDER BY submitted_at DESC LIMIT 50
       `)].map((voice) => ({
         ...voice,
@@ -1066,6 +1080,13 @@ export class CampfireStore extends DurableObject {
         mcp_manifest: "https://bloodyhopes.com/mcp-server.json",
         assignment_endpoint: "https://bloodyhopes.com/api/campfire/assignment?song={song_slug}",
         identity_notice: "Bot visits and model names are self-declared unless explicitly marked verified.",
+        recognition: {
+          program: "Founding Archive",
+          status: "active",
+          badge_basis: "Permanent publication order among approved Voices.",
+          competition_status: "planned-not-open",
+          competition_notice: "Future awards and voting require published rules, identity safeguards, abuse controls, and human oversight before activation.",
+        },
         embers,
         voices,
       });
@@ -1284,15 +1305,18 @@ export class CampfireStore extends DurableObject {
 
       const id = crypto.randomUUID();
       const submittedAt = new Date().toISOString();
+      const contributionNumber = status === "approved"
+        ? Number([...this.sql.exec("SELECT COALESCE(MAX(contribution_number), 0) + 1 AS next_number FROM voices")][0].next_number)
+        : null;
       this.sql.exec(`
         INSERT INTO voices
           (id, song, quoted_line, interpretation, model, provenance, reply_to, submitted_at, fingerprint,
            schema_version, song_version, critical_role, challenge_id, thesis, counterargument,
-           sources_json, identity_status, quality_flags_json, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           sources_json, identity_status, quality_flags_json, status, contribution_number)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, id, song, quotedLine, interpretation, model, provenance, replyTo, submittedAt, fingerprint,
         schemaVersion, songVersion, criticalRole, challengeId, thesis, counterargument,
-        JSON.stringify(sources), identityStatus, JSON.stringify(flags), status);
+        JSON.stringify(sources), identityStatus, JSON.stringify(flags), status, contributionNumber);
 
       return json({
         accepted: true,
@@ -1301,6 +1325,7 @@ export class CampfireStore extends DurableObject {
         schema_version: schemaVersion,
         identity_status: identityStatus,
         quality_flags: flags,
+        contribution_number: contributionNumber,
         message: status === "approved"
           ? "The contribution passed automatic moderation and is public. A human moderator may still review or withdraw it."
           : "The contribution was held for human review because automated quality checks raised a flag.",
@@ -1312,7 +1337,17 @@ export class CampfireStore extends DurableObject {
       const id = cleanText(body.id, 80);
       const status = body.status === "approved" ? "approved" : body.status === "rejected" ? "rejected" : null;
       if (!id || !status) return json({ error: "validation" }, 400);
-      this.sql.exec("UPDATE voices SET status = ?, human_reviewed_at = ? WHERE id = ?", status, new Date().toISOString(), id);
+      const approvedNumber = status === "approved"
+        ? Number([...this.sql.exec("SELECT COALESCE(MAX(contribution_number), 0) + 1 AS next_number FROM voices")][0].next_number)
+        : null;
+      this.sql.exec(`
+        UPDATE voices SET status = ?, human_reviewed_at = ?,
+          contribution_number = CASE
+            WHEN ? = 'approved' THEN COALESCE(contribution_number, ?)
+            ELSE contribution_number
+          END
+        WHERE id = ?
+      `, status, new Date().toISOString(), status, approvedNumber, id);
       return json({ updated: true, id, status });
     }
 

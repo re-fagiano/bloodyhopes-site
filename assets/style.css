@@ -393,13 +393,34 @@ footer.site a:hover { color: var(--gold); }
 .protocol-links { display: flex; flex-wrap: wrap; gap: 0.8rem 1.6rem; margin-top: 1.2rem; font-size: 0.9rem; }
 .identity-note { margin-top: 1.4rem; color: var(--ink-dim); font-size: 0.85rem; }
 .voice-list { margin-top: 2rem; }
-.voice-entry { padding: 1.6rem 0 1.8rem; border-top: 1px solid var(--line); }
+.voice-entry { position: relative; padding: 1.6rem 8rem 1.8rem 0; border-top: 1px solid var(--line); }
 .voice-entry:last-child { border-bottom: 1px solid var(--line); }
 .voice-meta { display: flex; flex-wrap: wrap; gap: 0.65rem 1.2rem; align-items: baseline; color: var(--ink-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .voice-meta strong { color: var(--gold); }
 .voice-meta span { color: var(--ink); }
 .voice-entry blockquote { margin: 1rem 0 0.7rem; font-family: var(--serif); font-size: 1.2rem; color: var(--ink); }
 .voice-entry p { margin: 0; max-width: 800px; color: var(--ink-dim); }
+.voice-badge { position: absolute; top: 1.35rem; right: 0; display: grid; min-width: 6.3rem; padding: 0.5rem 0.65rem; border: 1px solid currentColor; color: #c6baa4; text-align: right; background: rgba(8,7,6,0.72); transition: transform 180ms ease, background-color 180ms ease; }
+.voice-entry:hover .voice-badge { transform: translateY(-2px); background: #080706; }
+.voice-badge-tier { font-size: 0.58rem; line-height: 1.2; letter-spacing: 0.1em; text-transform: uppercase; }
+.voice-badge-number { font-family: var(--serif); font-size: 1.15rem; line-height: 1.1; }
+.voice-badge[data-tier="first-flame"] { color: #f0c96d; }
+.voice-badge[data-tier="kindling"] { color: #c98355; }
+.voice-badge[data-tier="ember"] { color: #d45c45; }
+.voice-badge[data-tier="lantern"] { color: #79a9b7; }
+.voice-badge[data-tier="hearth"] { color: #a98cc2; }
+.voice-badge[data-tier="archive"] { color: #a9adb2; }
+.recognition-note { display: flex; justify-content: space-between; gap: 2rem; align-items: end; margin-top: 1.4rem; padding: 1.4rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.recognition-note p { max-width: 760px; margin: 0.35rem 0 0; color: var(--ink-dim); }
+.recognition-note > a { flex: none; }
+.badge-key { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 1.4rem; }
+.badge-key span { padding: 0.5rem 0.7rem; border: 1px solid currentColor; color: #c6baa4; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.badge-key [data-tier="first-flame"] { color: #f0c96d; }.badge-key [data-tier="kindling"] { color: #c98355; }.badge-key [data-tier="ember"] { color: #d45c45; }.badge-key [data-tier="lantern"] { color: #79a9b7; }.badge-key [data-tier="hearth"] { color: #a98cc2; }.badge-key [data-tier="archive"] { color: #a9adb2; }
+.code-examples { min-width: 0; margin-top: 1.6rem; border-top: 1px solid var(--line); }
+.code-examples details { min-width: 0; overflow: hidden; border-bottom: 1px solid var(--line); }
+.code-examples summary { cursor: pointer; padding: 1rem 0; color: var(--gold); font-weight: 600; }
+.code-examples pre { box-sizing: border-box; width: 100%; max-width: 100%; margin: 0 0 1.2rem; padding: 1rem; overflow-x: auto; background: #080706; border-left: 3px solid var(--accent); }
+.code-examples code { color: var(--ink); font-size: 0.82rem; }
 .voice-thesis { max-width: 800px; margin: 1.1rem 0 0; font-size: 1.15rem; }
 .voice-counterargument { margin-top: 0.8rem !important; padding-left: 1rem; border-left: 1px solid var(--line); font-size: 0.9rem; }
 .voice-reply, .voice-sources { display: inline-block; margin-top: 0.9rem; color: var(--gold); font-size: 0.8rem; }
@@ -493,6 +514,9 @@ footer.site a:hover { color: var(--gold); }
   .ember-list li { grid-template-columns: 10px 1fr; }
   .ember-list time { grid-column: 2; }
   .protocol-line { align-items: flex-start; flex-direction: column; }
+  .voice-entry { padding-right: 0; padding-top: 4.6rem; }
+  .voice-badge { left: 0; right: auto; top: 1.1rem; text-align: left; }
+  .recognition-note { align-items: flex-start; flex-direction: column; }
   .assignment-controls { grid-template-columns: 1fr; }
   .assignment-controls label { grid-column: 1; }
   .assignment-result { grid-template-columns: 1fr; gap: 1.6rem; }
