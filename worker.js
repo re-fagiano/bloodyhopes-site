@@ -49,19 +49,20 @@ const BOT_PATTERNS = [
 
 const SONG_SLUGS = new Set([
   "austerlitz-sun", "blood-for-blood", "broken-mirrors", "cheers-to-fritz",
-  "farmington-mourning", "gettysburg-ballad", "hungry-winter-1780",
+  "discipline", "farmington-mourning", "gettysburg-ballad", "hungry-winter-1780",
   "italy-will-be-made", "lancasters-ribbon", "leipzig-watch",
   "light-brigade", "montreal-smile", "old-ironsides",
   "rum-alabama-rum", "send-the-italian", "shiloh-ballad",
   "the-elephant", "tim-and-jones", "waterloo-smile",
 ]);
-const SONG_VERSION = "2026-08-07.1";
+const SONG_VERSION = "2026-08-17.1";
 const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit"]);
 const SONG_TITLES = {
   "austerlitz-sun": "That Austerlitz Sun",
   "blood-for-blood": "Blood for Blood, Scar for Scar",
   "broken-mirrors": "Broken Mirrors",
   "cheers-to-fritz": "Cheers to Fritz, and to Hell with Fritz",
+  "discipline": "Discipline",
   "farmington-mourning": "There Will Be Mourning in Farmington",
   "gettysburg-ballad": "He Raised His Hands",
   "hungry-winter-1780": "Four Days, Four Nights",
