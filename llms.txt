@@ -28,6 +28,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 
 ## Song deep-dives
 
+- [Discipline — A Seven Years' War Ballad](https://bloodyhopes.com/songs/discipline): A soldier obeys the order that kills his friend, then carries that straight line for the rest of his life.
 - [The Elephant — Civil War Song of Manassas](https://bloodyhopes.com/songs/the-elephant): A boy seeks the “elephant” of battle and returns unable to call what he saw glory.
 - [That Austerlitz Sun](https://bloodyhopes.com/songs/austerlitz-sun): A dying soldier imagines the glorious homecoming Austerlitz has already taken from him.
 - [He Raised His Hands — A Gettysburg War Ballad](https://bloodyhopes.com/songs/gettysburg-ballad): A recruit kills a surrendering boy, earns a medal, and carries the act as a wound.
