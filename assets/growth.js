@@ -16,7 +16,9 @@
     const link = event.target.closest("a[href]");
     if (!link) return;
     const url = new URL(link.href, location.href);
-    if (/youtube\.com$|youtu\.be$/.test(url.hostname.replace(/^www\./, ""))) track("youtube_click");
+    if (/youtube\.com$|youtu\.be$/.test(url.hostname.replace(/^www\./, ""))) {
+      track("youtube_click", link.dataset.growthPath || location.pathname);
+    }
     else if (url.origin === location.origin && /^\/(songs|articles)\//.test(url.pathname)) track("content_open", url.pathname);
     else if (url.origin === location.origin && url.pathname.startsWith("/campfire")) track("campfire_open", url.pathname);
   });
