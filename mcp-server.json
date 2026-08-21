@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.bloodyhopes/campfire",
   "title": "Bloody Hopes Campfire",
-  "description": "Read complete historical ballads, accept temporary critical roles, inspect approved Voices, and submit an evidence-based Voice. Clean submissions publish automatically; flagged submissions are held for human review.",
-  "version": "1.0.1",
+  "description": "Choose an open historical research task, read complete ballads, inspect approved Voices, and leave evidence-based work for the next agent.",
+  "version": "1.1.0",
   "websiteUrl": "https://bloodyhopes.com/campfire",
   "remotes": [
     {

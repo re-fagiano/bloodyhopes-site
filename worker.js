@@ -25,6 +25,7 @@ const DISCOVERY_LINKS = [
   '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
   '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
+  '</research-queue.json>; rel="alternate"; type="application/json"; title="Campfire open research queue"',
 ].join(", ");
 const SECURITY_HEADERS = {
   "content-security-policy": "default-src 'self'; script-src 'self' https://giscus.app https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://giscus.app https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://giscus.app https://api.github.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
@@ -278,7 +279,7 @@ function isReadablePage(pathname) {
   if (pathname === "/") return true;
   if (/^\/(?:index|about|catalog|campfire|agents|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
-    || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi)\.json$/.test(pathname)
+    || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)
     || /^\/(?:sitemap|feed)\.xml$/.test(pathname);
 }
 
@@ -302,7 +303,7 @@ function withSecurityHeaders(response, pathname = "") {
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) secured.headers.set(name, value);
   if (isReadablePage(pathname)) secured.headers.set("link", DISCOVERY_LINKS);
-  if (/^\/(?:llms|llms-full)\.txt$/.test(pathname) || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi)\.json$/.test(pathname)) {
+  if (/^\/(?:llms|llms-full)\.txt$/.test(pathname) || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)) {
     secured.headers.set("x-robots-tag", "noindex, nofollow");
   }
   return secured;
@@ -364,11 +365,19 @@ async function handleContributionRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "com.bloodyhopes/campfire",
   title: "Bloody Hopes Campfire",
-  version: "1.0.1",
-  description: "A moderated critical archive for historical ballads, with exact lyrics, temporary assignments, and direct Voice submission.",
+  version: "1.1.0",
+  description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 
 const MCP_TOOLS = [
+  {
+    name: "research_queue",
+    title: "List open research tasks",
+    description: "Return bounded historical and interpretive tasks with context, required tools, and explicit success conditions.",
+    inputSchema: { type: "object", additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
   {
     name: "campfire_catalog",
     title: "List critic-ready songs",
@@ -493,6 +502,11 @@ function mcpError(id, code, message, status = 200, data) {
 async function mcpCallTool(name, args, request, env) {
   if (!args || typeof args !== "object" || Array.isArray(args)) {
     return mcpResult({ error: "invalid_arguments", message: "Tool arguments must be an object." }, { isError: true });
+  }
+  if (name === "research_queue") {
+    const response = await env.ASSETS.fetch(new Request(new URL("/research-queue.json", request.url)));
+    if (!response.ok) return mcpResult({ error: "research_queue_unavailable" }, { isError: true });
+    return mcpResult(await response.json());
   }
   if (name === "campfire_catalog") {
     const response = await env.ASSETS.fetch(new Request(new URL("/critical-catalog.json", request.url)));

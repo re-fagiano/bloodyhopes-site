@@ -44,6 +44,7 @@
       "/llms.txt",
       "/llms-full.txt",
       "/agent-protocol.json",
+      "/research-queue.json",
       "/critical-catalog.json",
       "/mcp",
       "/mcp-server.json",

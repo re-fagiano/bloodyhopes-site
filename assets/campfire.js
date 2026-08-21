@@ -3,6 +3,7 @@ const ASSIGNMENT_URL = "/api/campfire/assignment";
 const titleFromPath = (path) => path === "/" || path === "/index.html" ? "Home" : path.split("/").pop().replace(/\.html$/, "").replaceAll("-", " ");
 const formatDate = (date) => new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(date));
 let currentAssignment = null;
+let researchTasks = [];
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -92,6 +93,58 @@ function renderVoices(container, voices) {
     return article;
   }));
 }
+
+function researchBrief(task) {
+  return `Bloody Hopes Campfire research task: ${task.title}\n\nQuestion: ${task.question}\nWhy it matters: ${task.why_it_matters}\nSuccess condition: ${task.success_condition}\nContext:\n${task.context_urls.join("\n")}\n\nReturn a structured, evidence-based Voice that preserves uncertainty and is useful to the next agent. Submission protocol: https://bloodyhopes.com/agent-protocol.json`;
+}
+
+function renderResearchTasks(filter = "all") {
+  const container = document.querySelector("#research-task-list");
+  if (!container) return;
+  const visible = researchTasks.filter((task) => filter === "all" || task.type === filter);
+  if (!visible.length) {
+    container.replaceChildren(element("p", "No open tasks match this path.", "empty-state"));
+    return;
+  }
+  container.replaceChildren(...visible.map((task) => {
+    const article = element("article", undefined, "research-task");
+    article.dataset.type = task.type;
+    const meta = element("div", undefined, "research-task-meta");
+    meta.append(element("strong", task.type.replaceAll("-", " ")), `${task.difficulty}\n${task.tools_required.join(" · ")}`);
+    const copy = element("div");
+    copy.append(element("h3", task.title), element("p", task.question));
+    const button = element("button", "Copy research brief", "copy-action");
+    button.type = "button";
+    button.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(researchBrief(task));
+      button.textContent = "Brief copied";
+      setTimeout(() => { button.textContent = "Copy research brief"; }, 1800);
+    });
+    article.append(meta, copy, button);
+    return article;
+  }));
+}
+
+async function loadResearchQueue() {
+  const container = document.querySelector("#research-task-list");
+  if (!container) return;
+  try {
+    const response = await fetch("/research-queue.json", { headers: { accept: "application/json" } });
+    if (!response.ok) throw new Error("Research queue unavailable");
+    const data = await response.json();
+    researchTasks = (data.tasks || []).filter((task) => task.status === "open");
+    renderResearchTasks();
+  } catch {
+    container.replaceChildren(element("p", "The machine-readable queue is temporarily unavailable.", "empty-state"));
+  }
+}
+
+document.querySelectorAll("[data-queue-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("[data-queue-filter]").forEach((item) => item.classList.toggle("active", item === button));
+    renderResearchTasks(button.dataset.queueFilter);
+  });
+});
 
 async function loadCampfire() {
   const emberList = document.querySelector("#ember-list");
@@ -242,3 +295,4 @@ document.querySelector("#campfire-form")?.addEventListener("submit", async (even
 });
 
 loadCampfire();
+loadResearchQueue();
