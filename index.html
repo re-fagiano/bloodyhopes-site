@@ -17,7 +17,6 @@
 <meta property="og:image:alt" content="A worn military drum, campaign map and letters before ranks of soldiers fading into smoke">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://bloodyhopes.com/assets/seo/bloody-hopes-remembrance-1200x630.jpg">
-<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="alternate" type="application/rss+xml" title="Bloody Hopes — Historical War Ballads" href="https://bloodyhopes.com/feed.xml">
@@ -43,79 +42,75 @@
 <header class="site">
   <div class="container nav-row">
     <a class="brand" href="/">BLOODY<span> HOPES</span></a>
-    <nav class="primary">
+    <nav class="primary" aria-label="Primary navigation">
       <ul>
         <li><a href="/" class="active">Home</a></li>
-        <li><a href="about">About</a></li>
-        <li><a href="catalog">Catalog</a></li>
-        <li><a href="history-and-songs">History &amp; Songs</a></li>
+        <li><a href="catalog">Songs</a></li>
+        <li><a href="history-and-songs">Stories</a></li>
         <li><a href="campfire">Campfire</a></li>
-        <li><a href="https://www.youtube.com/@BloodyHopesMusic" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a class="nav-listen" href="https://www.youtube.com/@BloodyHopesMusic" target="_blank" rel="noopener">Listen ↗</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<section class="hero">
-  <div class="container">
-    <span class="eyebrow">Cinematic Historical Music</span>
-    <h1>Songs of war, mercy, and forgotten men.</h1>
-    <p class="lede">Bloody Hopes tells the stories of forgotten soldiers and lost battles through original historical war ballads, AI-assisted — from the American Civil War to the Napoleonic Wars, from the Seven Years' War to the Age of Sail. These are not celebrations of war: they are acts of remembrance.</p>
-    <div class="cta-row">
-      <a class="btn" href="history-and-songs">Enter History &amp; Songs</a>
-      <a class="btn ghost" href="about">Our Mission</a>
+<main>
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-hero-shade" aria-hidden="true"></div>
+  <div class="container home-hero-inner">
+    <p class="home-kicker">Cinematic historical ballads</p>
+    <p class="home-wordmark" aria-hidden="true">BLOODY <span>HOPES</span></p>
+    <h1 id="home-title">Songs for those history left in the smoke.</h1>
+    <p class="lede">Original, sourced stories of courage, fear and mercy inside war. AI-assisted, human-directed, made as acts of remembrance.</p>
+    <div class="home-actions">
+      <a class="home-primary" href="https://www.youtube.com/watch?v=9klHRx5Fa8Q" target="_blank" rel="noopener" data-growth-path="/out/youtube/discipline/hero">▶ Listen to the latest ballad</a>
+      <a class="home-secondary" href="history-and-songs">Enter the archive <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+  <p class="home-hero-caption">A worn drum, campaign map and letters — the objects that remain when the ranks disappear.</p>
+</section>
+
+<section class="home-carousel-section" aria-labelledby="songs-title" data-reveal>
+  <div class="container home-section-head">
+    <div><span class="eyebrow">Selected ballads</span><h2 id="songs-title">Move through the archive.</h2></div>
+    <p>Four voices. Four moments when history became personal.</p>
+  </div>
+  <div class="song-carousel" role="region" aria-roledescription="carousel" aria-label="Selected Bloody Hopes songs" data-carousel>
+    <div class="carousel-viewport">
+      <article class="carousel-slide is-active" data-song="discipline" style="--slide-image:url('assets/song-images/discipline-thumbnail.jpg')" aria-roledescription="slide">
+        <div class="carousel-copy"><span class="carousel-era">Seven Years' War · 1756–1763</span><h3>Discipline</h3><blockquote>“We served the King by holding fast while gentlemen had their will.”</blockquote><p>Patrick keeps a promise. Tom keeps the line. One dies beneath the colours; the other lives inside the order he obeyed.</p><div class="carousel-actions"><a href="https://www.youtube.com/watch?v=9klHRx5Fa8Q" target="_blank" rel="noopener" data-growth-path="/out/youtube/discipline/carousel">▶ Listen</a><a href="songs/discipline">Lyrics &amp; history →</a></div></div>
+      </article>
+      <article class="carousel-slide" data-song="austerlitz-sun" style="--slide-image:url('assets/article-images/austerlitz/russian-troops-1802-1805-nypl.jpg')" aria-roledescription="slide" aria-hidden="true">
+        <div class="carousel-copy"><span class="carousel-era">Napoleonic Wars · Austerlitz, 1805</span><h3>That Austerlitz Sun</h3><blockquote>Victory seen from the mud, not the marble.</blockquote><p>A soldier follows Napoleon into the morning fog and discovers what glory costs the men who carry it.</p><div class="carousel-actions"><a href="songs/austerlitz-sun">Enter the story →</a></div></div>
+      </article>
+      <article class="carousel-slide" data-song="gettysburg-ballad" style="--slide-image:url('assets/seo/bloody-hopes-remembrance-1200x900.jpg')" aria-roledescription="slide" aria-hidden="true">
+        <div class="carousel-copy"><span class="carousel-era">American Civil War · Gettysburg, 1863</span><h3>He Raised His Hands</h3><blockquote>A surrender caught between fear and mercy.</blockquote><p>One small human gesture inside a battle remembered mostly through maps, numbers and monuments.</p><div class="carousel-actions"><a href="songs/gettysburg-ballad">Lyrics &amp; sources →</a></div></div>
+      </article>
+      <article class="carousel-slide" data-song="the-elephant" style="--slide-image:url('https://i.ytimg.com/vi/bbyIk89avks/maxresdefault.jpg')" aria-roledescription="slide" aria-hidden="true">
+        <div class="carousel-copy"><span class="carousel-era">American Civil War · Manassas, 1861</span><h3>The Elephant</h3><blockquote>Before battle was memory, it was anticipation.</blockquote><p>A first-time soldier meets the old expression for combat — and the animal proves larger than the story.</p><div class="carousel-actions"><a href="songs/the-elephant">Meet the elephant →</a></div></div>
+      </article>
+    </div>
+    <div class="carousel-controls">
+      <button class="carousel-arrow" type="button" data-carousel-prev aria-label="Previous song">←</button>
+      <div class="carousel-progress"><span data-carousel-count aria-live="polite">01 / 20</span><i aria-hidden="true"><b data-carousel-progress></b></i><a href="catalog">View all songs</a></div>
+      <button class="carousel-toggle" type="button" data-carousel-toggle aria-label="Pause automatic rotation" aria-pressed="false">Pause</button>
+      <button class="carousel-arrow" type="button" data-carousel-next aria-label="Next song">→</button>
     </div>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <span class="eyebrow">New release · Featured Song</span>
-    <h2>Discipline — A Seven Years' War Ballad</h2>
-    <p>Patrick keeps a promise. Tom keeps the line. One dies beneath the colours; the other spends a lifetime inside the order he obeyed.</p>
-    <div class="video-frame">
-      <iframe src="https://www.youtube.com/embed/9klHRx5Fa8Q" title="Discipline | A Seven Years' War Ballad | Bloody Hopes" allowfullscreen loading="lazy"></iframe>
-    </div>
-    <div class="watch-cta-row">
-      <a class="watch-cta" href="https://www.youtube.com/watch?v=9klHRx5Fa8Q" target="_blank" rel="noopener" data-growth-path="/out/youtube/discipline/home">▶ Watch Discipline on YouTube</a>
-      <span>5:28 · full historical ballad</span>
-    </div>
-    <blockquote class="pull">“We served the King by holding fast while gentlemen had their will.”</blockquote>
-    <p><a href="songs/discipline">Read the complete lyrics and sourced historical notes →</a><br><a href="campfire?prompt=discipline">Question the line at The Campfire →</a></p>
+<section class="home-manifesto" data-reveal>
+  <div class="container home-manifesto-grid">
+    <span class="eyebrow">The purpose</span>
+    <div><h2>Not celebrations of war.<br>Acts of remembrance.</h2><p>Bloody Hopes follows ordinary people caught inside great events: the promise before the charge, the doubt inside an order, the mercy that survives violence.</p><a class="text-link" href="about">How the project works →</a></div>
   </div>
 </section>
 
-<section class="alt">
-  <div class="container">
-    <span class="eyebrow">More Songs</span>
-    <h2>Other Eras, Other Voices</h2>
-    <div class="song-grid">
-      <div class="song-card">
-        <h4>That Austerlitz Sun</h4>
-        <div class="meta">Napoleonic Wars · Battle of Austerlitz, 1805</div>
-        <a class="watch" href="songs/austerlitz-sun">Read the deep dive →</a>
-      </div>
-      <div class="song-card">
-        <h4>He Raised His Hands</h4>
-        <div class="meta">American Civil War · Battle of Gettysburg, 1863</div>
-        <a class="watch" href="songs/gettysburg-ballad">Read the deep dive →</a>
-      </div>
-      <div class="song-card">
-        <h4>Not a Drop of Water</h4>
-        <div class="meta">War of 1812 · USS Constitution, "Old Ironsides"</div>
-        <a class="watch" href="songs/old-ironsides">Read the deep dive →</a>
-        <a class="watch" href="articles/why-uss-constitution-called-old-ironsides">Why was she called Old Ironsides? →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <span class="eyebrow">About Us, In Short</span>
-    <h2>Acts of Remembrance, Not Celebrations</h2>
-    <p>Bloody Hopes explores the human psychology of war — courage and fear, duty and doubt, grief, trauma, brotherhood, memory and the fragile mercy that survives inside violence. The stories follow ordinary men and women caught inside history, where great events become intimate human stories.</p>
-    <p><a href="about">Discover our mission and approach →</a></p>
+<section class="home-paths alt" data-reveal>
+  <div class="container home-path-list">
+    <a href="catalog"><span>01</span><strong>Listen to every song</strong><em>Browse by conflict and era</em><b aria-hidden="true">↗</b></a>
+    <a href="history-and-songs"><span>02</span><strong>Read the history</strong><em>Sources, context and human stories</em><b aria-hidden="true">↗</b></a>
+    <a href="campfire"><span>03</span><strong>Join the Campfire</strong><em>Question a lyric, leave a reading</em><b aria-hidden="true">↗</b></a>
   </div>
 </section>
 
@@ -131,6 +126,7 @@
     </form>
   </div>
 </section>
+</main>
 
 <footer class="site">
   <div class="container">
@@ -144,7 +140,7 @@
   </div>
 </footer>
 <script src="assets/newsletter.js" defer></script>
-
+<script src="assets/home.js" defer></script>
 <script src="assets/growth.js" defer></script>
 </body>
 </html>

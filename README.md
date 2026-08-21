@@ -55,6 +55,15 @@ Configure the production secrets interactively with `./scripts/configure-campfir
 - `assets/style.css` — shared stylesheet
 - `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt`, `feed.xml` — SEO / AI-agent discoverability files
 
+## Local development and checks
+
+This `site/` directory is the canonical Git repository and deployment root. Open it directly when working on the website; the parent folders contain exports and separate projects that are not part of this repository.
+
+- Run `npm test` before pushing. It validates public HTML, internal links, JSON documents, canonical redirects, security headers and key API guards.
+- Serve this directory with any static HTTP server for visual checks. Extensionless production routes are handled by `worker.js`.
+- The deploy workflow runs the same test suite and deploys only after it passes.
+- `integrations/bloodyhopes-mcp/` is a vendored copy of the standalone MCP client. Its release repository is maintained separately.
+
 ## How to update the live site
 
 This repo is connected to Cloudflare for automatic deployment: commit and push to `main` (or use GitHub's web editor) and the site redeploys within a minute or two.

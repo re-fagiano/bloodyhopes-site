@@ -609,6 +609,100 @@ footer.site a:hover { color: var(--gold); }
 .history-exit{padding:clamp(6rem,11vw,10rem) 0;background:#e9e1d7;color:#1f1915}.history-exit .container{display:grid;grid-template-columns:.55fr 1.15fr 1fr;gap:3rem;align-items:end}.history-exit h2{margin:0;color:#1f1915;font-size:clamp(2.7rem,5vw,4.8rem);line-height:.95}.history-exit .btn{margin:.4rem .5rem .4rem 0}.history-exit .ghost{color:#1f1915;border-color:#7d6e61}
 @media(max-width:800px){.history-cover{min-height:calc(100svh - 146px);background-position:58% center}.history-cover-inner{width:calc(100% - 2rem);padding:4rem 0}.history-cover h1{font-size:clamp(3.8rem,17vw,6rem)}.history-cover-actions{flex-direction:column}.history-section-head,.history-exit .container{grid-template-columns:1fr;gap:1.1rem}.history-leads{grid-template-columns:1fr;min-height:auto}.history-lead{min-height:78svh}.history-row,.history-row-reverse{grid-template-columns:1fr}.history-row-reverse .history-row-image{order:0}.history-row-image{min-height:60vw}.history-row-copy{padding:3.5rem 1.25rem 5rem}.history-start,.history-chronology{padding-top:5rem}}
 @media(prefers-reduced-motion:reduce){.history-lead::before,.history-row-image{transition:none}}
+
+/* ---------- Home: cinematic archive ---------- */
+.home-hero {
+  position: relative;
+  min-height: calc(100svh - 76px);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  background: #080706 url("seo/bloody-hopes-remembrance-1200x900.jpg") 50% 45% / cover no-repeat;
+}
+.home-hero::before {
+  content: "";
+  position: absolute;
+  inset: -3%;
+  z-index: -2;
+  background: inherit;
+  animation: home-drift 14s ease-out both;
+}
+.home-hero-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(5,4,3,.9) 0%, rgba(5,4,3,.7) 42%, rgba(5,4,3,.12) 76%), linear-gradient(0deg, rgba(5,4,3,.92), transparent 52%); }
+.home-hero-inner { width: 100%; padding-top: 8rem; padding-bottom: clamp(4.5rem, 9vh, 7rem); }
+.home-kicker { margin: 0 0 1.1rem; color: #d5c7ae; font-size: .72rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; animation: home-rise .7s .05s ease-out both; }
+.home-wordmark { margin: 0 0 .4rem; font-family: var(--serif); font-size: clamp(1.2rem, 2vw, 1.65rem); font-weight: 700; letter-spacing: .04em; animation: home-rise .7s .12s ease-out both; }
+.home-wordmark span { color: #d6493f; }
+.home-hero h1 { max-width: 760px; margin: 0; color: #fff; font-size: clamp(3.3rem, 7.5vw, 7rem); line-height: .91; letter-spacing: -.045em; text-wrap: balance; animation: home-rise .8s .18s ease-out both; }
+.home-hero .lede { max-width: 610px; margin: 1.4rem 0 0; color: rgba(255,255,255,.8); font-size: clamp(1rem, 1.5vw, 1.2rem); animation: home-rise .8s .27s ease-out both; }
+.home-actions { display: flex; align-items: center; gap: 1rem 1.6rem; margin-top: 2rem; animation: home-rise .8s .36s ease-out both; }
+.home-primary { display: inline-flex; align-items: center; min-height: 50px; padding: .85rem 1.25rem; background: #9e2722; color: #fff; font-size: .78rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; transition: background .2s, transform .2s; }
+.home-primary:hover, .home-primary:focus-visible { background: #bd332c; color: #fff; text-decoration: none; transform: translateY(-2px); }
+.home-secondary { color: rgba(255,255,255,.85); font-size: .84rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.home-secondary span { display: inline-block; margin-left: .4rem; transition: transform .2s; }
+.home-secondary:hover { color: #fff; text-decoration: none; }.home-secondary:hover span { transform: translateY(3px); }
+.home-hero-caption { position: absolute; right: 1rem; bottom: 1rem; max-width: 260px; margin: 0; color: rgba(255,255,255,.5); font-size: .62rem; line-height: 1.4; text-align: right; }
+.nav-listen { color: var(--ink) !important; }
+
+.home-carousel-section { padding: clamp(5rem, 10vw, 8rem) 0; opacity: 0; transform: translateY(25px); transition: opacity .7s, transform .7s; }
+.home-section-head { display: grid; grid-template-columns: 1.4fr .6fr; align-items: end; gap: 2rem; margin-bottom: 2.5rem; }
+.home-section-head h2 { margin: .3rem 0 0; font-size: clamp(2.5rem, 5vw, 4.8rem); letter-spacing: -.035em; }
+.home-section-head > p { max-width: 340px; margin: 0 0 .55rem; color: var(--ink-dim); }
+.song-carousel { position: relative; max-width: 1440px; margin: 0 auto; }
+.carousel-viewport { position: relative; min-height: min(68vw, 720px); overflow: hidden; background: #14100e; }
+.carousel-slide { position: absolute; inset: 0; display: grid; align-items: end; padding: clamp(2rem, 6vw, 6rem); opacity: 0; visibility: hidden; pointer-events: none; background: linear-gradient(90deg, rgba(7,6,5,.94) 0%, rgba(7,6,5,.76) 42%, rgba(7,6,5,.1) 80%), linear-gradient(0deg, rgba(7,6,5,.88), transparent 60%), var(--slide-image) center / cover no-repeat; transition: opacity .65s ease, visibility .65s; }
+.carousel-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
+.carousel-copy { max-width: 660px; transform: translateY(18px); transition: transform .65s ease; }
+.carousel-slide.is-active .carousel-copy { transform: translateY(0); }
+.carousel-era { color: #dbc9aa; font-size: .7rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.carousel-copy h3 { margin: .3rem 0 1rem; color: #fff; font-size: clamp(3rem, 8vw, 7rem); line-height: .9; letter-spacing: -.04em; }
+.carousel-copy blockquote { margin: 0 0 .9rem; color: #fff; font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.45rem); }
+.carousel-copy p { max-width: 570px; margin: 0; color: rgba(255,255,255,.72); }
+.carousel-actions { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; margin-top: 1.5rem; }
+.carousel-actions a { color: #fff; font-size: .75rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
+.carousel-controls { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: .7rem; padding: 1rem max(1rem, calc((100vw - 1080px) / 2)); border-bottom: 1px solid var(--line); }
+.carousel-arrow, .carousel-toggle { border: 0; color: var(--ink); background: transparent; cursor: pointer; }
+.carousel-arrow { width: 44px; height: 44px; border: 1px solid var(--line); font-size: 1.2rem; transition: border-color .2s, color .2s; }
+.carousel-arrow:hover, .carousel-arrow:focus-visible { border-color: var(--gold); color: var(--gold); }
+.carousel-toggle { padding: .65rem; color: var(--ink-dim); font: 600 .68rem var(--sans); letter-spacing: .1em; text-transform: uppercase; }
+.carousel-progress { display: grid; grid-template-columns: auto minmax(80px, 1fr) auto; align-items: center; gap: 1rem; padding: 0 .5rem; color: var(--ink-dim); font-size: .68rem; letter-spacing: .09em; text-transform: uppercase; }
+.carousel-progress i { height: 2px; overflow: hidden; background: #463c37; }.carousel-progress i b { display: block; width: 5%; height: 100%; background: var(--accent-bright); transition: width .35s ease; }
+.carousel-progress a { color: var(--ink-dim); white-space: nowrap; }
+
+.home-manifesto { padding: clamp(6rem, 12vw, 11rem) 0; opacity: 0; transform: translateY(25px); transition: opacity .7s, transform .7s; }
+.home-manifesto-grid { display: grid; grid-template-columns: .5fr 1.5fr; gap: 2rem; }
+.home-manifesto h2 { max-width: 850px; margin: 0; font-size: clamp(2.8rem, 6.5vw, 6rem); line-height: .98; letter-spacing: -.04em; }
+.home-manifesto p { max-width: 660px; margin: 1.7rem 0; color: var(--ink-dim); font-size: 1.1rem; }
+.text-link { font-size: .76rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
+.home-paths { padding: 1rem 0; opacity: 0; transform: translateY(25px); transition: opacity .7s, transform .7s; }
+.home-path-list a { display: grid; grid-template-columns: 70px 1fr 1fr auto; align-items: center; gap: 1rem; min-height: 120px; border-bottom: 1px solid var(--line); color: var(--ink); transition: color .2s, padding .25s; }
+.home-path-list a:hover { padding-left: 1rem; color: #fff; text-decoration: none; }
+.home-path-list span { color: var(--gold); font-size: .72rem; letter-spacing: .12em; }
+.home-path-list strong { font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2.25rem); }
+.home-path-list em { color: var(--ink-dim); font-style: normal; }.home-path-list b { font-size: 1.4rem; font-weight: 400; }
+[data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+
+@keyframes home-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes home-drift { from { transform: scale(1.07); } to { transform: scale(1); } }
+
+@media (max-width: 760px) {
+  .home-hero { min-height: calc(100svh - 145px); background-position: 58% center; }
+  .home-hero-shade { background: linear-gradient(90deg, rgba(5,4,3,.84), rgba(5,4,3,.25)), linear-gradient(0deg, rgba(5,4,3,.96) 5%, rgba(5,4,3,.35) 75%); }
+  .home-hero-inner { padding: 5rem 1.2rem 3.5rem; }.home-hero h1 { font-size: clamp(3.2rem, 15vw, 5.2rem); }
+  .home-actions { align-items: flex-start; flex-direction: column; }.home-hero-caption { display: none; }
+  .home-section-head, .home-manifesto-grid { grid-template-columns: 1fr; }.home-section-head > p { margin: 0; }
+  .carousel-viewport { min-height: 78svh; }.carousel-slide { padding: 2rem 1.25rem 3rem; background-position: 60% center; }
+  .carousel-copy h3 { font-size: clamp(3.2rem, 17vw, 5.5rem); }.carousel-copy p { font-size: .92rem; }
+  .carousel-controls { grid-template-columns: auto 1fr auto; }.carousel-toggle { grid-row: 2; grid-column: 2; justify-self: center; }
+  .carousel-progress { grid-template-columns: auto 1fr; }.carousel-progress a { display: none; }
+  .home-path-list a { grid-template-columns: 42px 1fr auto; padding: 1.2rem 0; }.home-path-list em { grid-column: 2 / 4; grid-row: 2; }.home-path-list a:hover { padding-left: .5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero::before, .home-kicker, .home-wordmark, .home-hero h1, .home-hero .lede, .home-actions { animation: none; }
+  .home-carousel-section, .home-manifesto, .home-paths, .carousel-slide, .carousel-copy { transition: none; }
+}
 .history-row-austerlitz .history-row-image{background-image:url('article-images/austerlitz/russian-troops-1802-1805-nypl.jpg');background-position:center center}
 .history-image-credit{display:block;margin-top:1.6rem;color:#786e65;font:500 .68rem/1.45 Inter,sans-serif;letter-spacing:.045em}
 .history-exit .btn{color:#1f1915;background:transparent;border-color:#9e2727}

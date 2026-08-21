@@ -1,0 +1,11 @@
+{
+  "name": "bloody-hopes-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
