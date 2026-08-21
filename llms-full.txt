@@ -4253,11 +4253,11 @@ Historical Deep-Dive · 1750–1881
 
  1757–63Violence without a statutory ceilingSeven Years’ War court-martial sentences could reach hundreds of lashes.
 
- 1812A limit enters the systemThe previously unlimited number of lashes was brought under regulation.
+ 1812Unlimited totals endThe National Army Museum dates the end of unlimited lash totals to this year.
 
  1868Restricted to active serviceThe Mutiny Act sharply narrowed when flogging could be imposed.
 
- 1881Removed from ordinary Army disciplineThe Army Act confined corporal punishment to military prisons.
+ 1881Removed from ordinary Army disciplineLegislation confined corporal punishment to military prisons.
 
 ## Why Punish a Man in Front of His Regiment?
 
@@ -4291,9 +4291,9 @@ Historical Deep-Dive · 1750–1881
 
  Opposition did not begin with Victorian hindsight. Parliament debated military flogging repeatedly in the early nineteenth century. Critics called it degrading, dangerous and hostile to recruitment. Defenders answered that imprisonment was impractical on campaign and that no substitute carried the same immediate authority. In 1832 and 1833, experienced officers claimed that experiments without flogging had weakened discipline; abolitionists replied that brutal punishment helped produce the very kind of army that supposedly required it.
 
- That argument gradually changed because the army changed. Barracks, policing, military prisons, record-keeping, longer professional administration and new ideas about the respectable soldier expanded the alternatives available to commanders. Public feeling also altered. By 1846, Parliament discussed reduced maximums—200 lashes after a general court martial, 150 after a district or garrison court, 100 after a regimental court—figures still severe but evidence of a power being bounded rather than accepted as limitless.
+ That argument gradually changed because the army changed. Barracks, policing, military prisons, record-keeping, longer professional administration and new ideas about the respectable soldier expanded the alternatives available to commanders. Public feeling also altered. In 1846 the Articles of War still permitted maximums of 200 lashes after a general court martial, 150 after a district or garrison court and 100 after a regimental court. That August, Parliament was told that the Duke of Wellington had ordered a single maximum of 50 lashes. The new ceiling remained severe, but it marked a substantial retreat.
 
- The Mutiny Act of 1868 restricted flogging to active service and certain offences committed under sentence in military prisons. The Army Discipline and Regulation debates of 1879 narrowed it further. The Army Act of 1881 removed it from ordinary military discipline and confined corporal punishment to military prisons; that remaining prison power was abolished in 1906. “Abolition in 1881” is therefore useful shorthand, not the entire legal story.
+ The Mutiny Act of 1868 restricted flogging to active service and certain offences committed under sentence in military prisons. The Army Discipline and Regulation debates of 1879 narrowed it further. The Army Discipline and Regulation Act of 1881 restricted corporal punishment to military prisons; that remaining prison power was abolished in 1906. “Abolition in 1881” is therefore useful shorthand, not the entire legal story.
 
  Hear the moral mechanism
 ## Discipline turns witnesses into participants.
@@ -4325,6 +4325,8 @@ That was what we chose to think.”▶ Watch Discipline
 - Hansard, “Flogging in the Army,” 18 June 1811 — early parliamentary abolition arguments.
 
 - Hansard, “Flogging in the Army,” 7 August 1846 — sentence limits and arguments for retention.
+
+- Hansard, “Mutiny Bill—Committee,” 10 March 1864 — the parliamentary contrast between the Austrian gauntlet and British military punishment.
 
 - Hansard, 28 January 1913 — official summary of the 1868, 1881 and 1906 restrictions.
 
