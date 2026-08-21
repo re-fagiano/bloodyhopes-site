@@ -703,6 +703,43 @@ footer.site a:hover { color: var(--gold); }
   .home-hero::before, .home-kicker, .home-wordmark, .home-hero h1, .home-hero .lede, .home-actions { animation: none; }
   .home-carousel-section, .home-manifesto, .home-paths, .carousel-slide, .carousel-copy { transition: none; }
 }
+
+/* ---------- The Lash and the Line ---------- */
+.discipline-article-hero { position: relative; min-height: min(82svh, 850px); display: grid; align-items: end; overflow: hidden; color: #fff; background: #0b0908 url("song-images/discipline-thumbnail.jpg") 66% 42% / cover no-repeat; }
+.discipline-article-hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,6,5,.96) 0%, rgba(8,6,5,.7) 48%, rgba(8,6,5,.1) 82%), linear-gradient(0deg, rgba(8,6,5,.95), transparent 52%); }
+.discipline-article-hero .container { position: relative; width: 100%; padding-top: 8rem; padding-bottom: clamp(4rem, 8vw, 7rem); }
+.discipline-article-hero h1 { max-width: 850px; margin: .35rem 0 1rem; color: #fff; font-size: clamp(4rem, 10.5vw, 9.5rem); line-height: .78; letter-spacing: -.06em; }
+.discipline-article-hero p { max-width: 610px; margin: 0; color: rgba(255,255,255,.8); font-size: clamp(1.05rem, 2vw, 1.35rem); }
+.discipline-hero-note { position: absolute; right: 1rem; bottom: 1rem; color: rgba(255,255,255,.55); font-size: .65rem; }
+.discipline-article { padding: clamp(5rem, 9vw, 9rem) 0; }
+.discipline-article-grid { display: grid; grid-template-columns: 220px minmax(0, 760px); justify-content: space-between; gap: clamp(3rem, 8vw, 8rem); }
+.discipline-rail { position: sticky; top: 110px; align-self: start; padding-left: 1rem; border-left: 1px solid var(--line); }
+.discipline-rail > span { color: var(--gold); font-size: .67rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
+.discipline-rail ol { margin: 1rem 0 0; padding: 0; list-style: none; counter-reset: rail; }
+.discipline-rail li { counter-increment: rail; margin: .75rem 0; }.discipline-rail li::before { content: "0" counter(rail); display: inline-block; width: 2rem; color: #6f6258; font-size: .62rem; }
+.discipline-rail a { color: var(--ink-dim); font-size: .75rem; }.discipline-rail a:hover { color: var(--gold); }
+.article-deck { margin: 0 0 3.5rem; color: var(--ink); font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.35; }
+.discipline-prose h2 { margin-top: clamp(4rem, 8vw, 7rem); font-size: clamp(2.2rem, 5vw, 4.2rem); line-height: 1; letter-spacing: -.035em; scroll-margin-top: 110px; }
+.discipline-prose > p { max-width: 700px; }
+.discipline-facts { display: grid; grid-template-columns: repeat(4, 1fr); margin: 3rem 0 6rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.discipline-facts div { padding: 1.3rem 1rem 1.5rem 0; }.discipline-facts div + div { padding-left: 1rem; border-left: 1px solid var(--line); }
+.discipline-facts time { display: block; color: var(--accent-bright); font: 700 1.5rem var(--serif); }.discipline-facts strong { display: block; margin: .45rem 0; font-size: .78rem; line-height: 1.35; }.discipline-facts span { display: block; color: var(--ink-dim); font-size: .7rem; line-height: 1.45; }
+.discipline-pull { margin: 4rem 0; padding: 2rem 0 2rem 2rem; border-left: 3px solid var(--accent); }.discipline-pull span { color: var(--gold); font-size: .66rem; letter-spacing: .15em; text-transform: uppercase; }.discipline-pull blockquote { margin: .5rem 0 0; font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 3.8rem); line-height: 1.05; }
+.discipline-comparison { display: grid; grid-template-columns: 1fr 1fr; margin: 4rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.discipline-comparison div { padding: 2rem 2rem 2rem 0; }.discipline-comparison div + div { padding-left: 2rem; border-left: 1px solid var(--line); }.discipline-comparison span { display: block; color: var(--gold); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }.discipline-comparison strong { display: block; margin-top: .7rem; font-family: var(--serif); font-size: 1.3rem; line-height: 1.35; }
+.discipline-video { display: grid; grid-template-columns: 1.08fr .92fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; margin: 7rem calc(50% - 50vw); padding: clamp(3rem, 7vw, 6rem) max(1.5rem, calc((100vw - 1080px) / 2)); background: #17100e; }
+.discipline-video h2 { margin: .5rem 0 1rem; color: #fff; font-size: clamp(2.5rem, 5vw, 4.6rem); }.discipline-video p { color: var(--ink-dim); }.discipline-video blockquote { margin: 1.6rem 0; color: #fff; font-family: var(--serif); font-size: 1.45rem; }
+.discipline-video-image { position: relative; display: block; overflow: hidden; color: #fff; }.discipline-video-image img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform .5s ease; }.discipline-video-image span { position: absolute; right: 1rem; bottom: 1rem; padding: .6rem .8rem; background: rgba(8,6,5,.86); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }.discipline-video-image:hover img { transform: scale(1.025); }
+.discipline-sources ol { padding-left: 1.25rem; }.discipline-sources li { margin: 1rem 0; color: var(--ink-dim); font-size: .86rem; }.article-close { margin: 4rem 0; padding-top: 2rem; border-top: 1px solid var(--line); color: var(--ink-dim); }
+
+@media (max-width: 800px) {
+  .discipline-article-hero { min-height: 70svh; background-position: 62% center; }.discipline-article-hero h1 { font-size: clamp(4rem, 21vw, 7rem); }.discipline-hero-note { display: none; }
+  .discipline-article-grid { grid-template-columns: 1fr; }.discipline-rail { position: static; display: none; }
+  .discipline-facts { grid-template-columns: 1fr 1fr; }.discipline-facts div + div { border-left: 0; }.discipline-facts div:nth-child(even) { padding-left: 1rem; border-left: 1px solid var(--line); }.discipline-facts div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .discipline-comparison, .discipline-video { grid-template-columns: 1fr; }.discipline-comparison div + div { padding-left: 0; border-top: 1px solid var(--line); border-left: 0; }.discipline-video { margin-top: 5rem; margin-bottom: 5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) { .discipline-video-image img { transition: none; } }
 .history-row-austerlitz .history-row-image{background-image:url('article-images/austerlitz/russian-troops-1802-1805-nypl.jpg');background-position:center center}
 .history-image-credit{display:block;margin-top:1.6rem;color:#786e65;font:500 .68rem/1.45 Inter,sans-serif;letter-spacing:.045em}
 .history-exit .btn{color:#1f1915;background:transparent;border-color:#9e2727}

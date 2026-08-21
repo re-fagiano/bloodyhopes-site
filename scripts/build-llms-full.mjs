@@ -52,9 +52,11 @@ const songOrder = [
   "broken-mirrors.html", "blood-for-blood.html", "italy-will-be-made.html", "send-the-italian.html",
 ];
 const articleOrder = [
-  "battlefield-mercy.html", "from-napoleon-to-gettysburg.html", "doomed-messengers.html",
+  "the-lash-and-the-line.html", "battlefield-mercy.html", "from-napoleon-to-gettysburg.html", "doomed-messengers.html",
   "flag-you-cannot-lose.html", "smile-as-a-mask.html", "who-gets-to-be-a-hero.html",
-  "winter-that-broke-armies.html", "from-line-to-skirmish.html",
+  "winter-that-broke-armies.html", "from-line-to-skirmish.html", "seeing-the-elephant-civil-war.html",
+  "why-uss-constitution-called-old-ironsides.html", "behind-the-army.html", "from-lance-to-repeater.html",
+  "bred-for-battle.html",
 ];
 const pages = [
   ...songOrder.map((name) => ({ kind: "PAGE", name })),

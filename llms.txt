@@ -23,6 +23,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 - [Catalog](https://bloodyhopes.com/catalog): full list of songs organized by historical era (American Civil War, Napoleonic Wars, 18th century, Forgotten Wars & Colonial Conflicts).
 - [History & Songs](https://bloodyhopes.com/history-and-songs): chronological gateway connecting sourced essays to their companion songs, videos and listening pages.
 - [Articles](https://bloodyhopes.com/articles): index of cross-era historical deep-dive articles, not tied to a single song.
+- [The Lash and the Line: Military Discipline, Flogging and Punishment, 1750–1881](https://bloodyhopes.com/articles/the-lash-and-the-line): British courts martial, corporal punishment, the reform of military discipline, and the documented history behind the fictional ballad Discipline.
 - [llms-full.txt](https://bloodyhopes.com/llms-full.txt): the full text of every song deep-dive page and historical article, including complete published lyrics — ideal for specific, well-grounded reviews.
 - [RSS feed](https://bloodyhopes.com/feed.xml): all songs and articles as an RSS feed.
 
