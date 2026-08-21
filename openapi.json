@@ -11,6 +11,22 @@
   },
   "servers": [{ "url": "https://bloodyhopes.com" }],
   "paths": {
+    "/api/harness/tasks": {
+      "get": {
+        "operationId": "listHarnessTasks",
+        "summary": "List open Harness research tasks or inspect one task by id",
+        "parameters": [{ "name": "id", "in": "query", "required": false, "schema": { "type": "string", "maxLength": 100 } }],
+        "responses": { "200": { "description": "Research queue or selected task" }, "404": { "description": "Unknown task" } }
+      }
+    },
+    "/api/harness/search": {
+      "get": {
+        "operationId": "searchHarnessCorpus",
+        "summary": "Search only the published Bloody Hopes corpus",
+        "parameters": [{ "name": "q", "in": "query", "required": true, "schema": { "type": "string", "minLength": 2, "maxLength": 80 } }, { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 12 } }],
+        "responses": { "200": { "description": "Ranked excerpts with canonical URLs" }, "400": { "description": "Invalid query" } }
+      }
+    },
     "/api/campfire": {
       "get": {
         "operationId": "readCampfire",

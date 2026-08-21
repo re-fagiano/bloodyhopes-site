@@ -137,6 +137,32 @@ async function hashText(value) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+async function readResearchQueue(request, env) {
+  const response = await env.ASSETS.fetch(new Request(new URL("/research-queue.json", request.url)));
+  if (!response.ok) return null;
+  try { return await response.json(); } catch { return null; }
+}
+
+async function searchHarnessCorpus(query, request, env, limit = 8) {
+  const response = await env.ASSETS.fetch(new Request(new URL("/llms-full.txt", request.url)));
+  if (!response.ok) return null;
+  const corpus = await response.text();
+  const terms = query.toLocaleLowerCase("en").split(/\s+/).filter((term) => term.length > 1).slice(0, 6);
+  if (!terms.length) return [];
+  const sections = corpus.split(/\n----\n/g);
+  return sections.map((section) => {
+    const lower = section.toLocaleLowerCase("en");
+    const score = terms.reduce((total, term) => total + (lower.split(term).length - 1), 0);
+    if (!score) return null;
+    const firstIndex = Math.min(...terms.map((term) => lower.indexOf(term)).filter((index) => index >= 0));
+    const start = Math.max(0, firstIndex - 180);
+    const excerpt = section.slice(start, start + 900).replace(/\s+/g, " ").trim();
+    const heading = section.match(/^PAGE:\s*(.+)$/m)?.[1] || section.match(/^#\s+(.+)$/m)?.[1] || "Bloody Hopes corpus";
+    const url = section.match(/^URL:\s*(https:\/\/\S+)/m)?.[1] || null;
+    return { heading, url, score, excerpt };
+  }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, Math.min(Math.max(limit, 1), 12));
+}
+
 function containsLink(value) {
   return /(?:https?:\/\/|www\.)/i.test(value);
 }
@@ -277,7 +303,7 @@ function botVerification(request) {
 
 function isReadablePage(pathname) {
   if (pathname === "/") return true;
-  if (/^\/(?:index|about|catalog|campfire|agents|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (/^\/(?:index|about|catalog|campfire|agents|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
     || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)
     || /^\/(?:sitemap|feed)\.xml$/.test(pathname);
@@ -365,7 +391,7 @@ async function handleContributionRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "com.bloodyhopes/campfire",
   title: "Bloody Hopes Campfire",
-  version: "1.1.0",
+  version: "1.2.0",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 
@@ -375,6 +401,22 @@ const MCP_TOOLS = [
     title: "List open research tasks",
     description: "Return bounded historical and interpretive tasks with context, required tools, and explicit success conditions.",
     inputSchema: { type: "object", additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "search_corpus",
+    title: "Search the Bloody Hopes corpus",
+    description: "Search the complete published corpus and return ranked excerpts with canonical source URLs. This does not search the open web.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["query"],
+      properties: {
+        query: { type: "string", minLength: 2, maxLength: 80 },
+        limit: { type: "integer", minimum: 1, maximum: 12 },
+      },
+    },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     execution: { taskSupport: "forbidden" },
   },
@@ -504,9 +546,16 @@ async function mcpCallTool(name, args, request, env) {
     return mcpResult({ error: "invalid_arguments", message: "Tool arguments must be an object." }, { isError: true });
   }
   if (name === "research_queue") {
-    const response = await env.ASSETS.fetch(new Request(new URL("/research-queue.json", request.url)));
-    if (!response.ok) return mcpResult({ error: "research_queue_unavailable" }, { isError: true });
-    return mcpResult(await response.json());
+    const queue = await readResearchQueue(request, env);
+    if (!queue) return mcpResult({ error: "research_queue_unavailable" }, { isError: true });
+    return mcpResult(queue);
+  }
+  if (name === "search_corpus") {
+    const query = cleanText(args.query, 80);
+    if (query.length < 2) return mcpResult({ error: "invalid_query", message: "Use at least two characters." }, { isError: true });
+    const results = await searchHarnessCorpus(query, request, env, Number(args.limit) || 8);
+    if (!results) return mcpResult({ error: "corpus_unavailable" }, { isError: true });
+    return mcpResult({ query, scope: "bloodyhopes.com published corpus", results });
   }
   if (name === "campfire_catalog") {
     const response = await env.ASSETS.fetch(new Request(new URL("/critical-catalog.json", request.url)));
@@ -821,7 +870,7 @@ export default {
       let canonicalPath = null;
       if (url.pathname === "/index.html") {
         canonicalPath = "/";
-      } else if (/^\/(?:about|catalog|campfire|agents|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
+      } else if (/^\/(?:about|catalog|campfire|agents|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
         || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
       } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
@@ -834,6 +883,24 @@ export default {
     }
 
     if (url.pathname === "/mcp") return handleMcp(request, env);
+
+    if (url.pathname === "/api/harness/tasks") {
+      if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+      const queue = await readResearchQueue(request, env);
+      if (!queue) return json({ error: "research_queue_unavailable" }, 503);
+      const requestedId = cleanText(url.searchParams.get("id"), 100);
+      if (!requestedId) return json(queue);
+      const task = queue.tasks.find((candidate) => candidate.id === requestedId);
+      return task ? json({ schema_version: queue.schema_version, task }) : json({ error: "unknown_task" }, 404);
+    }
+
+    if (url.pathname === "/api/harness/search") {
+      if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+      const query = cleanText(url.searchParams.get("q"), 80);
+      if (query.length < 2) return json({ error: "invalid_query", message: "Use at least two characters." }, 400);
+      const results = await searchHarnessCorpus(query, request, env, Number(url.searchParams.get("limit")) || 8);
+      return results ? json({ query, scope: "bloodyhopes.com published corpus", results }) : json({ error: "corpus_unavailable" }, 503);
+    }
 
     if (url.pathname === "/api/growth/summary") {
       if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
