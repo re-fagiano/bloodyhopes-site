@@ -32,6 +32,12 @@ const page = await worker.fetch(new Request("https://bloodyhopes.com/"), env, ct
 assert.equal(page.status, 200);
 assert.equal(page.headers.get("x-content-type-options"), "nosniff");
 assert.match(page.headers.get("content-security-policy") || "", /default-src/);
+assert.match(page.headers.get("link") || "", /agent-entry/);
+assert.match(page.headers.get("link") || "", /bot-access\.json/);
+
+const agentEntryRedirect = await worker.fetch(new Request("https://bloodyhopes.com/agent-entry.html"), env, ctx);
+assert.equal(agentEntryRedirect.status, 301);
+assert.equal(agentEntryRedirect.headers.get("location"), "https://bloodyhopes.com/agent-entry");
 
 const method = await worker.fetch(new Request("https://bloodyhopes.com/api/newsletter"), env, ctx);
 assert.equal(method.status, 405);

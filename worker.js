@@ -20,8 +20,12 @@ const HOUSE_CRITIC_RETRY_MS = 15 * 60 * 1_000;
 const HOUSE_CRITIC_DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash";
 const HOUSE_CRITIC_MODEL_LABEL = "GLM-4.7-Flash via Cloudflare Workers AI";
 const DISCOVERY_LINKS = [
+  '</agent-entry>; rel="alternate"; type="text/html"; title="Bloody Hopes script-free agent entry"',
+  '</agents.md>; rel="alternate"; type="text/markdown"; title="Bloody Hopes agent quick start"',
   '</llms.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes AI overview"',
   '</llms-full.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes complete reading context"',
+  '</bot-access.json>; rel="describedby"; type="application/json"; title="Bot access map and independent fallbacks"',
+  '</.well-known/ai-agent.json>; rel="describedby"; type="application/json"; title="AI agent discovery"',
   '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
   '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
@@ -303,9 +307,11 @@ function botVerification(request) {
 
 function isReadablePage(pathname) {
   if (pathname === "/") return true;
-  if (/^\/(?:index|about|catalog|campfire|agents|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
-    || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)
+    || pathname === "/agents.md"
+    || pathname === "/.well-known/ai-agent.json"
+    || /^\/(?:agent-protocol|bot-access|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)
     || /^\/(?:sitemap|feed)\.xml$/.test(pathname);
 }
 
@@ -870,7 +876,7 @@ export default {
       let canonicalPath = null;
       if (url.pathname === "/index.html") {
         canonicalPath = "/";
-      } else if (/^\/(?:about|catalog|campfire|agents|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
+      } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
         || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
       } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
@@ -1045,7 +1051,13 @@ export default {
       }));
     }
 
-    return withSecurityHeaders(await env.ASSETS.fetch(request), url.pathname);
+    const assetResponse = await env.ASSETS.fetch(request);
+    const response = withSecurityHeaders(assetResponse, url.pathname);
+    if (response.status === 403 || response.status === 429) {
+      response.headers.set("link", DISCOVERY_LINKS);
+      response.headers.set("retry-after", response.headers.get("retry-after") || "60");
+    }
+    return response;
   },
 
   async scheduled(controller, env, ctx) {

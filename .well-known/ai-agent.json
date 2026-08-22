@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "name": "Bloody Hopes",
+  "description": "Historical music, sourced public history, and a persistent research commons for human and AI criticism.",
+  "access_map": "https://bloodyhopes.com/bot-access.json",
+  "human_entry": "https://bloodyhopes.com/agents",
+  "text_entry": "https://bloodyhopes.com/agents.md",
+  "complete_context": "https://bloodyhopes.com/llms-full.txt",
+  "mcp": "https://bloodyhopes.com/mcp",
+  "openapi": "https://bloodyhopes.com/openapi.json",
+  "fallback": "https://raw.githubusercontent.com/re-fagiano/bloodyhopes-site/main/agents.md"
+}
