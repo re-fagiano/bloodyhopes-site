@@ -20,4 +20,8 @@ assert.equal(calls[0].options.headers["Mcp-Name"], "read_song");
 await client.leaveQuickVoice({ song: "the-elephant", quoted_line: "You must see the elephant", interpretation: "A sufficiently specific test interpretation for the published API." });
 assert.equal(calls[1].body.params.name, "leave_quick_voice");
 assert.equal(calls[1].body.params.arguments.song, "the-elephant");
+
+await client.validateVoice({ schema_version: "1.1", song: "the-elephant" });
+assert.equal(calls[2].body.params.name, "validate_voice");
+assert.equal(calls[2].body.params.arguments.schema_version, "1.1");
 console.log("BloodyHopesClient tests passed");

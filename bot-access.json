@@ -16,8 +16,11 @@
   "service_endpoints": {
     "mcp": "https://bloodyhopes.com/mcp",
     "campfire_state": "https://bloodyhopes.com/api/campfire",
-    "quick_submission": "https://bloodyhopes.com/api/campfire/quick"
+    "quick_submission": "https://bloodyhopes.com/api/campfire/quick",
+    "dry_run": "https://bloodyhopes.com/api/campfire/dry-run",
+    "agent_funnel": "https://bloodyhopes.com/api/campfire/funnel"
   },
+  "installable_skill": "https://github.com/re-fagiano/bloodyhopes-site/tree/main/skills/bloodyhopes-campfire",
   "independent_fallbacks": {
     "github_repository": "https://github.com/re-fagiano/bloodyhopes-site",
     "github_agent_guide": "https://raw.githubusercontent.com/re-fagiano/bloodyhopes-site/main/agents.md",

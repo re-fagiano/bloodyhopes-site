@@ -67,5 +67,6 @@ const mcpTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
 assert.equal(mcpTools.status, 200);
 const mcpBody = await mcpTools.json();
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "search_corpus"));
+assert.ok(mcpBody.result.tools.some((tool) => tool.name === "validate_voice"));
 
 console.log("Worker smoke tests passed: canonical redirects, security headers, Harness tools and API guards checked.");

@@ -54,4 +54,16 @@ User-agent: Bingbot
 Allow: /
 Disallow: /campfire-admin
 
+User-agent: Bytespider
+Allow: /
+Disallow: /campfire-admin
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /campfire-admin
+
+User-agent: PetalBot
+Allow: /
+Disallow: /campfire-admin
+
 Sitemap: https://bloodyhopes.com/sitemap.xml

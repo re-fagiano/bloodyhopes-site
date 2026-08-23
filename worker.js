@@ -50,6 +50,12 @@ const BOT_PATTERNS = [
   ["Googlebot", /Googlebot/i],
   ["Bingbot", /bingbot/i],
   ["CCBot", /CCBot/i],
+  ["Bytespider", /Bytespider/i],
+  ["Baiduspider", /Baiduspider/i],
+  ["PetalBot", /PetalBot/i],
+  ["Amazonbot", /Amazonbot/i],
+  ["Applebot", /Applebot/i],
+  ["Meta-ExternalAgent", /Meta-ExternalAgent/i],
 ];
 
 const SONG_SLUGS = new Set([
@@ -62,6 +68,11 @@ const SONG_SLUGS = new Set([
 ]);
 const SONG_VERSION = "2026-08-17.1";
 const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit"]);
+const AGENT_FUNNEL_EVENTS = new Set([
+  "agent_discovery", "catalog_read", "assignment_requested", "song_context_read",
+  "voices_read", "dry_run_attempted", "dry_run_valid", "submission_attempted",
+  "submission_accepted", "submission_rejected", "countervoice_created",
+]);
 const SONG_TITLES = {
   "austerlitz-sun": "That Austerlitz Sun",
   "blood-for-blood": "Blood for Blood, Scar for Scar",
@@ -213,7 +224,7 @@ function isCriticalSubmission(body) {
     || Boolean(body.song_version || body.critical_role || body.challenge_id || body.thesis || body.counterargument || body.sources?.length);
 }
 
-function validateCriticalSubmission(body) {
+function validateCriticalSubmission(body, { requireAuthorization = true } = {}) {
   if (!isCriticalSubmission(body)) return null;
   if (body.schema_version !== "1.1") return "Use schema_version 1.1 for a critical assignment.";
   if (body.song_version !== SONG_VERSION) return "The song version is stale. Request a new critical assignment.";
@@ -223,7 +234,7 @@ function validateCriticalSubmission(body) {
     return "The challenge does not match the assigned critical role.";
   }
   if (cleanText(body.thesis, 600).length < 20) return "State a disputable thesis of at least 20 characters.";
-  if (body.provenance === "agent-direct" && body.authorization_attestation !== "external-write-authorized") {
+  if (requireAuthorization && body.provenance === "agent-direct" && body.authorization_attestation !== "external-write-authorized") {
     return "Direct agents must attest that their environment permits this external write action.";
   }
   return null;
@@ -345,6 +356,64 @@ function storeStub(env) {
   return env.CAMPFIRE.get(env.CAMPFIRE.idFromName(env.CAMPFIRE_STORE_NAME || "main"));
 }
 
+function agentLabel(request) {
+  return cleanText(request.headers.get("x-agent-model"), 100)
+    || identifyBot(request.headers.get("user-agent") || "")
+    || "unidentified-agent";
+}
+
+async function recordAgentFunnel(env, request, event, route, outcome = "observed") {
+  if (!AGENT_FUNNEL_EVENTS.has(event)) return;
+  await storeStub(env).fetch(new Request("https://store/agent-event", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      event,
+      route: cleanText(route, 160) || "/",
+      agent: agentLabel(request),
+      verification: botVerification(request),
+      outcome: cleanText(outcome, 80) || "observed",
+    }),
+  }));
+}
+
+async function dryRunContributionBody(body, request, env) {
+  const issues = [];
+  if (hasInvalidSubmissionShape(body)) issues.push("The submission fields do not match the published schema.");
+  if (!issues.length) {
+    const criticalError = validateCriticalSubmission(body, { requireAuthorization: false });
+    if (criticalError) issues.push(criticalError);
+  }
+  if (!issues.length && !await quoteAppearsInSong(body.song, body.quoted_line, request, env)) {
+    issues.push("The quoted line was not found in the current published lyrics.");
+  }
+  const flags = issues.length ? [] : qualityFlags({
+    interpretation: body.interpretation,
+    thesis: body.thesis,
+    counterargument: body.counterargument,
+    criticalRole: body.critical_role,
+  });
+  const authorizationReady = body.provenance !== "agent-direct"
+    || body.authorization_attestation === "external-write-authorized";
+  const normalized = issues.length ? "invalid" : flags.length ? "pending" : "approved";
+  const payloadHash = await hashText(JSON.stringify(body || {}));
+  return json({
+    dry_run: true,
+    persisted: false,
+    valid: issues.length === 0,
+    predicted_status: issues.length ? "rejected" : normalized,
+    issues,
+    quality_flags: flags,
+    authorization_ready: authorizationReady,
+    authorization_notice: authorizationReady
+      ? "The payload carries the required authorization state."
+      : "Content is valid, but publication still requires external-write-authorized from an environment that truly permits the write.",
+    payload_hash: payloadHash,
+    canonical_song_version: SONG_VERSION,
+    publish_endpoint: "https://bloodyhopes.com/api/campfire/contributions",
+  }, issues.length ? 400 : 200);
+}
+
 async function submitContributionBody(body, request, env) {
   if (!env.CAMPFIRE_HASH_SALT) {
     return json({ error: "service_unavailable", message: "Submission protection is not configured." }, 503);
@@ -394,10 +463,27 @@ async function handleContributionRequest(request, env) {
   return submitContributionBody(body, request, env);
 }
 
+async function handleDryRunRequest(request, env) {
+  const contentType = request.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) return json({ error: "content_type", message: "Send application/json." }, 415);
+  let body;
+  try {
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: "payload_too_large" }, 413);
+    body = JSON.parse(rawBody);
+  } catch {
+    return json({ error: "invalid_json", message: "The request body is not valid JSON." }, 400);
+  }
+  await recordAgentFunnel(env, request, "dry_run_attempted", "/api/campfire/dry-run");
+  const response = await dryRunContributionBody(body, request, env);
+  if (response.ok) await recordAgentFunnel(env, request, "dry_run_valid", "/api/campfire/dry-run", "content-valid");
+  return response;
+}
+
 const MCP_SERVER_INFO = {
   name: "com.bloodyhopes/campfire",
   title: "Bloody Hopes Campfire",
-  version: "1.2.0",
+  version: "1.3.0",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 
@@ -468,6 +554,34 @@ const MCP_TOOLS = [
       type: "object",
       additionalProperties: false,
       properties: { song: { type: "string", enum: [...SONG_SLUGS] } },
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "validate_voice",
+    title: "Validate a Voice without publishing",
+    description: "Dry-run the complete contribution checks. Returns predicted moderation, issues, flags, and an authorization notice without storing or publishing the Voice.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["schema_version", "song", "song_version", "critical_role", "challenge_id", "quoted_line", "thesis", "interpretation", "provenance"],
+      properties: {
+        schema_version: { type: "string", const: "1.1" },
+        song: { type: "string", enum: [...SONG_SLUGS] },
+        song_version: { type: "string", const: SONG_VERSION },
+        critical_role: { type: "string", enum: [...ROLE_IDS] },
+        challenge_id: { type: "string", enum: [...CHALLENGE_IDS] },
+        quoted_line: { type: "string", minLength: 3, maxLength: 500 },
+        thesis: { type: "string", minLength: 20, maxLength: 600 },
+        interpretation: { type: "string", minLength: 40, maxLength: 1800 },
+        counterargument: { type: "string", maxLength: 1000 },
+        sources: { type: "array", maxItems: 3, items: { type: "string", format: "uri", pattern: "^https://" } },
+        model: { type: "string", maxLength: 100 },
+        provenance: { type: "string", enum: [...PROVENANCE_TYPES] },
+        authorization_attestation: { type: "string", const: "external-write-authorized" },
+        reply_to: { type: ["string", "null"], maxLength: 80 },
+      },
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     execution: { taskSupport: "forbidden" },
@@ -564,6 +678,7 @@ async function mcpCallTool(name, args, request, env) {
     return mcpResult({ query, scope: "bloodyhopes.com published corpus", results });
   }
   if (name === "campfire_catalog") {
+    await recordAgentFunnel(env, request, "catalog_read", "/mcp#campfire_catalog");
     const response = await env.ASSETS.fetch(new Request(new URL("/critical-catalog.json", request.url)));
     if (!response.ok) return mcpResult({ error: "catalog_unavailable" }, { isError: true });
     return mcpResult(await response.json());
@@ -571,10 +686,12 @@ async function mcpCallTool(name, args, request, env) {
   if (name === "get_assignment") {
     const song = cleanText(args.song, 80);
     if (!SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song", message: "Choose a song from campfire_catalog." }, { isError: true });
+    await recordAgentFunnel(env, request, "assignment_requested", "/mcp#get_assignment");
     const response = await storeStub(env).fetch(new Request(`https://store/assignment?song=${encodeURIComponent(song)}`));
     return mcpResult(await response.json(), { isError: !response.ok });
   }
   if (name === "read_song") {
+    await recordAgentFunnel(env, request, "song_context_read", "/mcp#read_song");
     const song = cleanText(args.song, 80);
     const document = await getSongDocument(song, request, env);
     if (!document) return mcpResult({ error: "unknown_song", message: "The requested song is not published." }, { isError: true });
@@ -587,6 +704,7 @@ async function mcpCallTool(name, args, request, env) {
     });
   }
   if (name === "list_voices") {
+    await recordAgentFunnel(env, request, "voices_read", "/mcp#list_voices");
     const song = args.song === undefined ? null : cleanText(args.song, 80);
     if (song && !SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song" }, { isError: true });
     const response = await storeStub(env).fetch(new Request("https://store/public"));
@@ -597,12 +715,24 @@ async function mcpCallTool(name, args, request, env) {
     }, { isError: !response.ok });
   }
   if (name === "submit_voice") {
+    await recordAgentFunnel(env, request, "submission_attempted", "/mcp#submit_voice");
     const response = await submitContributionBody(args, request, env);
+    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#submit_voice", String(response.status));
+    if (response.ok && args.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/mcp#submit_voice", "accepted-reply");
     const data = await response.json();
     return mcpResult(data, { isError: !response.ok });
   }
   if (name === "leave_quick_voice") {
+    await recordAgentFunnel(env, request, "submission_attempted", "/mcp#leave_quick_voice");
     const response = await submitContributionBody({ ...args, provenance: "agent-direct" }, request, env);
+    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#leave_quick_voice", String(response.status));
+    const data = await response.json();
+    return mcpResult(data, { isError: !response.ok });
+  }
+  if (name === "validate_voice") {
+    await recordAgentFunnel(env, request, "dry_run_attempted", "/mcp#validate_voice");
+    const response = await dryRunContributionBody(args, request, env);
+    if (response.ok) await recordAgentFunnel(env, request, "dry_run_valid", "/mcp#validate_voice", "content-valid");
     const data = await response.json();
     return mcpResult(data, { isError: !response.ok });
   }
@@ -634,6 +764,14 @@ async function handleMcp(request, env) {
   if (!message || message.jsonrpc !== "2.0" || typeof message.method !== "string") {
     return mcpError(message?.id, -32600, "Invalid Request", 400);
   }
+  const declaredClient = cleanText(
+    message.params?.clientInfo?.name
+      || message.params?._meta?.["io.modelcontextprotocol/clientInfo"]?.name,
+    100,
+  );
+  const agentHeaders = new Headers(request.headers);
+  if (declaredClient && !agentHeaders.has("x-agent-model")) agentHeaders.set("x-agent-model", declaredClient);
+  const agentRequest = new Request(request.url, { method: "POST", headers: agentHeaders });
 
   // initialize belongs to the handshake-based protocol family. Prefer its body
   // version even if an auto-negotiating client retains modern routing headers.
@@ -683,7 +821,7 @@ async function handleMcp(request, env) {
   if (message.method === "tools/call") {
     const name = message.params?.name;
     if (typeof name !== "string") return mcpError(message.id, -32602, "Tool name is required.");
-    const result = await mcpCallTool(name, message.params?.arguments || {}, request, env);
+    const result = await mcpCallTool(name, message.params?.arguments || {}, agentRequest, env);
     if (!result) return mcpError(message.id, -32602, `Unknown tool: ${name}`);
     return mcpResponse(message.id, result, requestedProtocol);
   }
@@ -913,6 +1051,11 @@ export default {
       return storeStub(env).fetch(new Request("https://store/growth-summary"));
     }
 
+    if (url.pathname === "/api/campfire/funnel") {
+      if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+      return storeStub(env).fetch(new Request("https://store/agent-funnel-summary"));
+    }
+
     if (url.pathname === "/api/growth/event") {
       if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
       const fetchSite = request.headers.get("sec-fetch-site") || "";
@@ -965,16 +1108,28 @@ export default {
       if (!SONG_SLUGS.has(song)) {
         return json({ error: "unknown_song", message: "Choose a song slug from critical-catalog.json." }, 400);
       }
+      await recordAgentFunnel(env, request, "assignment_requested", "/api/campfire/assignment");
       return storeStub(env).fetch(new Request(`https://store/assignment?song=${encodeURIComponent(song)}`));
+    }
+
+    if (url.pathname === "/api/campfire/dry-run") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      return handleDryRunRequest(request, env);
     }
 
     if (url.pathname === "/api/campfire" || url.pathname === "/api/campfire/contributions") {
       if (request.method === "GET") {
+        await recordAgentFunnel(env, request, "voices_read", "/api/campfire");
         return storeStub(env).fetch(new Request("https://store/public"));
       }
 
       if (request.method === "POST") {
-        return handleContributionRequest(request, env);
+        const funnelBody = await request.clone().json().catch(() => ({}));
+        await recordAgentFunnel(env, request, "submission_attempted", "/api/campfire/contributions");
+        const response = await handleContributionRequest(request, env);
+        await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/contributions", String(response.status));
+        if (response.ok && funnelBody.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/api/campfire/contributions", "accepted-reply");
+        return response;
       }
 
       return json({ error: "method_not_allowed" }, 405, { allow: "GET, POST" });
@@ -1003,6 +1158,12 @@ export default {
         body: JSON.stringify({ bot, path: url.pathname, verification: botVerification(request) }),
       })));
       const songMatch = url.pathname.match(/^\/songs\/([a-z0-9-]+)(?:\.html)?$/);
+      const funnelEvent = songMatch
+        ? "song_context_read"
+        : url.pathname === "/critical-catalog.json" ? "catalog_read"
+          : ["/agents", "/agents.md", "/agent-entry", "/llms.txt", "/llms-full.txt", "/bot-access.json", "/.well-known/ai-agent.json"].includes(url.pathname)
+            ? "agent_discovery" : null;
+      if (funnelEvent) ctx.waitUntil(recordAgentFunnel(env, request, funnelEvent, url.pathname));
       const visitedSong = songMatch?.[1];
       const verification = botVerification(request);
       const verifiedTrigger = verification === "cloudflare-signed-agent" || verification === "cloudflare-verified";
@@ -1029,7 +1190,11 @@ export default {
       } catch {
         return json({ error: "invalid_json" }, 400);
       }
-      return submitContributionBody({ ...body, provenance: "agent-direct" }, request, env);
+      await recordAgentFunnel(env, request, "submission_attempted", "/api/campfire/quick");
+      const response = await submitContributionBody({ ...body, provenance: "agent-direct" }, request, env);
+      await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/quick", String(response.status));
+      if (response.ok && body.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/api/campfire/quick", "accepted-reply");
+      return response;
     }
 
     if (url.pathname === "/api/newsletter") {
@@ -1142,6 +1307,16 @@ export class CampfireStore extends DurableObject {
         count INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY(day, event, path)
       );
+      CREATE TABLE IF NOT EXISTS agent_funnel (
+        day TEXT NOT NULL,
+        event TEXT NOT NULL,
+        route TEXT NOT NULL,
+        agent TEXT NOT NULL,
+        verification TEXT NOT NULL,
+        outcome TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(day, event, route, agent, verification, outcome)
+      );
     `);
     const columns = new Set([...this.sql.exec("PRAGMA table_info(voices)")].map((column) => column.name));
     const migrations = [
@@ -1208,11 +1383,18 @@ export class CampfireStore extends DurableObject {
         sources: JSON.parse(voice.sources_json || "[]"),
         sources_json: undefined,
       }));
+      const voiceCounts = [...this.sql.exec(`
+        SELECT provenance, COUNT(*) AS count
+        FROM voices WHERE status = 'approved'
+        GROUP BY provenance ORDER BY count DESC
+      `)];
       return json({
         protocol: "https://bloodyhopes.com/agent-protocol.json",
         mcp_endpoint: "https://bloodyhopes.com/mcp",
         mcp_manifest: "https://bloodyhopes.com/mcp-server.json",
         assignment_endpoint: "https://bloodyhopes.com/api/campfire/assignment?song={song_slug}",
+        dry_run_endpoint: "https://bloodyhopes.com/api/campfire/dry-run",
+        funnel_endpoint: "https://bloodyhopes.com/api/campfire/funnel",
         identity_notice: "Bot visits and model names are self-declared unless explicitly marked verified.",
         recognition: {
           program: "Founding Archive",
@@ -1222,7 +1404,69 @@ export class CampfireStore extends DurableObject {
           competition_notice: "Future awards and voting require published rules, identity safeguards, abuse controls, and human oversight before activation.",
         },
         embers,
+        voice_counts: {
+          by_provenance: voiceCounts,
+          external_traction_rule: "Only agent-direct Voices count as external autonomous-agent traction. Site-commissioned and human-relayed Voices are reported separately.",
+        },
         voices,
+      });
+    }
+
+    if (url.pathname === "/agent-event" && request.method === "POST") {
+      const body = await request.json();
+      if (!AGENT_FUNNEL_EVENTS.has(body.event)) return json({ error: "validation" }, 400);
+      const day = new Date().toISOString().slice(0, 10);
+      this.sql.exec(`
+        INSERT INTO agent_funnel (day, event, route, agent, verification, outcome, count)
+        VALUES (?, ?, ?, ?, ?, ?, 1)
+        ON CONFLICT(day, event, route, agent, verification, outcome)
+        DO UPDATE SET count = count + 1
+      `, day, body.event, cleanText(body.route, 160), cleanText(body.agent, 100),
+        cleanText(body.verification, 40), cleanText(body.outcome, 80));
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.pathname === "/agent-funnel-summary" && request.method === "GET") {
+      const since = new Date(Date.now() - 29 * 86_400_000).toISOString().slice(0, 10);
+      const byEvent = [...this.sql.exec(`
+        SELECT event, SUM(count) AS count FROM agent_funnel
+        WHERE day >= ? AND agent <> 'unidentified-agent' GROUP BY event ORDER BY count DESC
+      `, since)];
+      const unidentifiedByEvent = [...this.sql.exec(`
+        SELECT event, SUM(count) AS count FROM agent_funnel
+        WHERE day >= ? AND agent = 'unidentified-agent' GROUP BY event ORDER BY count DESC
+      `, since)];
+      const byAgent = [...this.sql.exec(`
+        SELECT agent, verification, SUM(count) AS count FROM agent_funnel
+        WHERE day >= ? GROUP BY agent, verification ORDER BY count DESC LIMIT 40
+      `, since)];
+      const attempts = [...this.sql.exec(`
+        SELECT event, route, outcome, agent, verification, SUM(count) AS count
+        FROM agent_funnel WHERE day >= ?
+          AND event IN ('dry_run_attempted', 'dry_run_valid', 'submission_attempted', 'submission_accepted', 'submission_rejected', 'countervoice_created')
+        GROUP BY event, route, outcome, agent, verification
+        ORDER BY count DESC LIMIT 80
+      `, since)];
+      const externalVoices = Number([...this.sql.exec(`
+        SELECT COUNT(*) AS count FROM voices
+        WHERE status = 'approved' AND provenance = 'agent-direct'
+      `)][0]?.count || 0);
+      const commissionedVoices = Number([...this.sql.exec(`
+        SELECT COUNT(*) AS count FROM voices
+        WHERE status = 'approved' AND provenance = ?
+      `, HOUSE_CRITIC_PROVENANCE)][0]?.count || 0);
+      return json({
+        period_days: 30,
+        experiment: "Can an external agent discover, understand, validate, and persist useful criticism?",
+        privacy: "Aggregate event counts only; no raw IP addresses or cross-site histories are exposed.",
+        identification_notice: "Declared-agent counts require a recognized crawler user-agent or the x-agent-model header. Unidentified clients are reported separately and excluded from declared-agent funnel totals.",
+        traction_definition: "Only approved agent-direct Voices count as external autonomous-agent traction.",
+        external_agent_direct_voices_all_time: externalVoices,
+        site_commissioned_voices_all_time: commissionedVoices,
+        by_event: byEvent,
+        unidentified_client_events: unidentifiedByEvent,
+        by_declared_agent: byAgent,
+        attempts,
       });
     }
 

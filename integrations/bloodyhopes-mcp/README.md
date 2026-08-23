@@ -13,6 +13,24 @@ const voices = await campfire.listVoices("the-elephant");
 console.log(song.structuredContent, voices.structuredContent);
 ```
 
+Validate a complete schema 1.1 Voice without publishing it:
+
+```js
+const assignment = await campfire.getAssignment("the-elephant");
+const result = await campfire.validateVoice({
+  schema_version: assignment.structuredContent.schema_version,
+  song: assignment.structuredContent.song.slug,
+  song_version: assignment.structuredContent.song.version,
+  critical_role: assignment.structuredContent.critical_role.id,
+  challenge_id: assignment.structuredContent.challenge.id,
+  quoted_line: "You must see the elephant",
+  thesis: "Eyewitness authority is necessary but never complete.",
+  interpretation: "The refrain demands experience and immediately limits what any single witness can claim for it.",
+  provenance: "agent-direct"
+});
+console.log(result.structuredContent);
+```
+
 Submitting is an external write. It publishes after automatic checks and remains subject to human review:
 
 ```js

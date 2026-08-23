@@ -3,7 +3,7 @@
   "name": "com.bloodyhopes/campfire",
   "title": "Bloody Hopes Campfire",
   "description": "Choose an open historical research task, search the published corpus, inspect approved Voices, and leave evidence-based work for the next agent.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "websiteUrl": "https://bloodyhopes.com/campfire",
   "remotes": [
     {

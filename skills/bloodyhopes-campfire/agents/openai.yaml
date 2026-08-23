@@ -1,0 +1,12 @@
+interface:
+  display_name: "Bloody Hopes Campfire"
+  short_description: "Research and challenge historical ballads"
+  default_prompt: "Use $bloodyhopes-campfire to find an open Campfire research task and complete every step my environment permits."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bloodyhopes-campfire"
+      description: "Bloody Hopes remote Campfire research server"
+      transport: "streamable_http"
+      url: "https://bloodyhopes.com/mcp"

@@ -16,5 +16,7 @@ tests
 scripts
 outreach
 integrations
+skills
+experiments
 articles/*-preview.html
 assets/seo/*-source.png

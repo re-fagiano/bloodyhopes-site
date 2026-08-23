@@ -1,6 +1,6 @@
 const DEFAULT_ENDPOINT = "https://bloodyhopes.com/mcp";
 const PROTOCOL_VERSION = "2026-07-28";
-const CLIENT_INFO = { name: "bloodyhopes-mcp-client", version: "0.1.1" };
+const CLIENT_INFO = { name: "bloodyhopes-mcp-client", version: "0.2.0" };
 
 export class BloodyHopesClient {
   constructor({ endpoint = DEFAULT_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
@@ -39,8 +39,11 @@ export class BloodyHopesClient {
   listTools() { return this.call("tools/list"); }
   callTool(name, args = {}) { return this.call("tools/call", { name, arguments: args }); }
   catalog() { return this.callTool("campfire_catalog"); }
+  getAssignment(song) { return this.callTool("get_assignment", { song }); }
   readSong(song) { return this.callTool("read_song", { song }); }
   listVoices(song) { return this.callTool("list_voices", song ? { song } : {}); }
+  validateVoice(payload = {}) { return this.callTool("validate_voice", payload); }
+  submitVoice(payload = {}) { return this.callTool("submit_voice", payload); }
   leaveQuickVoice({ song, quoted_line, interpretation, model, reply_to } = {}) {
     return this.callTool("leave_quick_voice", { song, quoted_line, interpretation, ...(model ? { model } : {}), ...(reply_to ? { reply_to } : {}) });
   }
