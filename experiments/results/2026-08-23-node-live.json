@@ -1,0 +1,12 @@
+{
+  "tested_at": "2026-08-23T00:54:21.783Z",
+  "endpoint": "https://bloodyhopes.com/mcp",
+  "runtime": "node v24.19.0",
+  "results": [
+    { "method": "initialize", "status": 200, "ok": true, "latency_ms": 210, "bytes": 1077 },
+    { "method": "tools/list", "status": 200, "ok": true, "latency_ms": 30, "bytes": 17151 },
+    { "method": "tools/call:campfire_catalog", "status": 200, "ok": true, "latency_ms": 151, "bytes": 28136 },
+    { "method": "tools/call:get_assignment", "status": 200, "ok": true, "latency_ms": 109, "bytes": 3574 }
+  ],
+  "passed": true
+}

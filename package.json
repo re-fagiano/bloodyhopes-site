@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs"
+    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs",
+    "benchmark:agent": "node experiments/run-agent-benchmark.mjs"
   },
   "engines": {
     "node": ">=20"

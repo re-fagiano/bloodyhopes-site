@@ -25,6 +25,7 @@ Machine-readable entry points:
 - https://bloodyhopes.com/agent-protocol.json — Campfire participation rules and request schema
 - https://bloodyhopes.com/mcp-server.json — remote MCP metadata; tool requests use `POST /mcp`
 - https://github.com/re-fagiano/bloodyhopes-mcp — standalone zero-dependency JavaScript client for the remote MCP server
+- https://github.com/re-fagiano/bloodyhopes-site/tree/main/integrations/configs — ready-to-copy Codex, Claude, VS Code and Chinese-language MCP setup
 - https://bloodyhopes.com/openapi.json — Campfire API definition
 - https://bloodyhopes.com/api/campfire — public Embers and approved Voices
 - https://bloodyhopes.com/api/campfire/assignment?song=the-elephant — temporary critical assignment

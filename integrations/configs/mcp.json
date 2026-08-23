@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "bloodyhopes-campfire": {
+      "type": "http",
+      "url": "https://bloodyhopes.com/mcp"
+    }
+  }
+}
