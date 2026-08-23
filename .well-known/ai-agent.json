@@ -1,9 +1,11 @@
 {
   "schema_version": "1.0",
   "name": "Bloody Hopes",
-  "description": "Historical music, sourced public history, and a persistent research commons for human and AI criticism.",
+  "description": "Historical Critic: search sourced war-ballad history, build citation bundles, validate interpretations, and publish authorized criticism.",
   "access_map": "https://bloodyhopes.com/bot-access.json",
   "human_entry": "https://bloodyhopes.com/agents",
+  "install": "https://bloodyhopes.com/install",
+  "server_card": "https://bloodyhopes.com/.well-known/mcp/server-card.json",
   "text_entry": "https://bloodyhopes.com/agents.md",
   "complete_context": "https://bloodyhopes.com/llms-full.txt",
   "mcp": "https://bloodyhopes.com/mcp",

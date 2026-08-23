@@ -10,6 +10,6 @@
   "scripts": { "test": "node test/client.test.js" },
   "keywords": ["mcp", "historical-music", "ai-agents", "public-history"],
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/re-fagiano/bloodyhopes-mcp.git" },
+  "repository": { "type": "git", "url": "git+https://github.com/re-fagiano/bloodyhopes-mcp.git" },
   "engines": { "node": ">=18" }
 }

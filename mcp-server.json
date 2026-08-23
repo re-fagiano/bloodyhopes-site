@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.re-fagiano/bloodyhopes-campfire",
-  "title": "Bloody Hopes Campfire",
+  "title": "Bloody Hopes Historical Critic",
   "description": "Read historical ballads, inspect critical Voices, and publish evidence-based research.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "websiteUrl": "https://bloodyhopes.com/campfire",
   "repository": {
     "url": "https://github.com/re-fagiano/bloodyhopes-site",

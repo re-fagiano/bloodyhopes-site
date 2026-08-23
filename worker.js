@@ -26,6 +26,7 @@ const DISCOVERY_LINKS = [
   '</llms-full.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes complete reading context"',
   '</bot-access.json>; rel="describedby"; type="application/json"; title="Bot access map and independent fallbacks"',
   '</.well-known/ai-agent.json>; rel="describedby"; type="application/json"; title="AI agent discovery"',
+  '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes Historical Critic server card"',
   '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
   '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
@@ -67,9 +68,9 @@ const SONG_SLUGS = new Set([
   "the-elephant", "tim-and-jones", "waterloo-smile",
 ]);
 const SONG_VERSION = "2026-08-17.1";
-const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit"]);
+const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit", "install_view", "install_copy"]);
 const AGENT_FUNNEL_EVENTS = new Set([
-  "agent_discovery", "catalog_read", "assignment_requested", "song_context_read",
+  "agent_discovery", "mcp_initialized", "tools_discovered", "catalog_read", "assignment_requested", "song_context_read", "citation_bundle_requested",
   "voices_read", "dry_run_attempted", "dry_run_valid", "submission_attempted",
   "submission_accepted", "submission_rejected", "countervoice_created",
 ]);
@@ -318,7 +319,7 @@ function botVerification(request) {
 
 function isReadablePage(pathname) {
   if (pathname === "/") return true;
-  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
     || pathname === "/agents.md"
     || pathname === "/.well-known/ai-agent.json"
@@ -364,6 +365,7 @@ function agentLabel(request) {
 
 async function recordAgentFunnel(env, request, event, route, outcome = "observed") {
   if (!AGENT_FUNNEL_EVENTS.has(event)) return;
+  if (!env?.CAMPFIRE) return;
   await storeStub(env).fetch(new Request("https://store/agent-event", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -481,8 +483,8 @@ async function handleDryRunRequest(request, env) {
 }
 
 const MCP_SERVER_INFO = {
-  name: "com.bloodyhopes/campfire",
-  title: "Bloody Hopes Campfire",
+  name: "io.github.re-fagiano/bloodyhopes-campfire",
+  title: "Bloody Hopes Historical Critic",
   version: "1.3.0",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
@@ -511,6 +513,23 @@ const MCP_TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "build_citation_bundle",
+    title: "Build a citable historical evidence bundle",
+    description: "Return ranked corpus excerpts and canonical URLs for a focused historical or lyrical question. Use this to ground research before interpretation.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["query"],
+      properties: {
+        query: { type: "string", minLength: 2, maxLength: 80 },
+        song: { type: "string", enum: [...SONG_SLUGS] },
+        limit: { type: "integer", minimum: 1, maximum: 8 }
+      }
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" }
   },
   {
     name: "campfire_catalog",
@@ -677,6 +696,23 @@ async function mcpCallTool(name, args, request, env) {
     if (!results) return mcpResult({ error: "corpus_unavailable" }, { isError: true });
     return mcpResult({ query, scope: "bloodyhopes.com published corpus", results });
   }
+  if (name === "build_citation_bundle") {
+    const query = cleanText(args.query, 80);
+    const song = args.song === undefined ? null : cleanText(args.song, 80);
+    if (query.length < 2) return mcpResult({ error: "invalid_query", message: "Use at least two characters." }, { isError: true });
+    if (song && !SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song" }, { isError: true });
+    await recordAgentFunnel(env, request, "citation_bundle_requested", "/mcp#build_citation_bundle");
+    const searchQuery = song ? `${query} ${SONG_TITLES[song]}` : query;
+    const results = await searchHarnessCorpus(searchQuery, request, env, Number(args.limit) || 6);
+    if (!results) return mcpResult({ error: "corpus_unavailable" }, { isError: true });
+    return mcpResult({
+      query,
+      song,
+      evidence_policy: "Cite canonical_url fields. Excerpts are leads, not substitutes for checking the complete page and its listed sources.",
+      canonical_song_url: song ? `https://bloodyhopes.com/songs/${song}` : null,
+      excerpts: results
+    });
+  }
   if (name === "campfire_catalog") {
     await recordAgentFunnel(env, request, "catalog_read", "/mcp#campfire_catalog");
     const response = await env.ASSETS.fetch(new Request(new URL("/critical-catalog.json", request.url)));
@@ -773,6 +809,10 @@ async function handleMcp(request, env) {
   if (declaredClient && !agentHeaders.has("x-agent-model")) agentHeaders.set("x-agent-model", declaredClient);
   const agentRequest = new Request(request.url, { method: "POST", headers: agentHeaders });
 
+  if (message.method === "initialize") {
+    await recordAgentFunnel(env, agentRequest, "mcp_initialized", "/mcp#initialize");
+  }
+
   // initialize belongs to the handshake-based protocol family. Prefer its body
   // version even if an auto-negotiating client retains modern routing headers.
   const requestedProtocol = message.method === "initialize"
@@ -811,6 +851,7 @@ async function handleMcp(request, env) {
     }, negotiatedProtocol);
   }
   if (message.method === "tools/list") {
+    await recordAgentFunnel(env, agentRequest, "tools_discovered", "/mcp#tools-list");
     return mcpResponse(message.id, {
       resultType: "complete",
       tools: MCP_TOOLS,
@@ -1014,7 +1055,7 @@ export default {
       let canonicalPath = null;
       if (url.pathname === "/index.html") {
         canonicalPath = "/";
-      } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
+      } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
         || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
       } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {

@@ -621,6 +621,57 @@ footer.site a:hover { color: var(--gold); }
   color: #fff;
   background: #080706 url("seo/bloody-hopes-remembrance-1200x900.jpg") 50% 45% / cover no-repeat;
 }
+
+/* ---------- Historical Critic install ---------- */
+.install-page { background: #090807; }
+.install-nav { position: absolute; inset: 0 0 auto; background: linear-gradient(180deg, rgba(4,3,3,.92), transparent); border: 0; }
+.install-hero { min-height: 100svh; position: relative; display: grid; align-items: end; background: #090807 url("seo/bloody-hopes-remembrance-source.png") center 32% / cover no-repeat; overflow: hidden; }
+.install-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,5,4,.96) 0%, rgba(6,5,4,.82) 38%, rgba(6,5,4,.18) 76%), linear-gradient(0deg, #090807 0%, transparent 35%); }
+.install-hero-copy { position: relative; z-index: 1; width: 100%; padding-top: 10rem; padding-bottom: clamp(4rem, 9vh, 7rem); }
+.install-brandline { margin: 0 0 .7rem; font: 700 clamp(1.4rem, 2vw, 2rem)/1 var(--serif); letter-spacing: .08em; text-transform: uppercase; }
+.install-hero h1 { max-width: 760px; margin: 0; font-size: clamp(3.3rem, 9vw, 7.8rem); line-height: .88; letter-spacing: -.045em; }
+.install-hero .lede { max-width: 600px; margin: 1.8rem 0 2rem; font-size: clamp(1.05rem, 2vw, 1.35rem); color: #d3cbc1; }
+.install-hero-copy > * { animation: install-rise .7s both; }
+.install-hero-copy > :nth-child(2) { animation-delay: .08s; }
+.install-hero-copy > :nth-child(3) { animation-delay: .16s; }
+.install-hero-copy > :nth-child(4) { animation-delay: .24s; }
+.install-hero-copy > :nth-child(5) { animation-delay: .32s; }
+@keyframes install-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.install-proof { border-block: 1px solid var(--line); background: #100d0b; }
+.install-proof-line { display: flex; justify-content: space-between; gap: 1.2rem; padding-block: 1.1rem; color: var(--ink-dim); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+.install-section { padding: clamp(5rem, 10vw, 9rem) 0; border-bottom: 1px solid var(--line); opacity: .3; transform: translateY(24px); transition: opacity .65s ease, transform .65s ease; }
+.install-section.is-visible { opacity: 1; transform: none; }
+.install-layout { display: grid; grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); gap: clamp(3rem, 8vw, 8rem); align-items: start; }
+.install-layout h2 { margin: .4rem 0 1rem; font-size: clamp(2.2rem, 5vw, 4.6rem); letter-spacing: -.025em; }
+.install-commands article { display: grid; grid-template-columns: minmax(150px, .5fr) minmax(0, 1.5fr) auto; align-items: center; gap: 1.2rem; padding: 1.4rem 0; border-bottom: 1px solid var(--line); }
+.install-commands article:first-child { border-top: 1px solid var(--line); }
+.install-commands strong, .install-commands span { display: block; }
+.install-commands span { color: var(--ink-dim); font-size: .78rem; }
+.install-commands code, .install-cn > code { overflow-wrap: anywhere; color: #d8c79f; font-size: .82rem; }
+.install-commands button { border: 1px solid #5b4841; color: var(--ink); background: transparent; padding: .55rem .75rem; cursor: pointer; transition: background .2s, border-color .2s; }
+.install-commands button:hover { background: var(--accent); border-color: var(--accent); }
+.install-safe { background: #120e0c; }
+.install-sequence { display: grid; }
+.install-sequence span { padding: 1.15rem 0; border-bottom: 1px solid var(--line); font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.5rem); }
+.install-sequence span:last-child { color: var(--accent-bright); }
+.install-cn { border-left: 1px solid var(--accent); padding-left: clamp(1.5rem, 4vw, 3rem); }
+.install-cn > code { display: block; margin-bottom: 1.5rem; font-size: 1.05rem; }
+.install-final { padding: clamp(7rem, 14vw, 12rem) 0; text-align: center; background: radial-gradient(circle at 50% 110%, rgba(139,26,26,.35), transparent 45%); }
+.install-final h2 { max-width: 900px; margin: .5rem auto 1.2rem; font-size: clamp(2.7rem, 7vw, 6rem); line-height: .98; }
+.install-final p:not(.eyebrow) { color: var(--ink-dim); }
+.install-final .cta-row { justify-content: center; }
+@media (max-width: 760px) {
+  .install-nav nav { display: none; }
+  .install-hero { background-position: 60% center; }
+  .install-hero-shade { background: linear-gradient(90deg, rgba(6,5,4,.94), rgba(6,5,4,.42)), linear-gradient(0deg, #090807, transparent 55%); }
+  .install-proof-line { overflow-x: auto; justify-content: flex-start; white-space: nowrap; }
+  .install-layout { grid-template-columns: 1fr; gap: 2rem; }
+  .install-commands article { grid-template-columns: 1fr auto; }
+  .install-commands article code { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-hero-copy > *, .install-section { animation: none; transition: none; opacity: 1; transform: none; }
+}
 .home-hero::before {
   content: "";
   position: absolute;

@@ -39,6 +39,10 @@ const agentEntryRedirect = await worker.fetch(new Request("https://bloodyhopes.c
 assert.equal(agentEntryRedirect.status, 301);
 assert.equal(agentEntryRedirect.headers.get("location"), "https://bloodyhopes.com/agent-entry");
 
+const installRedirect = await worker.fetch(new Request("https://bloodyhopes.com/install.html"), env, ctx);
+assert.equal(installRedirect.status, 301);
+assert.equal(installRedirect.headers.get("location"), "https://bloodyhopes.com/install");
+
 const method = await worker.fetch(new Request("https://bloodyhopes.com/api/newsletter"), env, ctx);
 assert.equal(method.status, 405);
 assert.equal(method.headers.get("allow"), "POST");
@@ -67,6 +71,7 @@ const mcpTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
 assert.equal(mcpTools.status, 200);
 const mcpBody = await mcpTools.json();
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "search_corpus"));
+assert.ok(mcpBody.result.tools.some((tool) => tool.name === "build_citation_bundle"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "validate_voice"));
 
 console.log("Worker smoke tests passed: canonical redirects, security headers, Harness tools and API guards checked.");

@@ -24,4 +24,8 @@ assert.equal(calls[1].body.params.arguments.song, "the-elephant");
 await client.validateVoice({ schema_version: "1.1", song: "the-elephant" });
 assert.equal(calls[2].body.params.name, "validate_voice");
 assert.equal(calls[2].body.params.arguments.schema_version, "1.1");
+
+await client.buildCitationBundle("eyewitness authority", { song: "the-elephant", limit: 4 });
+assert.equal(calls[3].body.params.name, "build_citation_bundle");
+assert.equal(calls[3].body.params.arguments.limit, 4);
 console.log("BloodyHopesClient tests passed");

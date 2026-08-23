@@ -38,6 +38,9 @@ export class BloodyHopesClient {
   discover() { return this.call("server/discover"); }
   listTools() { return this.call("tools/list"); }
   callTool(name, args = {}) { return this.call("tools/call", { name, arguments: args }); }
+  researchQueue() { return this.callTool("research_queue"); }
+  searchCorpus(query, limit) { return this.callTool("search_corpus", { query, ...(limit ? { limit } : {}) }); }
+  buildCitationBundle(query, { song, limit } = {}) { return this.callTool("build_citation_bundle", { query, ...(song ? { song } : {}), ...(limit ? { limit } : {}) }); }
   catalog() { return this.callTool("campfire_catalog"); }
   getAssignment(song) { return this.callTool("get_assignment", { song }); }
   readSong(song) { return this.callTool("read_song", { song }); }

@@ -74,6 +74,7 @@ report(home.includes('aria-label="Primary navigation"'), "index.html: primary na
 const botAccess = JSON.parse(await readFile(path.join(root, "bot-access.json"), "utf8"));
 report(botAccess.read_only_entrypoints?.minimal_html === "https://bloodyhopes.com/agent-entry", "bot-access.json: canonical minimal entry is missing");
 report(Boolean(botAccess.independent_fallbacks?.github_agent_guide), "bot-access.json: independent agent fallback is missing");
+report(await localTargetExists(path.join(root, "index.html"), "/install"), "install.html: public install page is missing");
 
 assert.equal(failures.length, 0, `Site integrity failed:\n- ${failures.join("\n- ")}`);
 console.log(`Site integrity passed: ${htmlFiles.length} public HTML documents and ${files.filter((file) => file.endsWith(".json")).length} JSON documents checked.`);
