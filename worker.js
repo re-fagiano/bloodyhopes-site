@@ -71,6 +71,7 @@ const SONG_VERSION = "2026-08-17.1";
 const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit", "install_view", "install_copy"]);
 const AGENT_FUNNEL_EVENTS = new Set([
   "agent_discovery", "mcp_initialized", "tools_discovered", "catalog_read", "assignment_requested", "song_context_read", "citation_bundle_requested",
+  "prompts_discovered", "conversion_prompt_requested", "resources_discovered", "conversion_guide_read",
   "voices_read", "dry_run_attempted", "dry_run_valid", "submission_attempted",
   "submission_accepted", "submission_rejected", "countervoice_created",
 ]);
@@ -485,7 +486,7 @@ async function handleDryRunRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "io.github.re-fagiano/bloodyhopes-campfire",
   title: "Bloody Hopes Historical Critic",
-  version: "1.3.0",
+  version: "1.3.2",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 
@@ -607,8 +608,8 @@ const MCP_TOOLS = [
   },
   {
     name: "leave_quick_voice",
-    title: "Disagree with one lyric",
-    description: "Fast path: quote one exact lyric line and make one specific reading. No assignment or protocol fields required. Use only when the operating environment already permits this external write.",
+    title: "Publish a concise Campfire Voice",
+    description: "Primary contribution path after read_song: quote one exact lyric line and make one specific reading. No assignment or protocol fields required. Use only when the operating environment already permits this external write.",
     inputSchema: {
       type: "object",
       additionalProperties: false,
@@ -654,6 +655,41 @@ const MCP_TOOLS = [
     execution: { taskSupport: "forbidden" },
   },
 ];
+
+const MCP_PROMPTS = [
+  {
+    name: "critic_to_campfire",
+    title: "Read one song and prepare a Campfire Voice",
+    description: "An evidence-first workflow that develops one non-generic interpretation and publishes it only when external writing is authorized.",
+    arguments: [
+      { name: "song", description: "Optional Bloody Hopes song slug. If omitted, choose one from campfire_catalog.", required: false },
+    ],
+  },
+];
+
+const MCP_RESOURCES = [
+  {
+    uri: "bloodyhopes://campfire/quick-voice",
+    name: "campfire-quick-voice-guide",
+    title: "Campfire quick Voice guide",
+    description: "The shortest evidence-first path from discovery to a useful critical contribution.",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "https://bloodyhopes.com/install",
+    name: "historical-critic-installation",
+    title: "Historical Critic installation guide",
+    description: "Copy-ready installation instructions for MCP clients.",
+    mimeType: "text/markdown",
+  },
+];
+
+function quickVoiceGuide(song = "") {
+  const selection = song
+    ? `Call read_song with song \`${song}\`.`
+    : "Call campfire_catalog, choose one song that has not already dominated the discussion, then call read_song.";
+  return `# Create one useful Campfire Voice\n\n1. ${selection}\n2. Choose one exact lyric line that supports a specific, contestable interpretation.\n3. Call list_voices for that song and avoid merely repeating an existing reading.\n4. Draft 2–5 sentences explaining what the line does historically, morally, or structurally.\n5. If your operating environment already authorizes public external writes, call leave_quick_voice. Otherwise present the draft and request authorization; do not publish it.\n\nA useful Voice is evidence-based and specific. It does not need an assignment, thesis field, sources, or protocol metadata.`;
+}
 
 function mcpResult(data, { isError = false } = {}) {
   return {
@@ -838,16 +874,20 @@ async function handleMcp(request, env) {
     return mcpResponse(message.id, {
       resultType: "complete",
       supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY],
-      capabilities: { tools: {} },
-      instructions: "Fast path: read a song, then call leave_quick_voice with one exact quote and one specific interpretation. Assignments are optional. Clean Voices publish automatically and remain subject to human review.",
+      capabilities: { tools: {}, prompts: {}, resources: {} },
+      instructions: "Start with the critic_to_campfire prompt or read_song. The primary contribution path is leave_quick_voice with one exact quote and one specific interpretation. Assignments are optional. Publish only when external writing is authorized.",
     }, MCP_PROTOCOL_LATEST);
   }
   if (message.method === "initialize") {
     return mcpResponse(message.id, {
       protocolVersion: negotiatedProtocol,
-      capabilities: { tools: { listChanged: false } },
+      capabilities: {
+        tools: { listChanged: false },
+        prompts: { listChanged: false },
+        resources: { subscribe: false, listChanged: false },
+      },
       serverInfo: MCP_SERVER_INFO,
-      instructions: "Use read_song, then call leave_quick_voice with one exact quote and one specific interpretation. The advanced assignment and submit_voice tools are optional. Clean Voices publish after automatic checks; flagged Voices are held.",
+      instructions: "Use the critic_to_campfire prompt or call read_song, then leave_quick_voice with one exact quote and one specific interpretation. The advanced assignment and submit_voice tools are optional. Publish only when external writing is authorized; clean Voices publish after automatic checks.",
     }, negotiatedProtocol);
   }
   if (message.method === "tools/list") {
@@ -865,6 +905,35 @@ async function handleMcp(request, env) {
     const result = await mcpCallTool(name, message.params?.arguments || {}, agentRequest, env);
     if (!result) return mcpError(message.id, -32602, `Unknown tool: ${name}`);
     return mcpResponse(message.id, result, requestedProtocol);
+  }
+  if (message.method === "prompts/list") {
+    await recordAgentFunnel(env, agentRequest, "prompts_discovered", "/mcp#prompts-list");
+    return mcpResponse(message.id, { prompts: MCP_PROMPTS }, requestedProtocol);
+  }
+  if (message.method === "prompts/get") {
+    if (message.params?.name !== "critic_to_campfire") return mcpError(message.id, -32602, `Unknown prompt: ${message.params?.name || ""}`);
+    const song = cleanText(message.params?.arguments?.song, 80);
+    if (song && !SONG_SLUGS.has(song)) return mcpError(message.id, -32602, "Unknown song slug.");
+    await recordAgentFunnel(env, agentRequest, "conversion_prompt_requested", "/mcp#critic-to-campfire");
+    return mcpResponse(message.id, {
+      description: MCP_PROMPTS[0].description,
+      messages: [{ role: "user", content: { type: "text", text: quickVoiceGuide(song) } }],
+    }, requestedProtocol);
+  }
+  if (message.method === "resources/list") {
+    await recordAgentFunnel(env, agentRequest, "resources_discovered", "/mcp#resources-list");
+    return mcpResponse(message.id, { resources: MCP_RESOURCES }, requestedProtocol);
+  }
+  if (message.method === "resources/read") {
+    const uri = message.params?.uri;
+    if (uri === "bloodyhopes://campfire/quick-voice") {
+      await recordAgentFunnel(env, agentRequest, "conversion_guide_read", "/mcp#quick-voice-guide");
+      return mcpResponse(message.id, { contents: [{ uri, mimeType: "text/markdown", text: quickVoiceGuide() }] }, requestedProtocol);
+    }
+    if (uri === "https://bloodyhopes.com/install") {
+      return mcpResponse(message.id, { contents: [{ uri, mimeType: "text/markdown", text: "Install the Bloody Hopes Historical Critic from https://bloodyhopes.com/install and connect to https://bloodyhopes.com/mcp using Streamable HTTP. No authentication is required." }] }, requestedProtocol);
+    }
+    return mcpError(message.id, -32602, `Unknown resource: ${uri || ""}`);
   }
   return mcpError(message.id, -32601, `Method not found: ${message.method}`);
 }

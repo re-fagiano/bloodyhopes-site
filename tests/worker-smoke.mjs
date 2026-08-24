@@ -63,6 +63,16 @@ assert.equal(searchBody.results[0].url, "https://bloodyhopes.com/songs/disciplin
 const invalidSearch = await worker.fetch(new Request("https://bloodyhopes.com/api/harness/search?q=x"), env, ctx);
 assert.equal(invalidSearch.status, 400);
 
+const mcpInitialize = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "conversion-smoke", version: "1.0" } } }),
+}), env, ctx);
+const initializeBody = await mcpInitialize.json();
+assert.equal(initializeBody.result.serverInfo.version, "1.3.2");
+assert.ok(initializeBody.result.capabilities.prompts);
+assert.ok(initializeBody.result.capabilities.resources);
+
 const mcpTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
   method: "POST",
   headers: { "content-type": "application/json", "mcp-protocol-version": "2025-11-25" },
@@ -73,5 +83,37 @@ const mcpBody = await mcpTools.json();
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "search_corpus"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "build_citation_bundle"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "validate_voice"));
+
+const mcpRequest = async (id, method, params = {}) => {
+  const response = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+    method: "POST",
+    headers: { "content-type": "application/json", "mcp-protocol-version": "2025-11-25" },
+    body: JSON.stringify({ jsonrpc: "2.0", id, method, params }),
+  }), env, ctx);
+  assert.equal(response.status, 200);
+  return response.json();
+};
+
+const prompts = await mcpRequest(2, "prompts/list");
+assert.ok(prompts.result.prompts.some((prompt) => prompt.name === "critic_to_campfire"));
+const prompt = await mcpRequest(3, "prompts/get", { name: "critic_to_campfire", arguments: { song: "discipline" } });
+assert.match(prompt.result.messages[0].content.text, /leave_quick_voice/);
+const resources = await mcpRequest(4, "resources/list");
+assert.ok(resources.result.resources.some((resource) => resource.uri === "bloodyhopes://campfire/quick-voice"));
+const resource = await mcpRequest(5, "resources/read", { uri: "bloodyhopes://campfire/quick-voice" });
+assert.match(resource.result.contents[0].text, /read_song/);
+
+const modernPrompts = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "POST",
+  headers: {
+    "content-type": "application/json",
+    "mcp-protocol-version": "2026-07-28",
+    "mcp-method": "prompts/list",
+  },
+  body: JSON.stringify({ jsonrpc: "2.0", id: 6, method: "prompts/list", params: {} }),
+}), env, ctx);
+assert.equal(modernPrompts.status, 200);
+assert.equal(modernPrompts.headers.get("mcp-protocol-version"), "2026-07-28");
+assert.ok((await modernPrompts.json()).result.prompts.length > 0);
 
 console.log("Worker smoke tests passed: canonical redirects, security headers, Harness tools and API guards checked.");
