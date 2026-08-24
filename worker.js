@@ -21,6 +21,7 @@ const MCP_BROWSER_ORIGINS = new Set([
   "https://www.modelscope.cn",
   "https://modelscope.ai",
   "https://www.modelscope.ai",
+  "https://mcp.api-inference.modelscope.net",
 ]);
 const HOUSE_CRITIC_PROVENANCE = "site-commissioned";
 const HOUSE_CRITIC_MANUAL_WINDOW_MS = 15 * 60 * 1_000;
@@ -495,7 +496,7 @@ async function handleDryRunRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "io.github.re-fagiano/bloodyhopes-campfire",
   title: "Bloody Hopes Historical Critic",
-  version: "1.3.3",
+  version: "1.3.4",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 

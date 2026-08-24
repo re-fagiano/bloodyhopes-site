@@ -69,7 +69,7 @@ const mcpInitialize = await worker.fetch(new Request("https://bloodyhopes.com/mc
   body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "conversion-smoke", version: "1.0" } } }),
 }), env, ctx);
 const initializeBody = await mcpInitialize.json();
-assert.equal(initializeBody.result.serverInfo.version, "1.3.3");
+assert.equal(initializeBody.result.serverInfo.version, "1.3.4");
 assert.ok(initializeBody.result.capabilities.prompts);
 assert.ok(initializeBody.result.capabilities.resources);
 
@@ -126,6 +126,17 @@ const modelScopePreflight = await worker.fetch(new Request("https://bloodyhopes.
 }), env, ctx);
 assert.equal(modelScopePreflight.status, 204);
 assert.equal(modelScopePreflight.headers.get("access-control-allow-origin"), "https://www.modelscope.ai");
+
+const modelScopeProxyPreflight = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "OPTIONS",
+  headers: {
+    origin: "https://mcp.api-inference.modelscope.net",
+    "access-control-request-method": "POST",
+    "access-control-request-headers": "content-type,mcp-protocol-version",
+  },
+}), env, ctx);
+assert.equal(modelScopeProxyPreflight.status, 204);
+assert.equal(modelScopeProxyPreflight.headers.get("access-control-allow-origin"), "https://mcp.api-inference.modelscope.net");
 
 const untrustedPreflight = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
   method: "OPTIONS",
