@@ -13,6 +13,15 @@ const RATE_RETENTION_MS = 48 * 60 * 60 * 1_000;
 const RATE_LIMIT = 3;
 const MCP_PROTOCOL_LATEST = "2026-07-28";
 const MCP_PROTOCOL_LEGACY = "2025-11-25";
+const MCP_SUPPORTED_PROTOCOLS = [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY, "2025-06-18", "2025-03-26"];
+const MCP_PROTOCOL_HANDSHAKE = new Set(MCP_SUPPORTED_PROTOCOLS);
+const MCP_BROWSER_ORIGINS = new Set([
+  "https://bloodyhopes.com",
+  "https://modelscope.cn",
+  "https://www.modelscope.cn",
+  "https://modelscope.ai",
+  "https://www.modelscope.ai",
+]);
 const HOUSE_CRITIC_PROVENANCE = "site-commissioned";
 const HOUSE_CRITIC_MANUAL_WINDOW_MS = 15 * 60 * 1_000;
 const VISITOR_CRITIC_WINDOW_MS = 6 * 60 * 60 * 1_000;
@@ -486,7 +495,7 @@ async function handleDryRunRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "io.github.re-fagiano/bloodyhopes-campfire",
   title: "Bloody Hopes Historical Critic",
-  version: "1.3.2",
+  version: "1.3.3",
   description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
 };
 
@@ -817,7 +826,7 @@ async function handleMcp(request, env) {
   }
   const requestUrl = new URL(request.url);
   const origin = request.headers.get("origin");
-  if (origin && origin !== requestUrl.origin && origin !== "https://bloodyhopes.com") {
+  if (origin && origin !== requestUrl.origin && !MCP_BROWSER_ORIGINS.has(origin)) {
     return json({ error: "forbidden_origin" }, 403);
   }
   if (!(request.headers.get("content-type") || "").includes("application/json")) {
@@ -856,9 +865,11 @@ async function handleMcp(request, env) {
     : (request.headers.get("mcp-protocol-version")
       || message.params?._meta?.["io.modelcontextprotocol/protocolVersion"]
       || MCP_PROTOCOL_LEGACY);
-  const negotiatedProtocol = message.method === "initialize" ? MCP_PROTOCOL_LEGACY : requestedProtocol;
-  if (message.method !== "initialize" && ![MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY].includes(requestedProtocol)) {
-    return mcpError(message.id, -32022, "Unsupported protocol version", 400, { supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY] });
+  const negotiatedProtocol = message.method === "initialize"
+    ? (MCP_PROTOCOL_HANDSHAKE.has(requestedProtocol) ? requestedProtocol : MCP_PROTOCOL_LEGACY)
+    : requestedProtocol;
+  if (message.method !== "initialize" && !MCP_SUPPORTED_PROTOCOLS.includes(requestedProtocol)) {
+    return mcpError(message.id, -32022, "Unsupported protocol version", 400, { supportedVersions: MCP_SUPPORTED_PROTOCOLS });
   }
   if (message.method !== "initialize" && requestedProtocol === MCP_PROTOCOL_LATEST) {
     const methodHeader = request.headers.get("mcp-method");
@@ -873,7 +884,7 @@ async function handleMcp(request, env) {
   if (message.method === "server/discover") {
     return mcpResponse(message.id, {
       resultType: "complete",
-      supportedVersions: [MCP_PROTOCOL_LATEST, MCP_PROTOCOL_LEGACY],
+      supportedVersions: MCP_SUPPORTED_PROTOCOLS,
       capabilities: { tools: {}, prompts: {}, resources: {} },
       instructions: "Start with the critic_to_campfire prompt or read_song. The primary contribution path is leave_quick_voice with one exact quote and one specific interpretation. Assignments are optional. Publish only when external writing is authorized.",
     }, MCP_PROTOCOL_LATEST);
@@ -1136,7 +1147,30 @@ export default {
       }
     }
 
-    if (url.pathname === "/mcp") return handleMcp(request, env);
+    if (url.pathname === "/mcp") {
+      const origin = request.headers.get("origin");
+      const trustedBrowserOrigin = origin && (origin === url.origin || MCP_BROWSER_ORIGINS.has(origin));
+      if (request.method === "OPTIONS") {
+        if (!trustedBrowserOrigin) return json({ error: "forbidden_origin" }, 403);
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "access-control-allow-origin": origin,
+            "access-control-allow-methods": "POST, OPTIONS",
+            "access-control-allow-headers": "content-type, authorization, mcp-protocol-version, mcp-method, mcp-name, mcp-session-id, last-event-id",
+            "access-control-max-age": "86400",
+            vary: "Origin",
+          },
+        });
+      }
+      const response = await handleMcp(request, env);
+      if (trustedBrowserOrigin) {
+        response.headers.set("access-control-allow-origin", origin);
+        response.headers.set("access-control-expose-headers", "mcp-protocol-version, mcp-session-id");
+        response.headers.append("vary", "Origin");
+      }
+      return response;
+    }
 
     if (url.pathname === "/api/harness/tasks") {
       if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });

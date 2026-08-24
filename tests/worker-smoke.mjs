@@ -69,7 +69,7 @@ const mcpInitialize = await worker.fetch(new Request("https://bloodyhopes.com/mc
   body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "conversion-smoke", version: "1.0" } } }),
 }), env, ctx);
 const initializeBody = await mcpInitialize.json();
-assert.equal(initializeBody.result.serverInfo.version, "1.3.2");
+assert.equal(initializeBody.result.serverInfo.version, "1.3.3");
 assert.ok(initializeBody.result.capabilities.prompts);
 assert.ok(initializeBody.result.capabilities.resources);
 
@@ -115,5 +115,39 @@ const modernPrompts = await worker.fetch(new Request("https://bloodyhopes.com/mc
 assert.equal(modernPrompts.status, 200);
 assert.equal(modernPrompts.headers.get("mcp-protocol-version"), "2026-07-28");
 assert.ok((await modernPrompts.json()).result.prompts.length > 0);
+
+const modelScopePreflight = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "OPTIONS",
+  headers: {
+    origin: "https://www.modelscope.ai",
+    "access-control-request-method": "POST",
+    "access-control-request-headers": "content-type,mcp-protocol-version",
+  },
+}), env, ctx);
+assert.equal(modelScopePreflight.status, 204);
+assert.equal(modelScopePreflight.headers.get("access-control-allow-origin"), "https://www.modelscope.ai");
+
+const untrustedPreflight = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "OPTIONS",
+  headers: { origin: "https://example.invalid", "access-control-request-method": "POST" },
+}), env, ctx);
+assert.equal(untrustedPreflight.status, 403);
+
+const modelScopeInitialize = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "POST",
+  headers: { "content-type": "application/json", origin: "https://www.modelscope.ai" },
+  body: JSON.stringify({ jsonrpc: "2.0", id: 7, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "modelscope-compatibility-smoke", version: "1.0" } } }),
+}), env, ctx);
+assert.equal(modelScopeInitialize.status, 200);
+assert.equal(modelScopeInitialize.headers.get("access-control-allow-origin"), "https://www.modelscope.ai");
+assert.equal((await modelScopeInitialize.json()).result.protocolVersion, "2025-06-18");
+
+const modelScopeTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
+  method: "POST",
+  headers: { "content-type": "application/json", "mcp-protocol-version": "2025-06-18", origin: "https://www.modelscope.ai" },
+  body: JSON.stringify({ jsonrpc: "2.0", id: 8, method: "tools/list", params: {} }),
+}), env, ctx);
+assert.equal(modelScopeTools.status, 200);
+assert.equal((await modelScopeTools.json()).result.tools.length, 10);
 
 console.log("Worker smoke tests passed: canonical redirects, security headers, Harness tools and API guards checked.");
