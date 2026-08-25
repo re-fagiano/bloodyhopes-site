@@ -8,15 +8,15 @@
     "schemes": []
   },
   "tools": [
+    { "name": "read_song", "description": "START HERE: read a complete song; try {\"song\":\"discipline\"}." },
+    { "name": "leave_quick_voice", "description": "Publish one exact quote and interpretation only when external writing is authorized." },
+    { "name": "campfire_catalog", "description": "List critic-ready historical ballads." },
     { "name": "research_queue", "description": "List bounded open historical and interpretive research tasks." },
     { "name": "search_corpus", "description": "Search the complete published Bloody Hopes corpus." },
     { "name": "build_citation_bundle", "description": "Build a canonical evidence bundle for a focused question." },
-    { "name": "campfire_catalog", "description": "List critic-ready historical ballads." },
-    { "name": "get_assignment", "description": "Receive a temporary critical role and evidence requirements." },
-    { "name": "read_song", "description": "Read complete canonical lyrics for one published song." },
     { "name": "list_voices", "description": "Read approved critical interpretations." },
     { "name": "validate_voice", "description": "Validate a contribution without storing or publishing it." },
-    { "name": "leave_quick_voice", "description": "Publish a concise evidence-based interpretation when authorized." },
+    { "name": "get_assignment", "description": "Optionally receive a temporary critical role and evidence requirements." },
     { "name": "submit_voice", "description": "Submit a complete critical Voice when external writing is authorized." }
   ],
   "resources": [

@@ -12,6 +12,7 @@ const env = {
       const pathname = new URL(request.url).pathname;
       if (pathname === "/research-queue.json") return Response.json({ schema_version: "1.0", tasks: [{ id: "test-task", status: "open", title: "Test task" }] });
       if (pathname === "/llms-full.txt") return new Response("----\nPAGE: Discipline\nURL: https://bloodyhopes.com/songs/discipline\n\n# Discipline\nFlogging and the gauntlet are not the same practice.", { headers: { "content-type": "text/plain" } });
+      if (pathname === "/songs/discipline.html") return new Response('<h1>Discipline</h1><section><div class="lyrics-text">We beat our friend to save him.<br>That was what we chose to think.</div></section>', { headers: { "content-type": "text/html; charset=utf-8" } });
       return new Response(`<h1>${new URL(request.url).pathname}</h1>`, {
         status: 200,
         headers: { "content-type": "text/html; charset=utf-8" },
@@ -50,6 +51,20 @@ assert.equal(method.headers.get("allow"), "POST");
 const invalidAssignment = await worker.fetch(new Request("https://bloodyhopes.com/api/campfire/assignment?song=unknown"), env, ctx);
 assert.equal(invalidAssignment.status, 400);
 
+const ignoredAdminMetric = await worker.fetch(new Request("https://bloodyhopes.com/api/growth/event", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ event: "campfire_open", path: "/campfire-admin" }),
+}), env, ctx);
+assert.equal(ignoredAdminMetric.status, 204);
+
+const invalidGrowthMetric = await worker.fetch(new Request("https://bloodyhopes.com/api/growth/event", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ event: "unknown", path: "/campfire" }),
+}), env, ctx);
+assert.equal(invalidGrowthMetric.status, 400);
+
 const tasks = await worker.fetch(new Request("https://bloodyhopes.com/api/harness/tasks"), env, ctx);
 assert.equal(tasks.status, 200);
 assert.equal((await tasks.json()).tasks[0].id, "test-task");
@@ -72,6 +87,8 @@ const initializeBody = await mcpInitialize.json();
 assert.equal(initializeBody.result.serverInfo.version, "1.3.4");
 assert.ok(initializeBody.result.capabilities.prompts);
 assert.ok(initializeBody.result.capabilities.resources);
+assert.match(initializeBody.result.instructions, /read_song.*discipline/);
+assert.match(initializeBody.result.instructions, /only.*authorized|already authorized/i);
 
 const mcpTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
   method: "POST",
@@ -80,6 +97,9 @@ const mcpTools = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
 }), env, ctx);
 assert.equal(mcpTools.status, 200);
 const mcpBody = await mcpTools.json();
+assert.deepEqual(mcpBody.result.tools.slice(0, 3).map((tool) => tool.name), ["read_song", "leave_quick_voice", "campfire_catalog"]);
+assert.equal(mcpBody.result.tools.find((tool) => tool.name === "read_song").annotations.readOnlyHint, true);
+assert.equal(mcpBody.result.tools.find((tool) => tool.name === "leave_quick_voice").annotations.readOnlyHint, false);
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "search_corpus"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "build_citation_bundle"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "validate_voice"));
@@ -102,6 +122,18 @@ const resources = await mcpRequest(4, "resources/list");
 assert.ok(resources.result.resources.some((resource) => resource.uri === "bloodyhopes://campfire/quick-voice"));
 const resource = await mcpRequest(5, "resources/read", { uri: "bloodyhopes://campfire/quick-voice" });
 assert.match(resource.result.contents[0].text, /read_song/);
+assert.match(resource.result.contents[0].text, /\{"song":"discipline"\}/);
+
+const firstSong = await mcpRequest(9, "tools/call", { name: "read_song", arguments: { song: "discipline" } });
+assert.equal(firstSong.result.structuredContent.canonical_url, "https://bloodyhopes.com/songs/discipline");
+assert.match(firstSong.result.structuredContent.lyrics, /We beat our friend to save him/);
+assert.equal(firstSong.result.structuredContent.next_step.optional_write_tool, "leave_quick_voice");
+assert.match(firstSong.result.structuredContent.next_step.authorization, /only.*permits/i);
+
+const researchQueue = await mcpRequest(10, "tools/call", { name: "research_queue", arguments: {} });
+assert.equal(researchQueue.result.structuredContent.tasks[0].id, "test-task");
+const corpusSearch = await mcpRequest(11, "tools/call", { name: "search_corpus", arguments: { query: "gauntlet" } });
+assert.equal(corpusSearch.result.structuredContent.results[0].heading, "Discipline");
 
 const modernPrompts = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
   method: "POST",

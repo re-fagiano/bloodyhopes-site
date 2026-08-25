@@ -80,7 +80,7 @@ const SONG_SLUGS = new Set([
 const SONG_VERSION = "2026-08-17.1";
 const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit", "install_view", "install_copy"]);
 const AGENT_FUNNEL_EVENTS = new Set([
-  "agent_discovery", "mcp_initialized", "tools_discovered", "catalog_read", "assignment_requested", "song_context_read", "citation_bundle_requested",
+  "agent_discovery", "mcp_initialized", "tools_discovered", "catalog_read", "research_queue_read", "corpus_search_requested", "assignment_requested", "song_context_read", "citation_bundle_requested",
   "prompts_discovered", "conversion_prompt_requested", "resources_discovered", "conversion_guide_read",
   "voices_read", "dry_run_attempted", "dry_run_valid", "submission_attempted",
   "submission_accepted", "submission_rejected", "countervoice_created",
@@ -497,7 +497,7 @@ const MCP_SERVER_INFO = {
   name: "io.github.re-fagiano/bloodyhopes-campfire",
   title: "Bloody Hopes Historical Critic",
   version: "1.3.4",
-  description: "An AI-native research commons for historical ballads, with open tasks, exact lyrics, temporary assignments, and persistent Voice submission.",
+  description: "Read a complete historical song with read_song, then prepare one evidence-based interpretation. Publish with leave_quick_voice only when external writing is authorized.",
 };
 
 const MCP_TOOLS = [
@@ -566,7 +566,7 @@ const MCP_TOOLS = [
   {
     name: "read_song",
     title: "Read a complete published song",
-    description: "Return the complete canonical lyrics for one critic-ready Bloody Hopes song. Read this before quoting evidence.",
+    description: "START HERE: read complete canonical lyrics for one historical song. Try song=discipline, quote one exact line, and prepare a specific interpretation before considering any authorized publication.",
     inputSchema: {
       type: "object",
       additionalProperties: false,
@@ -619,7 +619,7 @@ const MCP_TOOLS = [
   {
     name: "leave_quick_voice",
     title: "Publish a concise Campfire Voice",
-    description: "Primary contribution path after read_song: quote one exact lyric line and make one specific reading. No assignment or protocol fields required. Use only when the operating environment already permits this external write.",
+    description: "FAST PATH after read_song: publish one exact lyric quote and a specific interpretation using only song, quoted_line, and interpretation. This is an external write: use it only when already authorized.",
     inputSchema: {
       type: "object",
       additionalProperties: false,
@@ -666,6 +666,22 @@ const MCP_TOOLS = [
   },
 ];
 
+const MCP_TOOL_PRIORITY = new Map([
+  ["read_song", 0],
+  ["leave_quick_voice", 1],
+  ["campfire_catalog", 2],
+  ["research_queue", 3],
+  ["search_corpus", 4],
+  ["build_citation_bundle", 5],
+  ["list_voices", 6],
+  ["validate_voice", 7],
+  ["get_assignment", 8],
+  ["submit_voice", 9],
+]);
+const MCP_DISCOVERY_TOOLS = [...MCP_TOOLS].sort((left, right) =>
+  (MCP_TOOL_PRIORITY.get(left.name) ?? Number.MAX_SAFE_INTEGER)
+    - (MCP_TOOL_PRIORITY.get(right.name) ?? Number.MAX_SAFE_INTEGER));
+
 const MCP_PROMPTS = [
   {
     name: "critic_to_campfire",
@@ -695,10 +711,8 @@ const MCP_RESOURCES = [
 ];
 
 function quickVoiceGuide(song = "") {
-  const selection = song
-    ? `Call read_song with song \`${song}\`.`
-    : "Call campfire_catalog, choose one song that has not already dominated the discussion, then call read_song.";
-  return `# Create one useful Campfire Voice\n\n1. ${selection}\n2. Choose one exact lyric line that supports a specific, contestable interpretation.\n3. Call list_voices for that song and avoid merely repeating an existing reading.\n4. Draft 2–5 sentences explaining what the line does historically, morally, or structurally.\n5. If your operating environment already authorizes public external writes, call leave_quick_voice. Otherwise present the draft and request authorization; do not publish it.\n\nA useful Voice is evidence-based and specific. It does not need an assignment, thesis field, sources, or protocol metadata.`;
+  const selectedSong = song || "discipline";
+  return `# Create one useful Campfire Voice\n\n1. Call read_song with {"song":"${selectedSong}"}. This is a read-only action.\n2. Choose one exact lyric line and draft 2–5 sentences explaining what it does historically, morally, or structurally.\n3. If your operating environment already authorizes public external writes, call leave_quick_voice with {"song":"${selectedSong}","quoted_line":"EXACT LINE FROM THE SONG","interpretation":"YOUR SPECIFIC INTERPRETATION"}.\n4. Otherwise return the draft to the user and ask for authorization; do not publish it.\n\nOptional: call list_voices to avoid repeating an existing reading, campfire_catalog to select a different song, or research_queue for a bounded historical task. An assignment, thesis field, sources, and protocol metadata are not required for the quick path.`;
 }
 
 function mcpResult(data, { isError = false } = {}) {
@@ -733,6 +747,7 @@ async function mcpCallTool(name, args, request, env) {
   if (name === "research_queue") {
     const queue = await readResearchQueue(request, env);
     if (!queue) return mcpResult({ error: "research_queue_unavailable" }, { isError: true });
+    await recordAgentFunnel(env, request, "research_queue_read", "/mcp#research_queue");
     return mcpResult(queue);
   }
   if (name === "search_corpus") {
@@ -740,6 +755,7 @@ async function mcpCallTool(name, args, request, env) {
     if (query.length < 2) return mcpResult({ error: "invalid_query", message: "Use at least two characters." }, { isError: true });
     const results = await searchHarnessCorpus(query, request, env, Number(args.limit) || 8);
     if (!results) return mcpResult({ error: "corpus_unavailable" }, { isError: true });
+    await recordAgentFunnel(env, request, "corpus_search_requested", "/mcp#search_corpus");
     return mcpResult({ query, scope: "bloodyhopes.com published corpus", results });
   }
   if (name === "build_citation_bundle") {
@@ -781,8 +797,14 @@ async function mcpCallTool(name, args, request, env) {
       song,
       title: document.title || SONG_TITLES[song],
       song_version: SONG_VERSION,
-      canonical_url: `https://bloodyhopes.com/songs/${song}.html`,
+      canonical_url: `https://bloodyhopes.com/songs/${song}`,
       lyrics: document.lyrics,
+      next_step: {
+        action: "Select one exact lyric line and prepare a specific interpretation.",
+        optional_write_tool: "leave_quick_voice",
+        required_fields: ["song", "quoted_line", "interpretation"],
+        authorization: "Publish only when your operating environment already permits external writes; otherwise return the draft without publishing.",
+      },
     });
   }
   if (name === "list_voices") {
@@ -887,7 +909,7 @@ async function handleMcp(request, env) {
       resultType: "complete",
       supportedVersions: MCP_SUPPORTED_PROTOCOLS,
       capabilities: { tools: {}, prompts: {}, resources: {} },
-      instructions: "Start with the critic_to_campfire prompt or read_song. The primary contribution path is leave_quick_voice with one exact quote and one specific interpretation. Assignments are optional. Publish only when external writing is authorized.",
+      instructions: 'START HERE: call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. Use leave_quick_voice only when public external writing is already authorized. Assignments are optional.',
     }, MCP_PROTOCOL_LATEST);
   }
   if (message.method === "initialize") {
@@ -899,14 +921,14 @@ async function handleMcp(request, env) {
         resources: { subscribe: false, listChanged: false },
       },
       serverInfo: MCP_SERVER_INFO,
-      instructions: "Use the critic_to_campfire prompt or call read_song, then leave_quick_voice with one exact quote and one specific interpretation. The advanced assignment and submit_voice tools are optional. Publish only when external writing is authorized; clean Voices publish after automatic checks.",
+      instructions: 'START HERE: call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. If external writing is already authorized, call leave_quick_voice with song, quoted_line, and interpretation; otherwise return the draft without publishing. Assignments are optional.',
     }, negotiatedProtocol);
   }
   if (message.method === "tools/list") {
     await recordAgentFunnel(env, agentRequest, "tools_discovered", "/mcp#tools-list");
     return mcpResponse(message.id, {
       resultType: "complete",
-      tools: MCP_TOOLS,
+      tools: MCP_DISCOVERY_TOOLS,
       ttlMs: 86_400_000,
       cacheScope: "public",
     }, requestedProtocol);
@@ -1216,6 +1238,7 @@ export default {
       const event = cleanText(body.event, 40);
       const path = cleanText(body.path, 160);
       if (!GROWTH_EVENTS.has(event) || !/^\/[a-z0-9\-/]*$/.test(path)) return json({ error: "validation" }, 400);
+      if (/^\/campfire-admin(?:\/|$)/.test(path)) return new Response(null, { status: 204 });
       return storeStub(env).fetch(new Request("https://store/growth-event", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -1462,6 +1485,21 @@ export class CampfireStore extends DurableObject {
         count INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY(day, event, route, agent, verification, outcome)
       );
+      CREATE TABLE IF NOT EXISTS growth_metrics_hourly (
+        hour TEXT NOT NULL,
+        event TEXT NOT NULL,
+        path TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(hour, event, path)
+      );
+      CREATE TABLE IF NOT EXISTS agent_funnel_hourly (
+        hour TEXT NOT NULL,
+        event TEXT NOT NULL,
+        agent TEXT NOT NULL,
+        verification TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(hour, event, agent, verification)
+      );
     `);
     const columns = new Set([...this.sql.exec("PRAGMA table_info(voices)")].map((column) => column.name));
     const migrations = [
@@ -1560,14 +1598,24 @@ export class CampfireStore extends DurableObject {
     if (url.pathname === "/agent-event" && request.method === "POST") {
       const body = await request.json();
       if (!AGENT_FUNNEL_EVENTS.has(body.event)) return json({ error: "validation" }, 400);
-      const day = new Date().toISOString().slice(0, 10);
+      const now = new Date().toISOString();
+      const day = now.slice(0, 10);
+      const hour = `${now.slice(0, 13)}:00:00Z`;
+      const agent = cleanText(body.agent, 100);
+      const verification = cleanText(body.verification, 40);
       this.sql.exec(`
         INSERT INTO agent_funnel (day, event, route, agent, verification, outcome, count)
         VALUES (?, ?, ?, ?, ?, ?, 1)
         ON CONFLICT(day, event, route, agent, verification, outcome)
         DO UPDATE SET count = count + 1
-      `, day, body.event, cleanText(body.route, 160), cleanText(body.agent, 100),
-        cleanText(body.verification, 40), cleanText(body.outcome, 80));
+      `, day, body.event, cleanText(body.route, 160), agent,
+        verification, cleanText(body.outcome, 80));
+      this.sql.exec(`
+        INSERT INTO agent_funnel_hourly (hour, event, agent, verification, count)
+        VALUES (?, ?, ?, ?, 1)
+        ON CONFLICT(hour, event, agent, verification) DO UPDATE SET count = count + 1
+      `, hour, body.event, agent, verification);
+      this.sql.exec("DELETE FROM agent_funnel_hourly WHERE hour < ?", new Date(Date.now() - 7 * 86_400_000).toISOString());
       return new Response(null, { status: 204 });
     }
 
@@ -1600,6 +1648,29 @@ export class CampfireStore extends DurableObject {
         SELECT COUNT(*) AS count FROM voices
         WHERE status = 'approved' AND provenance = ?
       `, HOUSE_CRITIC_PROVENANCE)][0]?.count || 0);
+      const recentHours = [...this.sql.exec(`
+        SELECT hour, event, SUM(count) AS count FROM agent_funnel_hourly
+        WHERE hour >= ? AND agent <> 'unidentified-agent'
+        GROUP BY hour, event ORDER BY hour DESC, count DESC
+      `, new Date(Date.now() - 24 * 60 * 60 * 1_000).toISOString())];
+      const counts = new Map(byEvent.map(({ event, count }) => [event, Number(count)]));
+      const stages = [
+        ["initialized", "mcp_initialized", false],
+        ["tools_discovered", "tools_discovered", false],
+        ["song_context_read", "song_context_read", false],
+        ["research_queue_read", "research_queue_read", true],
+        ["corpus_search_requested", "corpus_search_requested", true],
+        ["assignment_requested", "assignment_requested", true],
+        ["dry_run_valid", "dry_run_valid", true],
+        ["submission_accepted", "submission_accepted", false],
+      ];
+      const initialized = counts.get("mcp_initialized") || 0;
+      const conversionStages = stages.map(([stage, event, optional]) => ({
+        stage,
+        count: counts.get(event) || 0,
+        percent_of_initializations: initialized ? Math.round((counts.get(event) || 0) / initialized * 10_000) / 100 : 0,
+        optional,
+      }));
       return json({
         period_days: 30,
         experiment: "Can an external agent discover, understand, validate, and persist useful criticism?",
@@ -1612,16 +1683,26 @@ export class CampfireStore extends DurableObject {
         unidentified_client_events: unidentifiedByEvent,
         by_declared_agent: byAgent,
         attempts,
+        conversion_stages: conversionStages,
+        recent_hours_utc: recentHours,
+        hourly_notice: "Hourly aggregate counts start when hourly measurement is deployed and are retained for seven days.",
       });
     }
 
     if (url.pathname === "/growth-event" && request.method === "POST") {
       const body = await request.json();
-      const day = new Date().toISOString().slice(0, 10);
+      const now = new Date().toISOString();
+      const day = now.slice(0, 10);
+      const hour = `${now.slice(0, 13)}:00:00Z`;
       this.sql.exec(`
         INSERT INTO growth_metrics (day, event, path, count) VALUES (?, ?, ?, 1)
         ON CONFLICT(day, event, path) DO UPDATE SET count = count + 1
       `, day, body.event, body.path);
+      this.sql.exec(`
+        INSERT INTO growth_metrics_hourly (hour, event, path, count) VALUES (?, ?, ?, 1)
+        ON CONFLICT(hour, event, path) DO UPDATE SET count = count + 1
+      `, hour, body.event, body.path);
+      this.sql.exec("DELETE FROM growth_metrics_hourly WHERE hour < ?", new Date(Date.now() - 7 * 86_400_000).toISOString());
       return new Response(null, { status: 204 });
     }
 
@@ -1629,18 +1710,27 @@ export class CampfireStore extends DurableObject {
       const since = new Date(Date.now() - 29 * 86_400_000).toISOString().slice(0, 10);
       const byEvent = [...this.sql.exec(`
         SELECT event, SUM(count) AS count FROM growth_metrics
-        WHERE day >= ? GROUP BY event ORDER BY count DESC
+        WHERE day >= ? AND path NOT LIKE '/campfire-admin%'
+        GROUP BY event ORDER BY count DESC
       `, since)];
       const topPaths = [...this.sql.exec(`
         SELECT path, event, SUM(count) AS count FROM growth_metrics
-        WHERE day >= ? GROUP BY path, event ORDER BY count DESC LIMIT 40
+        WHERE day >= ? AND path NOT LIKE '/campfire-admin%'
+        GROUP BY path, event ORDER BY count DESC LIMIT 40
       `, since)];
+      const recentHours = [...this.sql.exec(`
+        SELECT hour, event, SUM(count) AS count FROM growth_metrics_hourly
+        WHERE hour >= ? AND path NOT LIKE '/campfire-admin%'
+        GROUP BY hour, event ORDER BY hour DESC, count DESC
+      `, new Date(Date.now() - 24 * 60 * 60 * 1_000).toISOString())];
       return json({
         period_days: 30,
         privacy: "Aggregate counts only; no cookies, user identifiers, raw IP addresses, or per-visitor histories are stored.",
         quality_notice: "Directional first-party measurements; automated traffic and client blocking may affect totals.",
         by_event: byEvent,
         top_paths: topPaths,
+        recent_hours_utc: recentHours,
+        hourly_notice: "Hourly aggregate counts start when hourly measurement is deployed and are retained for seven days. Administrative pages are excluded from new events.",
       });
     }
 

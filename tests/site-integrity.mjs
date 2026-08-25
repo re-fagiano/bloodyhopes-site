@@ -49,6 +49,20 @@ for (const file of htmlFiles) {
   report(/<meta\s+name="viewport"/i.test(html), `${relativeFile}: missing viewport meta`);
   report(/<title>[^<]+<\/title>/i.test(html), `${relativeFile}: missing title`);
   report(/<h1(?:\s|>)/i.test(html), `${relativeFile}: missing h1`);
+  if (relativeFile !== "campfire-admin.html") {
+    report(/<meta\s+property="og:image"\s+content="https:\/\//i.test(html), `${relativeFile}: missing absolute Open Graph image`);
+    report((html.match(/name="twitter:card"/g) || []).length <= 1, `${relativeFile}: duplicate twitter:card metadata`);
+    const structuredData = [...html.matchAll(/<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
+    report(structuredData.length > 0, `${relativeFile}: missing structured SEO data`);
+    for (const [index, match] of structuredData.entries()) {
+      try {
+        const data = JSON.parse(match[1]);
+        report(data["@context"] === "https://schema.org", `${relativeFile}: structured data block ${index + 1} needs schema.org context`);
+      } catch (error) {
+        failures.push(`${relativeFile}: invalid structured data block ${index + 1} (${error.message})`);
+      }
+    }
+  }
 
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
@@ -70,6 +84,21 @@ const home = await readFile(path.join(root, "index.html"), "utf8");
 report((home.match(/name="twitter:card"/g) || []).length === 1, "index.html: twitter:card must appear exactly once");
 report(home.includes('class="home-hero"'), "index.html: branded home hero is missing");
 report(home.includes('aria-label="Primary navigation"'), "index.html: primary navigation needs an accessible name");
+
+const catalogHtml = await readFile(path.join(root, "catalog.html"), "utf8");
+const catalogStructuredData = [...catalogHtml.matchAll(/<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
+  .map((match) => JSON.parse(match[1]));
+const catalogList = catalogStructuredData.find((data) => data["@type"] === "ItemList");
+const songFiles = htmlFiles.filter((file) => path.relative(root, file).replaceAll("\\", "/").startsWith("songs/"));
+report(Boolean(catalogList), "catalog.html: structured song ItemList is missing");
+if (catalogList) {
+  report(catalogList.numberOfItems === songFiles.length, "catalog.html: structured song count does not match published pages");
+  report(catalogList.itemListElement?.length === songFiles.length, "catalog.html: structured catalog does not include every published song");
+  report(catalogList.itemListElement?.every((item) => item.url.startsWith("https://bloodyhopes.com/songs/")), "catalog.html: structured catalog must use canonical Bloody Hopes song URLs");
+  for (const item of catalogList.itemListElement || []) {
+    report(await localTargetExists(path.join(root, "catalog.html"), new URL(item.url).pathname), `catalog.html: missing structured song target ${item.url}`);
+  }
+}
 
 const botAccess = JSON.parse(await readFile(path.join(root, "bot-access.json"), "utf8"));
 report(botAccess.read_only_entrypoints?.minimal_html === "https://bloodyhopes.com/agent-entry", "bot-access.json: canonical minimal entry is missing");

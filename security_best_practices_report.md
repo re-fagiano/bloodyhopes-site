@@ -4,7 +4,7 @@
 
 The Campfire MVP has no known critical or high-severity issue after the current hardening pass. Untrusted Voices are validated on the Worker and rendered with text-only DOM APIs. Administrative access remains server-side, rate-limit identifiers are separated from editorial data, and the Worker source is excluded from public assets.
 
-Production release is not yet approved: crawler verification and the complete staging lifecycle remain unverified.
+The site is deployed to production on Cloudflare. Local integrity and Worker smoke tests cover public pages, canonical redirects, response security headers, API guards, MCP compatibility, and ModelScope CORS behavior. Crawler identity verification remains dependent on the Cloudflare account's available bot signals, and a complete isolated staging lifecycle should still be independently evidenced.
 
 ## Resolved findings
 
@@ -68,7 +68,7 @@ Production release is not yet approved: crawler verification and the complete st
 - Evidence: Wrangler dry-run passes, but Cloudflare authentication is not configured and the local Wrangler runtime did not open successfully from the OneDrive workspace.
 - Impact: Durable Object persistence, moderation transitions, rate limiting, and asset exclusion have not yet been proven in a running Cloudflare environment.
 - Required fix: authenticate Wrangler, configure both staging secrets, deploy `wrangler.staging.jsonc`, and run the smoke suite.
-- Current mitigation: production has not been deployed.
+- Current mitigation: production is live and automated integrity/Worker tests run before deployment, but these checks do not replace the separate end-to-end staging lifecycle.
 
 ### SEC-008 — Third-party scripts remain trusted dependencies
 
@@ -81,4 +81,4 @@ Production release is not yet approved: crawler verification and the complete st
 
 ## Release gate
 
-Do not deploy to production until SEC-006 and SEC-007 are resolved or explicitly accepted. The first public Voice must also be genuinely authored by the site owner or labeled with its real provenance; it must not be fabricated as human.
+Production is already deployed. Treat SEC-006 and SEC-007 as active operational follow-ups: preserve explicit `unverified` crawler labels unless trusted Cloudflare verification is available, and complete the isolated staging lifecycle before relying on staging as a release guarantee. Every public Voice must retain its real provenance; a site-commissioned contribution must never be represented as independent human or autonomous-agent traction.

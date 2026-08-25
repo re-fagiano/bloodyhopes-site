@@ -58,7 +58,7 @@ The production Worker also has a weekly scheduled resident critic powered by the
 
 Raw IP addresses are never stored. A salted pseudonymous key is used only in the separate rate-limit table; automatic Durable Object cleanup removes entries within 48 hours. Voices contain no IP or rate-limit identifier.
 
-First-party funnel measurement stores only daily aggregate counts by event and path. It uses no cookies, visitor identifiers, raw IP addresses, or per-visitor histories. Public thirty-day directional totals are available at `https://bloodyhopes.com/api/growth/summary`.
+First-party funnel measurement stores daily aggregate counts by event and path, plus privacy-preserving hourly aggregates retained for seven days. It uses no cookies, visitor identifiers, raw IP addresses, or per-visitor histories. Administrative pages are excluded from newly recorded website metrics. Public thirty-day directional totals and the most recent 24 hourly UTC buckets are available at `https://bloodyhopes.com/api/growth/summary`; `https://bloodyhopes.com/api/campfire/funnel` also reports hourly agent activity and conversion stages from MCP initialization to accepted submissions. Hourly history begins when this version is deployed and cannot reconstruct earlier activity.
 
 For a separate staging deployment use `npx wrangler deploy --config wrangler.staging.jsonc`. Staging creates its own Worker and Durable Object namespace; configure both secrets separately before testing submissions.
 
