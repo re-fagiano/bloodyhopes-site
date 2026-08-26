@@ -4935,6 +4935,8 @@ The soldier was real. The printed account is vivid. The official movement record
 
 Short answer: Wescott published a first-person Shiloh account in 1909, but the unit chronology and brigade organization examined here do not independently verify his presence in the battle. The conflict is real; its cause remains unresolved.
 
+This matters beyond one soldier’s biography. Historical art inherits the strengths and weaknesses of its sources; showing where a source stops being secure is part of using it responsibly.
+
 Follow the evidence
 - The publication
 - Identity
@@ -4945,7 +4947,7 @@ Follow the evidence
 
 ## What the 1909 Publication Establishes
 
-The Library of Congress preserves a scan of M. Ebenezer Wescott’s privately printed Civil War Letters, 1861 to 1865: Written by a Boy in Blue to his Mother. Its introduction says that Wescott’s mother kept his wartime letters and later returned them to him. The surviving object online is the typeset 1909 book, not the original handwritten correspondence. We therefore know what Wescott chose to publish, but not whether every text reached print without correction, compression or combination.
+The Library of Congress preserves a complete scan of M. Ebenezer Wescott’s privately printed Civil War Letters, 1861 to 1865: Written by a Boy in Blue to his Mother. Its introduction says that Wescott’s mother kept his wartime letters and later returned them to him. The surviving object online is the typeset 1909 book, not the original handwritten correspondence. We therefore know what Wescott chose to publish, but not whether every text reached print without correction, compression or combination.
 
 The opening sequence is specific. A letter dated January 19, 1862, from Camp Randall says Wescott expects to join the 17th Regiment. A letter headed Pittsburg Landing, April 3, says “our regiment” left St. Louis aboard the steamer Imperial on March 26. A third, dated April 13, narrates the fighting of April 6–7 and reaches the sentence that inspired the Bloody Hopes ballad:
 
@@ -5022,7 +5024,7 @@ The Imperial used the stated routeIndependent wartime nurse recollection confirm
 
 ## Sources and Further Checking
 
-- M. Ebenezer Wescott, Civil War Letters, 1861 to 1865 (1909), Library of Congress record and facsimile; see printed pages 3–8.
+- M. Ebenezer Wescott, Civil War Letters, 1861 to 1865 (1909), Library of Congress catalog record; open the complete public-domain facsimile, especially printed pages 3–8.
 
 - Wisconsin Adjutant General, Roster of Wisconsin Volunteers, War of the Rebellion, vol. 2 (1886), 17th Wisconsin, Company E.
 
@@ -5033,6 +5035,8 @@ The Imperial used the stated routeIndependent wartime nurse recollection confirm
 - National Park Service, 16th Regiment, Wisconsin Infantry, and Prentiss’s Sixth Division battlefield plaque.
 
 - National Park Service, The Battle of Shiloh, “The Confederate Attack Stalls”, for McArthur’s field movement.
+
+- Lt. Col. Augustus L. Chetlain, official report dated April 10, 1862, reproduced in the Illinois Shiloh Battlefield Commission’s Illinois at Shiloh (1905), pp. 156–157.
 
 - National Park Service, 12th Illinois campsite tablet A-24.
 
