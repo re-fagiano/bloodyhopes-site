@@ -957,15 +957,23 @@ Outcome: Union victory; roughly 23,700 combined casualties
 
  Shiloh left roughly 13,000 Union and 10,700 Confederate casualties — a total greater than United States casualties in all its previous wars combined. The Union victory preserved Grant's position and opened the way toward Corinth and further advances in the western theater; it did not by itself secure the Mississippi River Valley, a result achieved only through later campaigns culminating at Vicksburg in 1863.
 
-## The Tennessee River at Their Backs
+## Wescott's Printed Shiloh Account—and a Regimental Puzzle
 
- The song's three choices come directly from M. Ebenezer Wescott of the 17th Wisconsin, who wrote to his mother six days after the battle. Recalling his regiment driven to within half a mile of the Tennessee River, he described “a deep river behind us and a victorious army in front of us” and concluded: “There were three things to do, surrender, swim the river or fight to the death.” This was a young participant's description of how the crisis felt, not a claim that every Union soldier literally faced only those three tactical options.
+ In a collection he published in 1909, M. Ebenezer Wescott printed a letter dated April 13, 1862 that describes the battle in the first person. Recalling troops driven to within half a mile of the Tennessee River, the letter describes “a deep river behind us and a victorious army in front of us” and concludes: “There were three things to do, surrender, swim the river or fight to the death.” This was one account of how the crisis felt, not a claim that every Union soldier literally faced only those three tactical options.
 
- Grant's final position near Pittsburg Landing was strengthened by massed artillery, infantry support, and the gunboats Lexington and Tyler. The Union line held on the evening of April 6; reinforcements from Don Carlos Buell's Army of the Ohio and Lew Wallace's division helped make the counterattack of April 7 possible. Wescott wrote that his regiment neither surrendered nor swam and was placed in reserve behind Buell's fresh troops on the second day.
+ The pamphlet identifies Wescott with Company E of the 17th Wisconsin. However, the National Park Service's regimental chronology places the 17th at Benton Barracks until April 10 and moving to Pittsburg Landing on April 10–14—after the battle. The printed letter and the unit chronology therefore conflict. Until muster rolls, company records, or surviving manuscripts resolve the discrepancy, this page treats the passage as an account printed by Wescott in 1909 rather than as an independently verified placement of the 17th Wisconsin at Shiloh.
+
+ Grant's final position near Pittsburg Landing was strengthened by massed artillery, infantry support, and the gunboats Lexington and Tyler. The Union line held on the evening of April 6; reinforcements from Don Carlos Buell's Army of the Ohio and Lew Wallace's division helped make the counterattack of April 7 possible. Wescott's printed text says that his regiment neither surrendered nor swam and was placed in reserve behind Buell's fresh troops on the second day.
+
+ Follow the full source investigation into Wescott, the 17th Wisconsin, and the unresolved Shiloh chronology →
+
+ Read how battlefield experience becomes public memory →
+
+ Follow the wider tactical change from Napoleonic battlefields to Shiloh and Gettysburg →
 
 ## Sources
 
- M. Ebenezer Wescott, letter dated April 13, 1862, in Civil War Letters, 1861 to 1865, pp. 7–8; National Park Service, “Shiloh”; U.S. Army Center of Military History, Shiloh campaign account.
+ M. Ebenezer Wescott, letter dated April 13, 1862, in Civil War Letters, 1861 to 1865, pp. 7–8; National Park Service, “Shiloh”; National Park Service, 17th Wisconsin unit chronology; U.S. Army Center of Military History, Shiloh campaign account.
 
  That narrowed, literal choice — not a metaphor, but the actual geography of the riverbank on April 6 — is the spine of the ballad: an army with its back to deep water, deciding in real time which of three bad options it could survive.
 
@@ -1130,6 +1138,8 @@ Historical basis: Documented accounts of "mercy killing" requests among the woun
 ## Two Names for an Old Question
 
  Tim and Jones are fictional stand-ins for that decision — not officers or generals, but two soldiers, Jones wounded and pleading and Tim standing over him with a choice that battlefield custom never resolved. The ballad does not claim that their encounter is a documented case, nor does it decide whether refusing to kill a suffering man is mercy or abandonment. It asks the listener to stand where Tim stood for the length of a verse.
+
+ Read the sourced history of the coup de grâce, battlefield medicine, and the changing law of mercy →
 
 ## Sources
 
@@ -4904,7 +4914,7 @@ Set side by side, the two battles suggest the same pattern from opposite directi
 
 ## Two Songs That Refuse the Clean Version
 
-Bloody Hopes' "Into the Guns — The Light Brigade" and "Surrender, Swim, or Fight — A Shiloh Civil War Ballad" stay with participants before later retellings gave their experiences a clean shape. The Shiloh title is not a modern summary of every soldier's tactical choices: it quotes the three alternatives M. Ebenezer Wescott believed he faced near Pittsburg Landing and recorded in an April 13, 1862 letter to his mother.
+Bloody Hopes' "Into the Guns — The Light Brigade" and "Surrender, Swim, or Fight — A Shiloh Civil War Ballad" stay with participants before later retellings gave their experiences a clean shape. The Shiloh title quotes three alternatives in an account M. Ebenezer Wescott published in 1909 as a letter dated April 13, 1862. Because the 17th Wisconsin's documented movement conflicts with that account, its eyewitness status remains an open source question examined here.
 
 Before memory cleans the battle“The order came down crooked. The line rode it straight.”One song begins with command failure; the other with a river behind and fire ahead. Both remain inside the participants' narrowed field of choice.
 
@@ -4913,6 +4923,128 @@ Before memory cleans the battle“The order came down crooked. The line rode it 
 This article is a companion piece to Bloody Hopes' historical war ballads. Discussion — human or AI — is open at The Campfire.
 
 ← Back to Catalog
+
+----
+
+ARTICLE: M. Ebenezer Wescott’s Shiloh Letter: Eyewitness Account or Regimental Puzzle?
+URL: https://bloodyhopes.com/articles/wescott-shiloh-letter-puzzle
+
+Open Source Study · Shiloh, 1862
+# M. Ebenezer Wescott’s Shiloh Letter: Eyewitness Account or Regimental Puzzle?
+The soldier was real. The printed account is vivid. The official movement record puts his regiment somewhere else. Here is what the evidence proves—and what it still cannot explain.
+
+Short answer: Wescott published a first-person Shiloh account in 1909, but the unit chronology and brigade organization examined here do not independently verify his presence in the battle. The conflict is real; its cause remains unresolved.
+
+Follow the evidence
+- The publication
+- Identity
+- Chronology
+- Brigade test
+- Conclusion
+- Sources
+
+## What the 1909 Publication Establishes
+
+The Library of Congress preserves a scan of M. Ebenezer Wescott’s privately printed Civil War Letters, 1861 to 1865: Written by a Boy in Blue to his Mother. Its introduction says that Wescott’s mother kept his wartime letters and later returned them to him. The surviving object online is the typeset 1909 book, not the original handwritten correspondence. We therefore know what Wescott chose to publish, but not whether every text reached print without correction, compression or combination.
+
+The opening sequence is specific. A letter dated January 19, 1862, from Camp Randall says Wescott expects to join the 17th Regiment. A letter headed Pittsburg Landing, April 3, says “our regiment” left St. Louis aboard the steamer Imperial on March 26. A third, dated April 13, narrates the fighting of April 6–7 and reaches the sentence that inspired the Bloody Hopes ballad:
+
+The printed words“There were three things to do, surrender, swim the river or fight to the death.”
+The facsimile establishes the publication and its wording. It does not, by itself, authenticate every date, command relationship or battlefield position.
+
+## The Soldier and Company Were Real
+
+Wisconsin’s official 1886 Roster of Wisconsin Volunteers lists “Westcott, Ebenezer”—with a final t—of Farmington in Company E, 17th Wisconsin Infantry. It records his enlistment on January 16, 1862, later status as veteran and corporal, and muster-out on July 27, 1865.
+
+The same Company E roster names John McGourin as captain. That makes “Captain McGowen” in Wescott’s printed January letter a plausible phonetic, spelling or typesetting variant. These matches strongly establish Wescott’s identity and Company E association. They do not place him at Shiloh.
+
+## Where the Chronology Breaks
+
+The National Park Service history of the 17th Wisconsin records the regiment at Benton Barracks until April 10 and moving to Pittsburg Landing on April 10–14. The Wisconsin Historical Society and Wisconsin Veterans Museum present the same sequence. Shiloh was fought on April 6–7.
+
+DateWescott’s 1909 textRegimental chronology
+March 23—17th Wisconsin leaves Wisconsin for St. Louis.
+March 26“Our regiment” leaves St. Louis aboard the Imperial.Regiment remains at Benton Barracks until April 10.
+April 3Letter headed Pittsburg Landing.Regiment still recorded at Benton Barracks.
+April 6–7First-person account of fighting at Shiloh.17th Wisconsin does not appear in the Shiloh order of battle.
+April 10–14—Regiment moves to Pittsburg Landing.
+
+This is not a disagreement over an hour or a landmark. It concerns the location of an entire regiment before and during the battle.
+
+## The Brigade Test
+
+The April 3 text says Wescott’s brigade included the 16th Wisconsin, 4th Kentucky and 20th Missouri, “besides ours,” under General John McArthur. At Shiloh, McArthur’s Second Brigade comprised the 9th and 12th Illinois, 81st Ohio, 13th Missouri and 14th Missouri. The brigade was dispersed during the battle: McArthur moved with the two Illinois regiments, while other elements served elsewhere. Lt. Col. Augustus L. Chetlain’s official April 10 report confirms the 12th Illinois acting with McArthur’s Second Brigade; commission-era organization records supply the complete five-regiment list.
+
+One detail is suggestive. The 16th Wisconsin really did fight at Shiloh, but in Everett Peabody’s First Brigade of Prentiss’s Sixth Division. After the battle, the newly arrived 17th Wisconsin served in the same brigade organization as the 16th, alongside the 21st and 25th Missouri.
+
+A later association with the 16th Wisconsin could therefore have been projected backward if the 1909 text was revised or combined. But the disputed list already appears under April 3, and its Kentucky and Missouri regiments still do not fit. This is a possible mechanism of conflation—not a solution.
+
+## The Steamer Imperial
+
+The vessel was real. In Our Army Nurses, Ruth Sinnotte recalled service aboard a hospital boat named Imperial operating between St. Louis and Pittsburg Landing. That independent account makes Wescott’s route plausible. No transport or quartermaster record located for this study connects the 17th Wisconsin to that vessel on March 26. The ship proves the route existed, not that Wescott’s regiment travelled it on the stated date.
+
+## Has Anyone Already Solved It?
+
+A targeted search of the publicly indexed web found the collection repeatedly reproduced, but no attempt to reconcile its Shiloh dates with the 17th Wisconsin chronology. A 2019 CivilWarTalk discussion presents the April letters as eyewitness testimony. A separate regimental thread gives the April 10–14 arrival and later recommends Wescott’s book, without connecting the incompatible claims. A family-history treatment and scholarly use of Wescott’s later Vicksburg writing likewise do not address the Shiloh problem.
+
+This does not prove that no archivist or private researcher has investigated it. It means that no resolution was located in the accessible material searched for this article.
+
+## What May Have Happened
+
+- One or more printed dates may be wrong.
+
+- The 1909 edition may combine or revise material written at different times.
+
+- Wescott may have moved separately under circumstances absent from the records examined.
+
+- A summarized unit chronology may omit an exceptional movement—although the brigade mismatch would remain.
+
+None is proven. Calling the letter a forgery would outrun the evidence. Calling it a verified eyewitness document from the 17th Wisconsin at Shiloh would do the same.
+
+Editorial conclusionDescribe it as a Shiloh account published by Wescott in 1909, with an unresolved conflict in its regimental chronology.
+
+## What Could Resolve the Question
+
+The strongest missing evidence would be Wescott’s compiled military service record, Company E muster rolls or morning reports for March–April 1862, transport records for the Imperial, and the original manuscript letters if they survive. Bloody Hopes welcomes a documented correction or archival lead through email or The Campfire.
+
+## From Document to Song
+
+“Surrender, Swim, or Fight” takes its central phrase and emotional predicament from the account Wescott printed. The song is historical imagination, not authentication. Its depiction of a collapsing Union line pressed toward the Tennessee River belongs to the broader history of Shiloh; its attribution to Wescott retains the qualification established here.
+
+## Evidence at a Glance
+
+ClaimFindingConfidence
+Wescott served in Company E, 17th WisconsinState roster, hometown and matching captain.High
+He published the Shiloh text in 1909Library of Congress facsimile and catalog record.High
+The printed text reproduces original letters unchangedAsserted generally in Wescott’s introduction; manuscripts not located.Unverified
+He fought at Shiloh with the 17th WisconsinPrinted narrative conflicts with unit movement and battle organization.Unresolved
+The Imperial used the stated routeIndependent wartime nurse recollection confirms vessel and route, not the regiment.Medium–high
+
+## Sources and Further Checking
+
+- M. Ebenezer Wescott, Civil War Letters, 1861 to 1865 (1909), Library of Congress record and facsimile; see printed pages 3–8.
+
+- Wisconsin Adjutant General, Roster of Wisconsin Volunteers, War of the Rebellion, vol. 2 (1886), 17th Wisconsin, Company E.
+
+- National Park Service, 17th Regiment, Wisconsin Infantry, unit chronology.
+
+- Wisconsin Historical Society, guide to the Wisconsin Civil War roster and regimental records.
+
+- National Park Service, 16th Regiment, Wisconsin Infantry, and Prentiss’s Sixth Division battlefield plaque.
+
+- National Park Service, The Battle of Shiloh, “The Confederate Attack Stalls”, for McArthur’s field movement.
+
+- National Park Service, 12th Illinois campsite tablet A-24.
+
+- Wisconsin Shiloh Monuments Commission, Wisconsin at Shiloh (1909).
+
+- Mary A. Gardner Holland, ed., Our Army Nurses (1895), Ruth Sinnotte recollection, for the hospital steamer Imperial.
+
+- CivilWarTalk, “A Wisconsin Private Writes Home About Shiloh” (2019), and “17th Wisconsin Infantry” (2018–2025), consulted as evidence of public reception, not as primary military records.
+
+Research status: open. Last reviewed August 26, 2026. New evidence may change the assessment; revisions will be dated.
+
+← More historical deep-dives · Read and hear the Shiloh ballad →
 
 ----
 
@@ -5624,12 +5756,12 @@ RecoverGeneral hospital
 
 ----
 
-ARTICLE: From Lance to Repeater
+ARTICLE: Cavalry Weapons: From Lance to Repeater
 URL: https://bloodyhopes.com/articles/from-lance-to-repeater
 
 Historical Deep-Dive · Cavalry
 
-# From Lance to Repeater
+# Cavalry Weapons: From Lance to Repeater
 
 Cavalry did not simply become obsolete when gunpowder arrived. It changed weapons, horses, armour and even the meaning of mounted combat. For five centuries horsemen argued—with lances, pistols, sabres and carbines—over whether mobility should end in shock, fire, or a man dismounting behind a wall.
 
