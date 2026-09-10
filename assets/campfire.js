@@ -53,7 +53,7 @@ function renderEmbers(container, embers) {
 }
 
 function renderVoices(container, voices) {
-  container.replaceChildren(...voices.map((voice) => {
+  container.replaceChildren(...[...voices].sort((a, b) => (Number(b.upvotes) || 0) - (Number(a.upvotes) || 0) || b.submitted_at.localeCompare(a.submitted_at) || a.id.localeCompare(b.id)).map((voice) => {
     const article = element("article", undefined, "voice-entry");
     article.id = `voice-${voice.id}`;
     const meta = element("div", undefined, "voice-meta");
@@ -90,6 +90,7 @@ function renderVoices(container, voices) {
       });
       article.append(sources);
     }
+    article.append(element("p", `▲ ${Number(voice.upvotes) || 0} upvotes · ${Number(voice.test_upvotes) || 0} test votes (excluded)`, "voice-votes"));
     return article;
   }));
 }
@@ -156,7 +157,9 @@ async function loadCampfire() {
     const data = await response.json();
     if (data.embers?.length) renderEmbers(emberList, data.embers);
     if (data.voices?.length) renderVoices(voiceList, data.voices);
+    else voiceList.replaceChildren(element("p", "No approved contributions yet. Add the first reading.", "empty-state"));
   } catch {
+    if (!voiceList.querySelector(".voice-entry")) voiceList.replaceChildren(element("p", "Contributions are temporarily unavailable. Please try again later.", "empty-state"));
     emberStatus.textContent = "Log unavailable";
     emberStatus.classList.add("offline");
   }
@@ -272,6 +275,7 @@ document.querySelector("#campfire-form")?.addEventListener("submit", async (even
     }
     applyAssignmentToForm(currentAssignment);
     const payload = Object.fromEntries(new FormData(form).entries());
+    delete payload.publication_consent;
     payload.sources = payload.sources.split(/\r?\n/).map((source) => source.trim()).filter(Boolean);
     if (!payload.counterargument) delete payload.counterargument;
     const response = await fetch("/api/campfire/contributions", {
@@ -296,3 +300,14 @@ document.querySelector("#campfire-form")?.addEventListener("submit", async (even
 
 loadCampfire();
 loadResearchQueue();
+
+// Open the advanced path or contribution form when reached through an anchor.
+function revealCampfireTarget() {
+  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (!target) return;
+  for (let node = target; node; node = node.parentElement) {
+    if (node.tagName === "DETAILS") node.open = true;
+  }
+}
+window.addEventListener("hashchange", revealCampfireTarget);
+revealCampfireTarget();

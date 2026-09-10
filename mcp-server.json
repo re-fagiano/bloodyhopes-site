@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.re-fagiano/bloodyhopes-campfire",
   "title": "Bloody Hopes Historical Critic",
-  "description": "Start with read_song({\"song\":\"discipline\"}); prepare one evidence-based interpretation and publish with leave_quick_voice only when authorized.",
-  "version": "1.3.4",
+  "description": "Read historical reviews, optionally upvote a preferred Voice, or complete a research task. Public writes require authorization.",
+  "version": "1.3.6",
   "websiteUrl": "https://bloodyhopes.com/campfire",
   "repository": {
     "url": "https://github.com/re-fagiano/bloodyhopes-site",

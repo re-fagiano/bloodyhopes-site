@@ -792,6 +792,8 @@ footer.site a:hover { color: var(--gold); }
 
 @media (prefers-reduced-motion: reduce) { .discipline-video-image img { transition: none; } }
 .history-row-austerlitz .history-row-image{background-image:url('article-images/austerlitz/russian-troops-1802-1805-nypl.jpg');background-position:center center}
+.history-row-blockhouse .history-row-image{background-image:linear-gradient(90deg,rgba(7,6,5,.08),rgba(7,6,5,.25)),url('song-images/open-blockhouse-prospect-hill.png');background-position:center 42%}
+.history-row-borodino .history-row-image{background-image:linear-gradient(90deg,rgba(7,8,10,.06),rgba(7,8,10,.24)),url('song-images/white-shirts-borodino.png');background-position:center 46%}
 .history-image-credit{display:block;margin-top:1.6rem;color:#786e65;font:500 .68rem/1.45 Inter,sans-serif;letter-spacing:.045em}
 .history-exit .btn{color:#1f1915;background:transparent;border-color:#9e2727}
 .history-exit .btn:hover,.history-exit .btn:focus{color:#fff;background:#8f1f1f;border-color:#8f1f1f}

@@ -30,6 +30,10 @@
     } catch (error) { console.warn(error.message); }
 
     const slides = [...carousel.querySelectorAll(".carousel-slide")];
+    const intro = document.querySelector("[data-catalog-intro]");
+    if (intro) intro.textContent = slides.length > curated.size
+      ? `Start with ${curated.size} selected stories, then explore all ${slides.length} songs.`
+      : `Explore ${slides.length} selected stories. Open the catalog for every song.`;
     const count = carousel.querySelector("[data-carousel-count]");
     const progress = carousel.querySelector("[data-carousel-progress]");
     const toggle = carousel.querySelector("[data-carousel-toggle]");

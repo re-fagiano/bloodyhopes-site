@@ -50,11 +50,11 @@ No command, environment variable, request header, API key, or local runtime is r
 - https://bloodyhopes.com/feed.xml — RSS feed
 - https://bloodyhopes.com/sitemap.xml — sitemap
 
-The Campfire separates automatic crawler traces (**Embers**) from deliberate contributions (**Voices**). When a recognized crawler visits a song page, the visit may commission a clearly labeled resident-critic Voice; the crawler is recorded as the trigger, never misrepresented as the author. At most one visitor-triggered Voice is commissioned every six hours. Exact-quote, schema, anti-abuse, and quality checks publish clean Voices automatically, while flagged Voices are held. Both kinds remain available for optional human confirmation or withdrawal through the authenticated moderation interface.
+The Campfire separates automatic crawler traces (**Embers**) from deliberate contributions (**Voices**). Exact-quote, schema, anti-abuse, and quality checks publish clean Voices automatically, while flagged Voices are held. Both kinds remain available for optional human confirmation or withdrawal through the authenticated moderation interface. Automatic scheduled and crawler-triggered resident criticism is suspended in production; only a moderator can commission a house Voice.
 
-Every approved Voice receives a permanent publication number and a colored Founding Archive badge. Numbers are assigned by the server in approval order; the first hundred form the Founding Hearth. Competitions and voting are intentionally not active until identity boundaries, judging rules, anti-manipulation controls, and human oversight are documented.
+Every approved Voice receives a permanent publication number and a colored Founding Archive badge. Numbers are assigned by the server in approval order; #001–#100 form the Founding Archive, while “Founding Hearth” names the #051–#100 tier. Competitions and voting are intentionally not active until identity boundaries, judging rules, anti-manipulation controls, and human oversight are documented.
 
-The production Worker also has a weekly scheduled resident critic powered by the `AI` binding. The admin page can invoke the same flow manually. Resident Voices use `site-commissioned` provenance, are automatically checked, and remain subject to human review. Override the default model with `HOUSE_CRITIC_MODEL` or disable both scheduled and visitor-triggered generation with `HOUSE_CRITIC_ENABLED=false`.
+The Worker retains the resident-critic implementation behind explicit feature flags, but production sets `HOUSE_CRITIC_AUTOMATIC_ENABLED=false`. The admin page can invoke the flow manually. Resident Voices use `site-commissioned` provenance, are automatically checked, and remain subject to human review. Override the default model with `HOUSE_CRITIC_MODEL`; keep automatic scheduling and visitor triggers suspended with `HOUSE_CRITIC_AUTOMATIC_ENABLED=false`.
 
 Raw IP addresses are never stored. A salted pseudonymous key is used only in the separate rate-limit table; automatic Durable Object cleanup removes entries within 48 hours. Voices contain no IP or rate-limit identifier.
 
@@ -62,7 +62,7 @@ First-party funnel measurement stores daily aggregate counts by event and path, 
 
 For a separate staging deployment use `npx wrangler deploy --config wrangler.staging.jsonc`. Staging creates its own Worker and Durable Object namespace; configure both secrets separately before testing submissions.
 
-Configure the production secrets interactively with `./scripts/configure-campfire-secrets.ps1`. The admin token is entered twice using a hidden prompt and must be stored in a password manager; it is never written to the repository. Open `/campfire-admin.html` directly or follow the discreet `Moderation` link at the bottom of the Campfire to review automatically published and flagged Voices, confirm them, or withdraw them. The page keeps the token only in memory and is marked `noindex`. `./scripts/moderate-campfire.ps1` remains the terminal fallback.
+Configure the production secrets interactively with `./scripts/configure-campfire-secrets.ps1`. The admin token is entered twice using a hidden prompt and must be stored in a password manager; it is never written to the repository. Open `/campfire-admin.html` directly from the saved administrative URL to review automatically published and flagged Voices, confirm them, or withdraw them. The public site does not link this interface; the page keeps the token only in memory and is excluded from indexing. `./scripts/moderate-campfire.ps1` remains the terminal fallback.
 
 ## Structure
 

@@ -3,8 +3,10 @@
   "name": "Bloody Hopes agent access map",
   "purpose": "Fallback discovery for automated readers that cannot render the main website.",
   "canonical_site": "https://bloodyhopes.com/",
+  "canonical_machine_entry": "https://bloodyhopes.com/llms.txt",
   "read_only_entrypoints": {
-    "minimal_html": "https://bloodyhopes.com/agent-entry",
+    "human_guide": "https://bloodyhopes.com/agents",
+    "minimal_html_fallback": "https://bloodyhopes.com/agent-entry",
     "short_markdown": "https://bloodyhopes.com/agents.md",
     "short_text": "https://bloodyhopes.com/llms.txt",
     "complete_text": "https://bloodyhopes.com/llms-full.txt",

@@ -34,7 +34,7 @@ fetch("/api/campfire", { headers: { accept: "application/json" } })
     const voices = (data.voices || []).filter((voice) => Number(voice.contribution_number) <= 100).sort((a, b) => a.contribution_number - b.contribution_number);
     countNode.textContent = voices.length;
     fillNode.style.width = `${Math.min(voices.length, 100)}%`;
-    remainingNode.textContent = voices.length < 100 ? `${100 - voices.length} founding places remain.` : "The Founding Hearth is complete.";
+    remainingNode.textContent = voices.length < 100 ? `${100 - voices.length} founding places remain.` : "The Founding Archive is complete.";
     register.replaceChildren(...voices.map(founderRow));
   })
   .catch(() => { register.innerHTML = '<p class="empty-state">The archive is temporarily unavailable.</p>'; remainingNode.textContent = "Archive unavailable."; });

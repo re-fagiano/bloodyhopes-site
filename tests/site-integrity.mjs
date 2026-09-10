@@ -85,6 +85,38 @@ report((home.match(/name="twitter:card"/g) || []).length === 1, "index.html: twi
 report(home.includes('class="home-hero"'), "index.html: branded home hero is missing");
 report(home.includes('aria-label="Primary navigation"'), "index.html: primary navigation needs an accessible name");
 
+const expectedPrimaryNav = [
+  ["/", "Home"],
+  ["/about", "About"],
+  ["/catalog", "Songs"],
+  ["/history-and-songs", "History"],
+  ["/campfire", "Campfire"],
+  ["https://www.youtube.com/@BloodyHopesMusic", "YouTube"],
+];
+for (const file of htmlFiles) {
+  const relativeFile = path.relative(root, file).replaceAll("\\", "/");
+  if (relativeFile === "campfire-admin.html") continue;
+  const html = await readFile(file, "utf8");
+  const primaryNav = html.match(/<nav class="primary"[^>]*>([\s\S]*?)<\/nav>/i)?.[1];
+  if (!primaryNav) continue;
+  const links = [...primaryNav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)]
+    .map((match) => [match[1], match[2].trim()]);
+  report(JSON.stringify(links) === JSON.stringify(expectedPrimaryNav), `${relativeFile}: primary navigation differs from the canonical site map`);
+}
+
+const agentEntry = await readFile(path.join(root, "agent-entry.html"), "utf8");
+report(agentEntry.includes('<meta name="robots" content="noindex,follow">'), "agent-entry.html: minimal fallback must remain noindex,follow");
+report(agentEntry.includes('<link rel="canonical" href="https://bloodyhopes.com/agents">'), "agent-entry.html: canonical guide must be /agents");
+
+const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");
+const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+report(sitemapEntries.length > 0, "sitemap.xml: no URL entries found");
+for (const entry of sitemapEntries) {
+  const location = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] || "unknown URL";
+  report(/^https:\/\/bloodyhopes\.com\//.test(location), `sitemap.xml: non-canonical URL ${location}`);
+  report(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(entry), `sitemap.xml: missing or invalid lastmod for ${location}`);
+}
+
 const catalogHtml = await readFile(path.join(root, "catalog.html"), "utf8");
 const catalogStructuredData = [...catalogHtml.matchAll(/<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
   .map((match) => JSON.parse(match[1]));
@@ -99,11 +131,42 @@ if (catalogList) {
     report(await localTargetExists(path.join(root, "catalog.html"), new URL(item.url).pathname), `catalog.html: missing structured song target ${item.url}`);
   }
 }
+for (const songFile of songFiles) {
+  const slug = path.basename(songFile, ".html");
+  const html = await readFile(songFile, "utf8");
+  const image = `https://bloodyhopes.com/assets/seo/songs/${slug}-1200x630.jpg`;
+  report(html.includes(`<meta property="og:title"`), `${slug}: missing Open Graph title`);
+  report(html.includes(`<meta property="og:description"`), `${slug}: missing Open Graph description`);
+  report(html.includes(`<meta property="og:url" content="https://bloodyhopes.com/songs/${slug}">`), `${slug}: missing canonical Open Graph URL`);
+  report(html.includes(`<meta property="og:image" content="${image}">`), `${slug}: missing dedicated Open Graph image`);
+  report(html.includes('<meta property="og:image:width" content="1200">') && html.includes('<meta property="og:image:height" content="630">'), `${slug}: Open Graph dimensions are missing`);
+  report(await localTargetExists(songFile, `/assets/seo/songs/${slug}-1200x630.jpg`), `${slug}: dedicated Open Graph asset is missing`);
+}
+
+const articlesHtml = await readFile(path.join(root, "articles.html"), "utf8");
+const articlesStructuredData = [...articlesHtml.matchAll(/<script\s+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
+  .map((match) => JSON.parse(match[1]));
+const articlesList = articlesStructuredData.find((data) => data["@type"] === "ItemList");
+const articleFiles = htmlFiles.filter((file) => path.relative(root, file).replaceAll("\\", "/").startsWith("articles/"));
+report(Boolean(articlesList), "articles.html: structured article ItemList is missing");
+if (articlesList) {
+  report(articlesList.numberOfItems === articleFiles.length, "articles.html: structured article count does not match published pages");
+  report(articlesList.itemListElement?.length === articleFiles.length, "articles.html: structured list does not include every published article");
+}
 
 const botAccess = JSON.parse(await readFile(path.join(root, "bot-access.json"), "utf8"));
-report(botAccess.read_only_entrypoints?.minimal_html === "https://bloodyhopes.com/agent-entry", "bot-access.json: canonical minimal entry is missing");
+report(botAccess.canonical_machine_entry === "https://bloodyhopes.com/llms.txt", "bot-access.json: canonical machine entry must be llms.txt");
+report(botAccess.read_only_entrypoints?.minimal_html_fallback === "https://bloodyhopes.com/agent-entry", "bot-access.json: script-free HTML fallback is missing");
 report(Boolean(botAccess.independent_fallbacks?.github_agent_guide), "bot-access.json: independent agent fallback is missing");
 report(await localTargetExists(path.join(root, "index.html"), "/install"), "install.html: public install page is missing");
+report(sitemap.includes("https://bloodyhopes.com/privacy"), "sitemap.xml: privacy page is missing");
+
+const campfire = await readFile(path.join(root, "campfire.html"), "utf8");
+report(!/href="(?:\/)?campfire-admin"/.test(campfire), "campfire.html: public moderation link must not be exposed");
+report(campfire.includes("Canonical machine entry:"), "campfire.html: canonical machine entry is not declared");
+
+const llms = await readFile(path.join(root, "llms.txt"), "utf8");
+report(llms.includes("This is the canonical machine entry for Bloody Hopes."), "llms.txt: canonical-entry declaration is missing");
 
 assert.equal(failures.length, 0, `Site integrity failed:\n- ${failures.join("\n- ")}`);
 console.log(`Site integrity passed: ${htmlFiles.length} public HTML documents and ${files.filter((file) => file.endsWith(".json")).length} JSON documents checked.`);

@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs",
-    "benchmark:agent": "node experiments/run-agent-benchmark.mjs"
+    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs && node tests/voting.mjs",
+    "benchmark:agent": "node experiments/run-agent-benchmark.mjs",
+    "build": "node scripts/build-critical-catalog.mjs && node scripts/build-llms-full.mjs",
+    "pretest": "npm run build"
   },
   "engines": {
     "node": ">=20"

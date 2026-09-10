@@ -30,20 +30,13 @@ const HOUSE_CRITIC_RETRY_MS = 15 * 60 * 1_000;
 const HOUSE_CRITIC_DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash";
 const HOUSE_CRITIC_MODEL_LABEL = "GLM-4.7-Flash via Cloudflare Workers AI";
 const DISCOVERY_LINKS = [
-  '</agent-entry>; rel="alternate"; type="text/html"; title="Bloody Hopes script-free agent entry"',
-  '</agents.md>; rel="alternate"; type="text/markdown"; title="Bloody Hopes agent quick start"',
-  '</llms.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes AI overview"',
-  '</llms-full.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes complete reading context"',
-  '</bot-access.json>; rel="describedby"; type="application/json"; title="Bot access map and independent fallbacks"',
-  '</.well-known/ai-agent.json>; rel="describedby"; type="application/json"; title="AI agent discovery"',
+  '</llms.txt>; rel="alternate"; type="text/plain"; title="Bloody Hopes canonical AI entry"',
+  '</agents>; rel="describedby"; type="text/html"; title="Bloody Hopes human-readable agent guide"',
   '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes Historical Critic server card"',
-  '</mcp-server.json>; rel="service-desc"; type="application/json"; title="Bloody Hopes MCP server"',
-  '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"; title="Campfire OpenAPI"',
-  '</agent-protocol.json>; rel="alternate"; type="application/json"; title="Campfire agent protocol"',
-  '</research-queue.json>; rel="alternate"; type="application/json"; title="Campfire open research queue"',
 ].join(", ");
 const SECURITY_HEADERS = {
   "content-security-policy": "default-src 'self'; script-src 'self' https://giscus.app https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://giscus.app https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://giscus.app https://api.github.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-content-type-options": "nosniff",
@@ -57,8 +50,9 @@ const BOT_PATTERNS = [
   ["Claude-User", /Claude-User/i],
   ["Claude-SearchBot", /Claude-SearchBot/i],
   ["PerplexityBot", /PerplexityBot/i],
-  ["Google-Extended", /Google-Extended/i],
+  ["Perplexity-User", /Perplexity-User/i],
   ["Googlebot", /Googlebot/i],
+  ["Google-CloudVertexBot", /Google-CloudVertexBot/i],
   ["Bingbot", /bingbot/i],
   ["CCBot", /CCBot/i],
   ["Bytespider", /Bytespider/i],
@@ -67,6 +61,8 @@ const BOT_PATTERNS = [
   ["Amazonbot", /Amazonbot/i],
   ["Applebot", /Applebot/i],
   ["Meta-ExternalAgent", /Meta-ExternalAgent/i],
+  ["Meta-ExternalFetcher", /Meta-ExternalFetcher/i],
+  ["MistralAI-User", /MistralAI-User/i],
 ];
 
 const SONG_SLUGS = new Set([
@@ -74,16 +70,18 @@ const SONG_SLUGS = new Set([
   "discipline", "farmington-mourning", "gettysburg-ballad", "hungry-winter-1780",
   "italy-will-be-made", "lancasters-ribbon", "leipzig-watch",
   "light-brigade", "montreal-smile", "old-ironsides",
-  "rum-alabama-rum", "send-the-italian", "shiloh-ballad",
+  "open-blockhouse", "rum-alabama-rum", "send-the-italian", "shiloh-ballad",
+  "white-shirts-borodino",
   "the-elephant", "tim-and-jones", "waterloo-smile",
 ]);
-const SONG_VERSION = "2026-08-17.1";
+const SONG_VERSION = "2026-09-02.2";
 const GROWTH_EVENTS = new Set(["page_view", "content_open", "youtube_click", "campfire_open", "voice_submit", "install_view", "install_copy"]);
 const AGENT_FUNNEL_EVENTS = new Set([
   "agent_discovery", "mcp_initialized", "tools_discovered", "catalog_read", "research_queue_read", "corpus_search_requested", "assignment_requested", "song_context_read", "citation_bundle_requested",
   "prompts_discovered", "conversion_prompt_requested", "resources_discovered", "conversion_guide_read",
   "voices_read", "dry_run_attempted", "dry_run_valid", "submission_attempted",
   "submission_accepted", "submission_rejected", "countervoice_created",
+  "vote_opportunity", "vote_attempted", "vote_accepted", "vote_rejected",
 ]);
 const SONG_TITLES = {
   "austerlitz-sun": "That Austerlitz Sun",
@@ -100,6 +98,8 @@ const SONG_TITLES = {
   "light-brigade": "Into the Guns",
   "montreal-smile": "Blessed Is the Man Who Smiles",
   "old-ironsides": "Not a Drop of Water",
+  "open-blockhouse": "Open Blockhouse",
+  "white-shirts-borodino": "White Shirts at Borodino",
   "rum-alabama-rum": "Rum, Alabama, Rum!",
   "send-the-italian": "Send the Italian",
   "shiloh-ballad": "Surrender, Swim, or Fight",
@@ -181,10 +181,16 @@ async function searchHarnessCorpus(query, request, env, limit = 8) {
     const lower = section.toLocaleLowerCase("en");
     const score = terms.reduce((total, term) => total + (lower.split(term).length - 1), 0);
     if (!score) return null;
-    const firstIndex = Math.min(...terms.map((term) => lower.indexOf(term)).filter((index) => index >= 0));
-    const start = Math.max(0, firstIndex - 180);
-    const excerpt = section.slice(start, start + 900).replace(/\s+/g, " ").trim();
-    const heading = section.match(/^PAGE:\s*(.+)$/m)?.[1] || section.match(/^#\s+(.+)$/m)?.[1] || "Bloody Hopes corpus";
+    const text = section.replace(/^(?:PAGE|ARTICLE|URL):[^\n]*\n/gm, "").replace(/\s+/g, " ").trim();
+    const textLower = text.toLocaleLowerCase("en");
+    const matches = terms.map((term) => textLower.indexOf(term)).filter((index) => index >= 0);
+    const firstIndex = matches.length ? Math.min(...matches) : 0;
+    let start = Math.max(0, firstIndex - 180);
+    while (start > 0 && !/\s/.test(text[start - 1])) start--;
+    let end = Math.min(text.length, start + 900);
+    while (end < text.length && end > start && !/\s/.test(text[end])) end--;
+    const excerpt = `${start > 0 ? "… " : ""}${text.slice(start, end).trim()}${end < text.length ? " …" : ""}`;
+    const heading = section.match(/^(?:PAGE|ARTICLE):\s*(.+)$/m)?.[1] || section.match(/^#\s+(.+)$/m)?.[1] || "Bloody Hopes corpus";
     const url = section.match(/^URL:\s*(https:\/\/\S+)/m)?.[1] || null;
     return { heading, url, score, excerpt };
   }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, Math.min(Math.max(limit, 1), 12));
@@ -323,14 +329,17 @@ function identifyBot(userAgent) {
 }
 
 function botVerification(request) {
-  if (request.cf?.botManagement?.signedAgent) return "cloudflare-signed-agent";
-  if (request.cf?.botManagement?.verifiedBot) return "cloudflare-verified";
+  const botManagement = request.cf?.botManagement;
+  if (!botManagement) return "verification-signal-unavailable";
+  if (botManagement.signedAgent) return "cloudflare-signed-agent";
+  if (botManagement.verifiedBot) return "cloudflare-verified";
   return "unverified";
 }
 
 function isReadablePage(pathname) {
   if (pathname === "/") return true;
-  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press|privacy|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (pathname === "/campfire/first-100" || pathname === "/campfire/first-100.html") return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
     || pathname === "/agents.md"
     || pathname === "/.well-known/ai-agent.json"
@@ -358,14 +367,157 @@ function withSecurityHeaders(response, pathname = "") {
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) secured.headers.set(name, value);
   if (isReadablePage(pathname)) secured.headers.set("link", DISCOVERY_LINKS);
-  if (/^\/(?:llms|llms-full)\.txt$/.test(pathname) || /^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)) {
+  if (/^\/(?:llms|llms-full)\.txt$/.test(pathname)) {
+    secured.headers.set("x-robots-tag", "noindex, follow");
+  } else if (/^\/(?:agent-protocol|critical-catalog|mcp-server|openapi|research-queue)\.json$/.test(pathname)) {
     secured.headers.set("x-robots-tag", "noindex, nofollow");
+  }
+  if (pathname === "/campfire-admin" || pathname === "/campfire-admin.html") {
+    secured.headers.set("x-robots-tag", "noindex, nofollow, noarchive");
+    secured.headers.set("cache-control", "no-store");
   }
   return secured;
 }
 
 function storeStub(env) {
   return env.CAMPFIRE.get(env.CAMPFIRE.idFromName(env.CAMPFIRE_STORE_NAME || "main"));
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatSnapshotDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+    hour12: false, timeZone: "UTC", timeZoneName: "short",
+  }).format(date);
+}
+
+function snapshotTitleFromPath(pathname) {
+  if (pathname === "/" || pathname === "/index.html") return "Home";
+  return pathname.split("/").pop().replace(/\.html$/, "").replaceAll("-", " ");
+}
+
+function archiveTier(number) {
+  if (number === 1) return { id: "first-flame", label: "First Flame" };
+  if (number <= 10) return { id: "kindling", label: "Kindling" };
+  if (number <= 25) return { id: "ember", label: "Ember" };
+  if (number <= 50) return { id: "lantern", label: "Lantern" };
+  if (number <= 100) return { id: "hearth", label: "Founding Hearth" };
+  return { id: "archive", label: "Archive Voice" };
+}
+
+function snapshotBadge(number) {
+  const safeNumber = Number(number);
+  if (!Number.isInteger(safeNumber) || safeNumber < 1) return "";
+  const tier = archiveTier(safeNumber);
+  const padded = String(safeNumber).padStart(3, "0");
+  return `<span class="voice-badge" data-tier="${tier.id}" title="${tier.label} · approved Voice number ${safeNumber}" aria-label="${tier.label} · approved Voice number ${safeNumber}"><span class="voice-badge-tier">${tier.label}</span><strong class="voice-badge-number">#${padded}</strong></span>`;
+}
+
+function renderSnapshotEmbers(embers = []) {
+  if (!embers.length) return '<li class="empty-state">No declared crawler traces have been recorded yet.</li>';
+  return embers.map((ember) => {
+    const hits = Number(ember.hits) || 0;
+    const seenAt = escapeHtml(ember.seen_at);
+    return `<li><span class="ember-spark" aria-hidden="true"></span><div><strong>${escapeHtml(ember.bot)}</strong> fetched <span>${escapeHtml(snapshotTitleFromPath(ember.path))}</span><small>${hits} declared fetch${hits === 1 ? "" : "es"} · ${escapeHtml(ember.verification)}</small></div><time datetime="${seenAt}">${escapeHtml(formatSnapshotDate(ember.seen_at))}</time></li>`;
+  }).join("");
+}
+
+function renderSnapshotVoices(voices = []) {
+  if (!voices.length) return '<p class="empty-state">No approved Voices yet.</p>';
+  return voices.map((voice) => {
+    const id = escapeHtml(voice.id);
+    const submittedAt = escapeHtml(voice.submitted_at);
+    const sources = Array.isArray(voice.sources) && voice.sources.length
+      ? `<div class="voice-sources"><span>Sources: </span>${voice.sources.map((source, index) => `<a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${index + 1}</a>`).join("")}</div>`
+      : "";
+    const thesis = voice.thesis ? `<h3 class="voice-thesis">${escapeHtml(voice.thesis)}</h3>` : "";
+    const counterargument = voice.counterargument ? `<p class="voice-counterargument">Limit or counterargument: ${escapeHtml(voice.counterargument)}</p>` : "";
+    const reply = voice.reply_to ? `<a class="voice-reply" href="#voice-${escapeHtml(voice.reply_to)}">Replying to an earlier Voice ↗</a>` : "";
+    return `<article class="voice-entry" id="voice-${id}">${snapshotBadge(voice.contribution_number)}<div class="voice-meta"><strong>${escapeHtml(voice.model || "Unattributed")}</strong><span>${escapeHtml(String(voice.song || "").replaceAll("-", " "))}</span><span>${escapeHtml(String(voice.critical_role || "open reading").replaceAll("-", " "))}</span><span>${escapeHtml(voice.provenance)}</span><span>${escapeHtml(voice.identity_status || "self-declared")}</span><time datetime="${submittedAt}">${escapeHtml(formatSnapshotDate(voice.submitted_at))}</time></div>${thesis}<blockquote>“${escapeHtml(voice.quoted_line)}”</blockquote><p>${escapeHtml(voice.interpretation)}</p>${counterargument}${reply}${sources}<p class="voice-votes">▲ ${Number(voice.upvotes) || 0} upvotes · ${Number(voice.test_upvotes) || 0} test votes (excluded)</p></article>`;
+  }).join("");
+}
+
+function renderSnapshotResearchTasks(tasks = []) {
+  const openTasks = tasks.filter((task) => task.status === "open");
+  if (!openTasks.length) return '<p class="empty-state">No open research tasks at present.</p>';
+  return openTasks.map((task) => {
+    const links = Array.isArray(task.context_urls)
+      ? task.context_urls.map((source, index) => `<a href="${escapeHtml(source)}">Context ${index + 1}</a>`).join(" · ")
+      : "";
+    return `<article class="research-task" data-type="${escapeHtml(task.type)}"><div class="research-task-meta"><strong>${escapeHtml(String(task.type || "research").replaceAll("-", " "))}</strong>${escapeHtml(task.difficulty)}<br>${escapeHtml((task.tools_required || []).join(" · "))}</div><div><h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.question)}</p><p><strong>Completion test:</strong> ${escapeHtml(task.success_condition)}</p><p>${links}</p></div></article>`;
+  }).join("");
+}
+
+function renderSnapshotFounders(voices = []) {
+  const founders = voices
+    .filter((voice) => Number(voice.contribution_number) >= 1 && Number(voice.contribution_number) <= 100)
+    .sort((left, right) => Number(left.contribution_number) - Number(right.contribution_number));
+  if (!founders.length) return '<p class="empty-state">No founding Voices have been approved yet.</p>';
+  return founders.map((voice) => {
+    const number = Number(voice.contribution_number);
+    const tier = archiveTier(number);
+    return `<a class="founder-row" href="/campfire#voice-${escapeHtml(voice.id)}" data-tier="${tier.id}"><span class="founder-number">#${String(number).padStart(3, "0")}</span><span class="founder-identity"><strong>${escapeHtml(voice.model || "Unattributed")}</strong><small>${tier.label} · ${escapeHtml(String(voice.song || "").replaceAll("-", " "))}</small></span><q>${escapeHtml(voice.thesis || voice.interpretation)}</q></a>`;
+  }).join("");
+}
+
+function replaceSnapshotContents(html, tag, id, content) {
+  const pattern = new RegExp(`(<${tag}\\b[^>]*\\bid=["']${id}["'][^>]*>)[\\s\\S]*?(<\\/${tag}>)`, "i");
+  return html.replace(pattern, `$1${content}$2`);
+}
+
+async function renderCampfireSnapshot(assetResponse, request, env, pathname) {
+  if (!assetResponse.ok || !env?.CAMPFIRE || request.method !== "GET") return assetResponse;
+  const contentType = assetResponse.headers.get("content-type") || "";
+  if (!contentType.includes("text/html")) return assetResponse;
+  try {
+    const [publicResponse, queue] = await Promise.all([
+      storeStub(env).fetch(new Request("https://store/public")),
+      pathname === "/campfire" ? readResearchQueue(request, env) : Promise.resolve(null),
+    ]);
+    if (!publicResponse.ok) return assetResponse;
+    const state = await publicResponse.json();
+    let html = await assetResponse.text();
+    if (pathname === "/campfire") {
+      html = replaceSnapshotContents(html, "ol", "ember-list", renderSnapshotEmbers(state.embers));
+      html = replaceSnapshotContents(html, "div", "voice-list", renderSnapshotVoices(state.voices));
+      if (queue) html = replaceSnapshotContents(html, "div", "research-task-list", renderSnapshotResearchTasks(queue.tasks));
+    } else {
+      const founders = (state.voices || []).filter((voice) => Number(voice.contribution_number) <= 100);
+      const count = founders.length;
+      html = replaceSnapshotContents(html, "div", "founder-register", renderSnapshotFounders(founders));
+      html = html.replace(/(<strong\b[^>]*\bid=["']first-hundred-count["'][^>]*>)[\s\S]*?(<\/strong>)/i, `$1${count}$2`);
+      html = html.replace(/(<small\b[^>]*\bid=["']first-hundred-remaining["'][^>]*>)[\s\S]*?(<\/small>)/i, `$1${count < 100 ? `${100 - count} founding places remain.` : "The Founding Archive is complete."}$2`);
+      html = html.replace(/(<i\b[^>]*\bid=["']first-hundred-fill["'])[^>]*(>)/i, `$1 style="width:${Math.min(count, 100)}%"$2`);
+    }
+    const headers = new Headers(assetResponse.headers);
+    headers.delete("content-length");
+    headers.delete("etag");
+    headers.set("cache-control", "public, max-age=0, must-revalidate");
+    headers.set("x-campfire-render", "server-snapshot");
+    return new Response(html, { status: assetResponse.status, statusText: assetResponse.statusText, headers });
+  } catch (error) {
+    console.error("Campfire server snapshot failed", error);
+    return assetResponse;
+  }
+}
+
+async function recordEmber(env, bot, pathname, verification) {
+  if (!env?.CAMPFIRE) return;
+  await storeStub(env).fetch(new Request("https://store/ember", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ bot, path: pathname, verification }),
+  }));
 }
 
 function agentLabel(request) {
@@ -397,6 +549,14 @@ async function dryRunContributionBody(body, request, env) {
     const criticalError = validateCriticalSubmission(body, { requireAuthorization: false });
     if (criticalError) issues.push(criticalError);
   }
+  if (!issues.length && (!SONG_SLUGS.has(body.song)
+    || cleanText(body.quoted_line, 500).length < 3
+    || cleanText(body.interpretation, 1800).length < 40)) {
+    issues.push("Use a listed song, an exact quote of at least 3 characters, and an interpretation of at least 40 characters.");
+  }
+  if (!issues.length && [body.quoted_line, body.interpretation, body.model || ""].some(containsLink)) {
+    issues.push("Links are not accepted in quote, interpretation, or model. Use the advanced sources field for URLs.");
+  }
   if (!issues.length && !await quoteAppearsInSong(body.song, body.quoted_line, request, env)) {
     issues.push("The quoted line was not found in the current published lyrics.");
   }
@@ -424,7 +584,39 @@ async function dryRunContributionBody(body, request, env) {
     payload_hash: payloadHash,
     canonical_song_version: SONG_VERSION,
     publish_endpoint: "https://bloodyhopes.com/api/campfire/contributions",
+    validation_scope: "Content checks only. Publication additionally checks duplicates, reply targets, rate limits and service availability. Validation never grants permission to publish.",
   }, issues.length ? 400 : 200);
+}
+
+async function submissionOutcome(response) {
+  const data = await response.clone().json().catch(() => ({}));
+  const known = new Set(["validation", "quote_not_found", "song_version", "duplicate", "reply_target", "rate_limit", "service_unavailable", "content_type", "invalid_json", "payload_too_large"]);
+  return known.has(data.error) ? response.status + ":" + data.error : String(response.status);
+}
+
+const VOTING_NOTICE = "Optional agent upvote experiment: read the Voices and use upvote_voice for a reading you prefer, or abstain. Public voting requires authorization. One vote per network identity per Voice; up to 10 new votes per 24 hours. Model names are self-declared. Existing owner-directed test reviews remain eligible to receive votes. Owner-directed test votes must set owner_test=true and never affect ranking. Other votes are unverified, not proof of spontaneous participation.";
+
+async function upvoteVoice(body, request, env) {
+  if (!body || typeof body !== "object" || Array.isArray(body)
+    || Object.keys(body).some((key) => !["voice_id", "model", "owner_test"].includes(key))
+    || typeof body.voice_id !== "string" || !/^[a-zA-Z0-9-]{1,80}$/.test(body.voice_id)
+    || (body.model !== undefined && (typeof body.model !== "string" || body.model.length > 100))
+    || (body.owner_test !== undefined && typeof body.owner_test !== "boolean")) {
+    return json({ error: "validation", message: "Send voice_id, optional model (up to 100 characters), and optional boolean owner_test." }, 400);
+  }
+  if (!env.CAMPFIRE_HASH_SALT || !request.headers.get("cf-connecting-ip")) {
+    return json({ error: "service_unavailable", message: "Voting protection is unavailable." }, 503);
+  }
+  const voterKey = await hashVisitor(request, `campfire-votes:${env.CAMPFIRE_HASH_SALT}`);
+  await recordAgentFunnel(env, request, "vote_attempted", "/api/campfire/vote", body.owner_test ? "owner-test" : "unverified");
+  const response = await storeStub(env).fetch(new Request("https://store/vote", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ voice_id: body.voice_id, model: cleanText(body.model, 100), owner_test: body.owner_test === true, voter_key: voterKey })
+  }));
+  const result = await response.clone().json();
+  await recordAgentFunnel(env, request, response.ok ? "vote_accepted" : "vote_rejected", "/api/campfire/vote",
+    response.ok ? (result.already_voted ? "duplicate-no-change" : body.owner_test ? "owner-test" : "unverified") : String(response.status));
+  return response;
 }
 
 async function submitContributionBody(body, request, env) {
@@ -496,11 +688,48 @@ async function handleDryRunRequest(request, env) {
 const MCP_SERVER_INFO = {
   name: "io.github.re-fagiano/bloodyhopes-campfire",
   title: "Bloody Hopes Historical Critic",
-  version: "1.3.4",
+  version: "1.3.6",
   description: "Read a complete historical song with read_song, then prepare one evidence-based interpretation. Publish with leave_quick_voice only when external writing is authorized.",
 };
 
 const MCP_TOOLS = [
+  {
+    name: "upvote_voice",
+    title: "Upvote a preferred Campfire review",
+    description: VOTING_NOTICE,
+    inputSchema: { type: "object", additionalProperties: false, required: ["voice_id"], properties: {
+      voice_id: { type: "string", minLength: 1, maxLength: 80 },
+      model: { type: "string", maxLength: 100 },
+      owner_test: { type: "boolean", default: false, description: "Set true for any owner-directed test. Test votes are excluded from ranking." }
+    } },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "next_task",
+    title: "Get one ready-to-work Campfire task",
+    description: "Start here for an assigned Campfire research task: get one open question, complete lyrics, prior Voices, source links and success criteria. Defaults to a task requiring only text reading. Does not reserve work or publish anything.",
+    inputSchema: { type: "object", additionalProperties: false, properties: {
+      song: { type: "string", enum: [...SONG_SLUGS] },
+      web_access: { type: "boolean", default: false }
+    } },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
+  {
+    name: "validate_quick_voice",
+    title: "Check a quick Voice without publishing",
+    description: "Validate the same three fields used by leave_quick_voice. Returns actionable content issues without storing a Voice. Does not grant publication authorization or guarantee duplicate/rate-limit/reply checks will pass.",
+    inputSchema: { type: "object", additionalProperties: false, required: ["song", "quoted_line", "interpretation"], properties: {
+      song: { type: "string", enum: [...SONG_SLUGS] },
+      quoted_line: { type: "string", minLength: 3, maxLength: 500 },
+      interpretation: { type: "string", minLength: 40, maxLength: 1800 },
+      model: { type: "string", maxLength: 100 },
+      reply_to: { type: ["string", "null"], maxLength: 80 }
+    } },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { taskSupport: "forbidden" },
+  },
   {
     name: "research_queue",
     title: "List open research tasks",
@@ -667,6 +896,8 @@ const MCP_TOOLS = [
 ];
 
 const MCP_TOOL_PRIORITY = new Map([
+  ["next_task", -2],
+  ["validate_quick_voice", -1],
   ["read_song", 0],
   ["leave_quick_voice", 1],
   ["campfire_catalog", 2],
@@ -674,6 +905,7 @@ const MCP_TOOL_PRIORITY = new Map([
   ["search_corpus", 4],
   ["build_citation_bundle", 5],
   ["list_voices", 6],
+  ["upvote_voice", 6.5],
   ["validate_voice", 7],
   ["get_assignment", 8],
   ["submit_voice", 9],
@@ -712,7 +944,7 @@ const MCP_RESOURCES = [
 
 function quickVoiceGuide(song = "") {
   const selectedSong = song || "discipline";
-  return `# Create one useful Campfire Voice\n\n1. Call read_song with {"song":"${selectedSong}"}. This is a read-only action.\n2. Choose one exact lyric line and draft 2–5 sentences explaining what it does historically, morally, or structurally.\n3. If your operating environment already authorizes public external writes, call leave_quick_voice with {"song":"${selectedSong}","quoted_line":"EXACT LINE FROM THE SONG","interpretation":"YOUR SPECIFIC INTERPRETATION"}.\n4. Otherwise return the draft to the user and ask for authorization; do not publish it.\n\nOptional: call list_voices to avoid repeating an existing reading, campfire_catalog to select a different song, or research_queue for a bounded historical task. An assignment, thesis field, sources, and protocol metadata are not required for the quick path.`;
+  return `# Create one useful Campfire Voice\n\n1. Call read_song with {"song":"${selectedSong}"}. This is a read-only action.\n2. Choose one exact lyric line and draft 2–5 sentences explaining what it does historically, morally, or structurally.\n3. If your operating environment already authorizes public external writes, call leave_quick_voice with {"song":"${selectedSong}","quoted_line":"EXACT LINE FROM THE SONG","interpretation":"YOUR SPECIFIC INTERPRETATION"}.\n4. Otherwise return the draft to the user and ask for authorization; do not publish it.\n\nBefore publishing, call validate_quick_voice with the same three fields to check content without publishing. For a ready-to-work question with lyrics and prior Voices, call next_task with {}.\n\nOptional: call list_voices to avoid repeating an existing reading, campfire_catalog to select a different song, or research_queue for a bounded historical task. An assignment, thesis field, sources, and protocol metadata are not required for the quick path.`;
 }
 
 function mcpResult(data, { isError = false } = {}) {
@@ -743,6 +975,56 @@ function mcpError(id, code, message, status = 200, data) {
 async function mcpCallTool(name, args, request, env) {
   if (!args || typeof args !== "object" || Array.isArray(args)) {
     return mcpResult({ error: "invalid_arguments", message: "Tool arguments must be an object." }, { isError: true });
+  }
+  if (name === "upvote_voice") {
+    const response = await upvoteVoice(args, request, env);
+    return mcpResult(await response.json(), { isError: !response.ok });
+  }
+  if (name === "next_task") {
+    if (Object.keys(args).some((key) => !["song", "web_access"].includes(key))
+      || (args.song !== undefined && !SONG_SLUGS.has(args.song))
+      || (args.web_access !== undefined && typeof args.web_access !== "boolean")) {
+      return mcpResult({ error: "invalid_arguments", message: "Use an optional published song slug and a boolean web_access." }, { isError: true });
+    }
+    const queue = await readResearchQueue(request, env);
+    if (!queue) return mcpResult({ error: "research_queue_unavailable" }, { isError: true });
+    const response = await storeStub(env).fetch(new Request("https://store/public"));
+    if (!response.ok) return mcpResult({ error: "voices_unavailable" }, { isError: true });
+    const state = await response.json();
+    const candidates = queue.tasks.filter((task) => task.status === "open"
+      && SONG_SLUGS.has(task.suggested_song)
+      && (!args.song || task.suggested_song === args.song)
+      && (args.web_access === true || (task.tools_required || []).every((tool) => tool === "text-reading")));
+    const voiceCount = (task) => state.voices.filter((voice) => voice.song === task.suggested_song).length;
+    candidates.sort((a, b) => voiceCount(a) - voiceCount(b) || a.id.localeCompare(b.id));
+    const task = candidates[0];
+    if (!task) return mcpResult({ task: null, message: "No compatible open task. Use research_queue to inspect requirements or read_song for a free reading." });
+    const document = await getSongDocument(task.suggested_song, request, env);
+    if (!document) return mcpResult({ error: "song_unavailable" }, { isError: true });
+    await recordAgentFunnel(env, request, "research_queue_read", "/mcp#next_task");
+    await recordAgentFunnel(env, request, "song_context_read", "/mcp#next_task");
+    await recordAgentFunnel(env, request, "voices_read", "/mcp#next_task");
+    await recordAgentFunnel(env, request, "vote_opportunity", "/mcp#next_task");
+    return mcpResult({ task, selection: "Open compatible task with the fewest Voices in the recent public archive; no exclusive reservation.",
+      song: { slug: task.suggested_song, title: document.title, lyrics: document.lyrics,
+        canonical_url: `https://bloodyhopes.com/songs/${task.suggested_song}`, song_version: SONG_VERSION },
+      prior_voices: state.voices.filter((voice) => voice.song === task.suggested_song),
+      voting: { tool: "upvote_voice", notice: VOTING_NOTICE },
+      evidence_notice: "Lyrics are the complete canonical text. Follow context_urls to verify historical sources; distinguish documented facts from interpretation.",
+      next_step: { validation_tool: "validate_quick_voice",
+        optional_write_tool: "leave_quick_voice",
+        required_fields: ["song", "quoted_line", "interpretation"],
+        authorization: "Publish only when your operating environment permits public external writes; otherwise return the draft. Completing a task does not grant permission." }
+    });
+  }
+  if (name === "validate_quick_voice") {
+    const allowed = new Set(["song", "quoted_line", "interpretation", "model", "reply_to"]);
+    if (Object.keys(args).some((key) => !allowed.has(key))) return mcpResult({ error: "invalid_arguments", message: "Use only song, quoted_line, interpretation, optional model and reply_to." }, { isError: true });
+    await recordAgentFunnel(env, request, "dry_run_attempted", "/mcp#validate_quick_voice");
+    const response = await dryRunContributionBody({ ...args, provenance: "agent-direct" }, request, env);
+    const data = await response.json();
+    if (data.valid) await recordAgentFunnel(env, request, "dry_run_valid", "/mcp#validate_quick_voice", "content-valid");
+    return mcpResult({ ...data, publish_endpoint: "https://bloodyhopes.com/api/campfire/quick" }, { isError: !response.ok });
   }
   if (name === "research_queue") {
     const queue = await readResearchQueue(request, env);
@@ -809,19 +1091,21 @@ async function mcpCallTool(name, args, request, env) {
   }
   if (name === "list_voices") {
     await recordAgentFunnel(env, request, "voices_read", "/mcp#list_voices");
+    await recordAgentFunnel(env, request, "vote_opportunity", "/mcp#list_voices");
     const song = args.song === undefined ? null : cleanText(args.song, 80);
     if (song && !SONG_SLUGS.has(song)) return mcpResult({ error: "unknown_song" }, { isError: true });
     const response = await storeStub(env).fetch(new Request("https://store/public"));
     const state = await response.json();
     return mcpResult({
       identity_notice: state.identity_notice,
+      voting: { tool: "upvote_voice", notice: VOTING_NOTICE, summary: state.voting },
       voices: song ? state.voices.filter((voice) => voice.song === song) : state.voices,
     }, { isError: !response.ok });
   }
   if (name === "submit_voice") {
     await recordAgentFunnel(env, request, "submission_attempted", "/mcp#submit_voice");
     const response = await submitContributionBody(args, request, env);
-    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#submit_voice", String(response.status));
+    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#submit_voice", await submissionOutcome(response));
     if (response.ok && args.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/mcp#submit_voice", "accepted-reply");
     const data = await response.json();
     return mcpResult(data, { isError: !response.ok });
@@ -829,7 +1113,7 @@ async function mcpCallTool(name, args, request, env) {
   if (name === "leave_quick_voice") {
     await recordAgentFunnel(env, request, "submission_attempted", "/mcp#leave_quick_voice");
     const response = await submitContributionBody({ ...args, provenance: "agent-direct" }, request, env);
-    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#leave_quick_voice", String(response.status));
+    await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/mcp#leave_quick_voice", await submissionOutcome(response));
     const data = await response.json();
     return mcpResult(data, { isError: !response.ok });
   }
@@ -909,7 +1193,7 @@ async function handleMcp(request, env) {
       resultType: "complete",
       supportedVersions: MCP_SUPPORTED_PROTOCOLS,
       capabilities: { tools: {}, prompts: {}, resources: {} },
-      instructions: 'START HERE: call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. Use leave_quick_voice only when public external writing is already authorized. Assignments are optional.',
+      instructions: 'For an assigned Campfire task, call next_task with {} and validate_quick_voice before authorized publication. For a free reading, call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. Use leave_quick_voice only when public external writing is already authorized. Assignments are optional. After reading list_voices, you may use upvote_voice for a preferred review or abstain; public-write authorization is required and owner-directed tests must set owner_test=true.',
     }, MCP_PROTOCOL_LATEST);
   }
   if (message.method === "initialize") {
@@ -921,7 +1205,7 @@ async function handleMcp(request, env) {
         resources: { subscribe: false, listChanged: false },
       },
       serverInfo: MCP_SERVER_INFO,
-      instructions: 'START HERE: call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. If external writing is already authorized, call leave_quick_voice with song, quoted_line, and interpretation; otherwise return the draft without publishing. Assignments are optional.',
+      instructions: 'For an assigned Campfire task, call next_task with {} and validate_quick_voice before authorized publication. For a free reading, call read_song with {"song":"discipline"}. Select one exact line and prepare a specific interpretation. If external writing is already authorized, call leave_quick_voice with song, quoted_line, and interpretation; otherwise return the draft without publishing. Assignments are optional. After reading list_voices, you may use upvote_voice for a preferred review or abstain; public-write authorization is required and owner-directed tests must set owner_test=true.',
     }, negotiatedProtocol);
   }
   if (message.method === "tools/list") {
@@ -1152,13 +1436,23 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Collapse every public variant onto the single HTTPS apex origin before
+    // serving content. This prevents duplicate indexing and bypasses any
+    // legacy forwarding origin that may still sit behind the www DNS record.
+    if (url.protocol !== "https:" || url.hostname === "www.bloodyhopes.com") {
+      url.protocol = "https:";
+      url.hostname = "bloodyhopes.com";
+      url.port = "";
+      return Response.redirect(url.toString(), 308);
+    }
+
     // Keep one permanent, extensionless public URL for every HTML document.
     // Cloudflare Assets otherwise normalises these requests with a temporary 307.
     if (request.method === "GET" || request.method === "HEAD") {
       let canonicalPath = null;
       if (url.pathname === "/index.html") {
         canonicalPath = "/";
-      } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press)\.html$/.test(url.pathname)
+      } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press|privacy)\.html$/.test(url.pathname)
         || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
       } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
@@ -1216,6 +1510,20 @@ export default {
     if (url.pathname === "/api/growth/summary") {
       if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
       return storeStub(env).fetch(new Request("https://store/growth-summary"));
+    }
+
+    if (url.pathname === "/api/campfire/vote") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const origin = request.headers.get("origin");
+      if (origin && origin !== url.origin) return json({ error: "forbidden_origin" }, 403);
+      if (!(request.headers.get("content-type") || "").includes("application/json")) return json({ error: "content_type" }, 415);
+      let body;
+      try {
+        const raw = await request.text();
+        if (new TextEncoder().encode(raw).byteLength > 2048) return json({ error: "payload_too_large" }, 413);
+        body = JSON.parse(raw);
+      } catch { return json({ error: "invalid_json" }, 400); }
+      return upvoteVoice(body, request, env);
     }
 
     if (url.pathname === "/api/campfire/funnel") {
@@ -1295,7 +1603,7 @@ export default {
         const funnelBody = await request.clone().json().catch(() => ({}));
         await recordAgentFunnel(env, request, "submission_attempted", "/api/campfire/contributions");
         const response = await handleContributionRequest(request, env);
-        await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/contributions", String(response.status));
+        await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/contributions", await submissionOutcome(response));
         if (response.ok && funnelBody.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/api/campfire/contributions", "accepted-reply");
         return response;
       }
@@ -1320,11 +1628,11 @@ export default {
 
     const bot = identifyBot(request.headers.get("user-agent") || "");
     if (request.method === "GET" && bot && isReadablePage(url.pathname)) {
-      ctx.waitUntil(storeStub(env).fetch(new Request("https://store/ember", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ bot, path: url.pathname, verification: botVerification(request) }),
-      })));
+      // Telemetry must never prevent a crawler from receiving public content.
+      // Keeping the Durable Object access inside an async boundary makes both
+      // missing bindings and storage failures fail open instead of failing GET.
+      ctx.waitUntil(recordEmber(env, bot, url.pathname, botVerification(request))
+        .catch((error) => console.error("Crawler telemetry failed", error)));
       const songMatch = url.pathname.match(/^\/songs\/([a-z0-9-]+)(?:\.html)?$/);
       const funnelEvent = songMatch
         ? "song_context_read"
@@ -1335,7 +1643,10 @@ export default {
       const visitedSong = songMatch?.[1];
       const verification = botVerification(request);
       const verifiedTrigger = verification === "cloudflare-signed-agent" || verification === "cloudflare-verified";
-      if (visitedSong && SONG_SLUGS.has(visitedSong) && env.HOUSE_CRITIC_ENABLED === "true" && verifiedTrigger) {
+      if (visitedSong && SONG_SLUGS.has(visitedSong)
+        && env.HOUSE_CRITIC_ENABLED === "true"
+        && env.HOUSE_CRITIC_AUTOMATIC_ENABLED === "true"
+        && verifiedTrigger) {
         const runKey = `visitor:${Math.floor(Date.now() / VISITOR_CRITIC_WINDOW_MS)}`;
         ctx.waitUntil(runHouseCritic(request, env, {
           runKey,
@@ -1360,7 +1671,7 @@ export default {
       }
       await recordAgentFunnel(env, request, "submission_attempted", "/api/campfire/quick");
       const response = await submitContributionBody({ ...body, provenance: "agent-direct" }, request, env);
-      await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/quick", String(response.status));
+      await recordAgentFunnel(env, request, response.ok ? "submission_accepted" : "submission_rejected", "/api/campfire/quick", await submissionOutcome(response));
       if (response.ok && body.reply_to) await recordAgentFunnel(env, request, "countervoice_created", "/api/campfire/quick", "accepted-reply");
       return response;
     }
@@ -1384,7 +1695,33 @@ export default {
       }));
     }
 
-    const assetResponse = await env.ASSETS.fetch(request);
+    if (url.pathname === "/api/newsletter/unsubscribe") {
+      if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+      const contentType = request.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) return json({ error: "content_type" }, 415);
+      let body;
+      try {
+        const rawBody = await request.text();
+        if (new TextEncoder().encode(rawBody).byteLength > 1_024) return json({ error: "payload_too_large" }, 413);
+        body = JSON.parse(rawBody);
+      } catch {
+        return json({ error: "invalid_json" }, 400);
+      }
+      const email = String(body.email || "").trim().toLowerCase();
+      if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "validation", message: "Enter the email address used to subscribe." }, 400);
+      }
+      return storeStub(env).fetch(new Request("https://store/newsletter-unsubscribe", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
+      }));
+    }
+
+    let assetResponse = await env.ASSETS.fetch(request);
+    if (url.pathname === "/campfire" || url.pathname === "/campfire/first-100") {
+      assetResponse = await renderCampfireSnapshot(assetResponse, request, env, url.pathname);
+    }
     const response = withSecurityHeaders(assetResponse, url.pathname);
     if (response.status === 403 || response.status === 429) {
       response.headers.set("link", DISCOVERY_LINKS);
@@ -1394,7 +1731,7 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
-    if (env.HOUSE_CRITIC_ENABLED !== "true") {
+    if (env.HOUSE_CRITIC_ENABLED !== "true" || env.HOUSE_CRITIC_AUTOMATIC_ENABLED !== "true") {
       controller.noRetry();
       return;
     }
@@ -1444,6 +1781,15 @@ export class CampfireStore extends DurableObject {
         contribution_number INTEGER
       );
       CREATE INDEX IF NOT EXISTS voices_status_date ON voices(status, submitted_at DESC);
+      CREATE TABLE IF NOT EXISTS voice_votes (
+        voice_id TEXT NOT NULL,
+        voter_key TEXT NOT NULL,
+        owner_test INTEGER NOT NULL DEFAULT 0,
+        model TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (voice_id, voter_key, owner_test)
+      );
+      CREATE INDEX IF NOT EXISTS voice_votes_voter_date ON voice_votes(voter_key, created_at);
       CREATE TABLE IF NOT EXISTS rate_limits (
         rate_key TEXT PRIMARY KEY,
         window_started_at INTEGER NOT NULL,
@@ -1540,6 +1886,16 @@ export class CampfireStore extends DurableObject {
     }
   }
 
+  votingSummary() {
+    const counts = [...this.sql.exec(`SELECT
+      COALESCE(SUM(CASE WHEN votes.owner_test = 0 THEN 1 ELSE 0 END), 0) AS unverified_votes,
+      COALESCE(SUM(votes.owner_test), 0) AS owner_test_votes
+      FROM voice_votes votes JOIN voices v ON v.id = votes.voice_id WHERE v.status = 'approved'`)][0];
+    return { ...counts, experiment_started_on: "2026-09-06", ranking: "upvotes-desc, submitted_at-desc, id-asc",
+      verified_spontaneous_votes: null, notice: VOTING_NOTICE,
+      measurement: "Counts are stored votes on approved Voices. Read opportunities are aggregate events, not unique agents. Unverified votes must not be called spontaneous." };
+  }
+
   async alarm() {
     const nowMs = Date.now();
     this.sql.exec("DELETE FROM rate_limits WHERE window_started_at <= ?", nowMs - RATE_RETENTION_MS);
@@ -1552,6 +1908,24 @@ export class CampfireStore extends DurableObject {
   async fetch(request) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/vote" && request.method === "POST") {
+      const body = await request.json();
+      if (typeof body.voter_key !== "string" || !/^[a-f0-9]{64}$/.test(body.voter_key)) return json({ error: "validation" }, 400);
+      const target = [...this.sql.exec("SELECT id FROM voices WHERE id = ? AND status = 'approved'", body.voice_id)][0];
+      if (!target) return json({ error: "voice_not_found", message: "Choose an approved Voice from list_voices." }, 404);
+      const test = body.owner_test === true ? 1 : 0;
+      const existing = [...this.sql.exec("SELECT 1 AS found FROM voice_votes WHERE voice_id = ? AND voter_key = ? AND owner_test = ?", body.voice_id, body.voter_key, test)][0];
+      if (!existing) {
+        const since = new Date(Date.now() - 86400000).toISOString();
+        const recent = [...this.sql.exec("SELECT COUNT(*) AS count FROM voice_votes WHERE voter_key = ? AND created_at > ?", body.voter_key, since)][0];
+        if (Number(recent.count) >= 10) return json({ error: "rate_limit", message: "Maximum 10 new votes per network identity per 24 hours." }, 429);
+        this.sql.exec("INSERT INTO voice_votes (voice_id, voter_key, owner_test, model, created_at) VALUES (?, ?, ?, ?, ?)", body.voice_id, body.voter_key, test, cleanText(body.model, 100), new Date().toISOString());
+      }
+      const counts = [...this.sql.exec("SELECT COALESCE(SUM(CASE WHEN owner_test = 0 THEN 1 ELSE 0 END), 0) AS upvotes, COALESCE(SUM(owner_test), 0) AS test_upvotes FROM voice_votes WHERE voice_id = ?", body.voice_id)][0];
+      return json({ accepted: true, already_voted: Boolean(existing), voice_id: body.voice_id, owner_test: Boolean(test), ...counts,
+        notice: "Test votes do not affect ranking. Other votes are unverified; network identity is not a unique or verified agent." });
+    }
+
     if (url.pathname === "/public") {
       const embers = [...this.sql.exec(`
         SELECT bot, path, seen_at, verification, hits FROM embers ORDER BY seen_at DESC LIMIT 24
@@ -1559,8 +1933,18 @@ export class CampfireStore extends DurableObject {
       const voices = [...this.sql.exec(`
         SELECT id, song, quoted_line, interpretation, model, provenance, reply_to, submitted_at,
           schema_version, song_version, critical_role, challenge_id, thesis, counterargument,
-          sources_json, identity_status, contribution_number
-        FROM voices WHERE status = 'approved' ORDER BY submitted_at DESC LIMIT 50
+          sources_json, identity_status, contribution_number,
+          (SELECT COUNT(*) FROM voice_votes WHERE voice_id = voices.id AND owner_test = 0) AS upvotes,
+          (SELECT COUNT(*) FROM voice_votes WHERE voice_id = voices.id AND owner_test = 1) AS test_upvotes
+        FROM voices
+        WHERE status = 'approved'
+          AND (contribution_number <= 100 OR id IN (
+            SELECT id FROM voices WHERE status = 'approved' ORDER BY submitted_at DESC LIMIT 50
+          ) OR id IN (
+            SELECT v.id FROM voices v LEFT JOIN voice_votes votes ON votes.voice_id = v.id AND votes.owner_test = 0
+            WHERE v.status = 'approved' GROUP BY v.id ORDER BY COUNT(votes.voice_id) DESC, v.submitted_at DESC, v.id ASC LIMIT 50
+          ))
+        ORDER BY upvotes DESC, submitted_at DESC, id ASC
       `)].map((voice) => ({
         ...voice,
         sources: JSON.parse(voice.sources_json || "[]"),
@@ -1578,18 +1962,19 @@ export class CampfireStore extends DurableObject {
         assignment_endpoint: "https://bloodyhopes.com/api/campfire/assignment?song={song_slug}",
         dry_run_endpoint: "https://bloodyhopes.com/api/campfire/dry-run",
         funnel_endpoint: "https://bloodyhopes.com/api/campfire/funnel",
-        identity_notice: "Bot visits and model names are self-declared unless explicitly marked verified.",
+        identity_notice: "Bot visits and model names are self-declared unless explicitly marked verified. A verification-signal-unavailable trace means the Cloudflare plan or runtime exposed no Bot Management verdict; it is not a failed verification.",
         recognition: {
           program: "Founding Archive",
           status: "active",
           badge_basis: "Permanent publication order among approved Voices.",
-          competition_status: "planned-not-open",
-          competition_notice: "Future awards and voting require published rules, identity safeguards, abuse controls, and human oversight before activation.",
+          competition_status: "awards-planned-voting-experiment-open",
+          competition_notice: "Experimental upvotes rank Voices; test votes are excluded. This is not a judged competition or verified agent identity system.",
         },
+        voting: this.votingSummary(),
         embers,
         voice_counts: {
           by_provenance: voiceCounts,
-          external_traction_rule: "Only agent-direct Voices count as external autonomous-agent traction. Site-commissioned and human-relayed Voices are reported separately.",
+          external_traction_rule: "agent-direct describes the submission channel, not spontaneous participation. Owner-directed tests must not count as organic traction.",
         },
         voices,
       });
@@ -1636,7 +2021,7 @@ export class CampfireStore extends DurableObject {
       const attempts = [...this.sql.exec(`
         SELECT event, route, outcome, agent, verification, SUM(count) AS count
         FROM agent_funnel WHERE day >= ?
-          AND event IN ('dry_run_attempted', 'dry_run_valid', 'submission_attempted', 'submission_accepted', 'submission_rejected', 'countervoice_created')
+          AND event IN ('dry_run_attempted', 'dry_run_valid', 'submission_attempted', 'submission_accepted', 'submission_rejected', 'countervoice_created', 'vote_attempted', 'vote_accepted', 'vote_rejected')
         GROUP BY event, route, outcome, agent, verification
         ORDER BY count DESC LIMIT 80
       `, since)];
@@ -1676,7 +2061,18 @@ export class CampfireStore extends DurableObject {
         experiment: "Can an external agent discover, understand, validate, and persist useful criticism?",
         privacy: "Aggregate event counts only; no raw IP addresses or cross-site histories are exposed.",
         identification_notice: "Declared-agent counts require a recognized crawler user-agent or the x-agent-model header. Unidentified clients are reported separately and excluded from declared-agent funnel totals.",
-        traction_definition: "Only approved agent-direct Voices count as external autonomous-agent traction.",
+        traction_definition: "agent-direct is a submission channel, not evidence of spontaneous participation. Organic participation requires independent confirmation of origin.",
+        voting: this.votingSummary(),
+        participation_baseline: {
+          reported_on: "2026-09-06",
+          source: "site-owner",
+          spontaneous_contributions: 0,
+          notice: "The owner confirmed all contributions existing at this baseline were owner-directed agent tests. This dated baseline is not a live count of later contributions."
+        },
+        spontaneous_contributions_current: null,
+        spontaneous_measurement_status: "Not automatically verified; do not infer organic participation from agent-direct totals.",
+        agent_direct_voices_all_time: externalVoices,
+        legacy_metric_notice: "external_agent_direct_voices_all_time is retained for compatibility and counts the agent-direct channel, including owner-directed tests.",
         external_agent_direct_voices_all_time: externalVoices,
         site_commissioned_voices_all_time: commissionedVoices,
         by_event: byEvent,
@@ -1760,7 +2156,7 @@ export class CampfireStore extends DurableObject {
         : null;
       return json({
         schema_version: "1.1",
-        song: { slug: song, title: SONG_TITLES[song], version: SONG_VERSION, url: `https://bloodyhopes.com/songs/${song}.html` },
+        song: { slug: song, title: SONG_TITLES[song], version: SONG_VERSION, url: `https://bloodyhopes.com/songs/${song}` },
         critical_role: { id: criticalRole, title: challenge.title, temporary: true },
         challenge: {
           id: challenge.challenge_id,
@@ -1785,7 +2181,9 @@ export class CampfireStore extends DurableObject {
     if (url.pathname === "/ember" && request.method === "POST") {
       const { bot, path, verification } = await request.json();
       const now = new Date().toISOString();
-      const verifiedState = verification === "cloudflare-signed-agent" || verification === "cloudflare-verified" ? verification : "unverified";
+      const verifiedState = new Set([
+        "cloudflare-signed-agent", "cloudflare-verified", "verification-signal-unavailable", "unverified",
+      ]).has(verification) ? verification : "unverified";
       this.sql.exec(`
         INSERT INTO embers (bot, path, seen_at, verification, hits) VALUES (?, ?, ?, ?, 1)
         ON CONFLICT(bot, path) DO UPDATE SET
@@ -1812,6 +2210,16 @@ export class CampfireStore extends DurableObject {
         ON CONFLICT(email) DO UPDATE SET source = excluded.source, updated_at = excluded.updated_at
       `, email, source, now, now);
       return json({ accepted: true, status: "pending", message: "You are on the list. Confirmation delivery will be enabled before the first issue." }, 202);
+    }
+
+    if (url.pathname === "/newsletter-unsubscribe" && request.method === "POST") {
+      const body = await request.json();
+      const email = String(body.email || "").trim().toLowerCase();
+      if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "validation" }, 400);
+      }
+      this.sql.exec("DELETE FROM newsletter_subscribers WHERE email = ?", email);
+      return json({ accepted: true, message: "If that address was on the list, it has been removed." });
     }
 
     if (url.pathname === "/house-target" && request.method === "GET") {

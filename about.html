@@ -14,39 +14,66 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+  "@graph": [
     {
-      "@type": "Question",
-      "name": "What is Bloody Hopes?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Bloody Hopes is a cinematic historical music project about forgotten soldiers, lost battles and the human cost of war. It releases original war ballads, fife and drum marches and military folk music set in conflicts ranging from the American Civil War and the Napoleonic Wars to the Seven Years' War, the Crimean War and the Age of Sail."
-      }
+      "@type": ["MusicGroup", "Organization"],
+      "@id": "https://bloodyhopes.com/#artist",
+      "name": "Bloody Hopes",
+      "url": "https://bloodyhopes.com/",
+      "description": "A human-directed, AI-assisted historical music and research project publishing cinematic war ballads and sourced military-history articles.",
+      "genre": ["War ballad", "Historical folk music", "Cinematic music", "Military folk song"],
+      "founder": { "@id": "https://bloodyhopes.com/about#re-fagiano" },
+      "sameAs": [
+        "https://www.youtube.com/@BloodyHopesMusic",
+        "https://open.spotify.com/artist/7jf2PjpwpyaTlsCcI4wN7p",
+        "https://bloodyhopes.bandcamp.com/"
+      ]
     },
     {
-      "@type": "Question",
-      "name": "Is Bloody Hopes' music AI-generated?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Bloody Hopes is an AI-assisted project: lyrics are written with AI assistance grounded in real historical research, and music and visual production use AI tools. Creative direction, historical research and editorial curation remain human-led."
-      }
+      "@type": "Person",
+      "@id": "https://bloodyhopes.com/about#re-fagiano",
+      "name": "Re Fagiano",
+      "url": "https://bloodyhopes.com/about#editor",
+      "jobTitle": "Founder and editorial director",
+      "worksFor": { "@id": "https://bloodyhopes.com/#artist" }
     },
     {
-      "@type": "Question",
-      "name": "What genre is Bloody Hopes?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Cinematic war ballads, historical folk music, military marches and martial choirs, with acoustic and orchestral arrangements inspired by the historical eras portrayed."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does Bloody Hopes celebrate war?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. Bloody Hopes treats war as a subject of remembrance, not celebration: the songs explore courage and fear, duty and doubt, grief, trauma, brotherhood and the fragile mercy that survives inside violence, through the stories of ordinary people caught inside history."
-      }
+      "@type": "FAQPage",
+      "@id": "https://bloodyhopes.com/about#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Bloody Hopes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bloody Hopes is a cinematic historical music project about forgotten soldiers, lost battles and the human cost of war. It releases original war ballads, fife and drum marches and military folk music set in conflicts ranging from the American Civil War and the Napoleonic Wars to the Seven Years' War, the Crimean War and the Age of Sail."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Bloody Hopes' music AI-generated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bloody Hopes is an AI-assisted project: lyrics are written with AI assistance grounded in real historical research, and music and visual production use AI tools. Creative direction, historical research and editorial curation remain human-led."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What genre is Bloody Hopes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cinematic war ballads, historical folk music, military marches and martial choirs, with acoustic and orchestral arrangements inspired by the historical eras portrayed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Bloody Hopes celebrate war?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Bloody Hopes treats war as a subject of remembrance, not celebration: the songs explore courage and fear, duty and doubt, grief, trauma, brotherhood and the fragile mercy that survives inside violence, through the stories of ordinary people caught inside history."
+          }
+        }
+      ]
     }
   ]
 }
@@ -57,16 +84,7 @@
 <header class="site">
   <div class="container nav-row">
     <a class="brand" href="/">BLOODY<span> HOPES</span></a>
-    <nav class="primary">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="about" class="active">About</a></li>
-        <li><a href="catalog">Catalog</a></li>
-        <li><a href="articles">Articles</a></li>
-        <li><a href="campfire">Campfire</a></li>
-        <li><a href="https://www.youtube.com/@BloodyHopesMusic" target="_blank" rel="noopener">YouTube</a></li>
-      </ul>
-    </nav>
+    <nav class="primary" aria-label="Primary navigation"><ul><li><a href="/">Home</a></li><li><a href="/about" class="active">About</a></li><li><a href="/catalog">Songs</a></li><li><a href="/history-and-songs">History</a></li><li><a href="/campfire">Campfire</a></li><li><a href="https://www.youtube.com/@BloodyHopesMusic" target="_blank" rel="noopener">YouTube</a></li></ul></nav>
   </div>
 </header>
 
@@ -88,6 +106,9 @@
     <h2>How We Work With AI</h2>
     <p>Bloody Hopes is an AI-assisted project. Every song begins with real historical research — documented events, battles, expressions and military customs — that guides the writing of the lyrics. AI tools are used for musical composition, vocals and visual production; creative direction, the selection of historical events and editorial curation remain human-led.</p>
     <p>We don't hide the use of AI, nor do we present it as a substitute for historical research: we treat it as a production tool, the same way other music projects use digital recording and arrangement tools.</p>
+
+    <h2 id="editor">Editorial Responsibility</h2>
+    <p><strong>Re Fagiano</strong> founded Bloody Hopes and is responsible for its creative direction, historical research and editorial review. Articles identify their publication or revision date, distinguish documentation from inference, and link the sources used wherever a public copy is available. Corrections and archival leads can be sent to <a href="mailto:bloodyhopesmusic@gmail.com">bloodyhopesmusic@gmail.com</a>.</p>
 
     <section class="machine-manifesto" aria-labelledby="machine-manifesto-title">
       <span class="eyebrow">A Campfire for Machines That Read</span>
@@ -131,7 +152,7 @@
     <div>© 2026 Bloody Hopes. AI-assisted music project.</div>
     <div>
       <a href="https://www.youtube.com/@BloodyHopesMusic" target="_blank" rel="noopener">YouTube</a> ·
-      <a href="https://open.spotify.com/artist/7jf2PjpwpyaTlsCcI4wN7p" target="_blank" rel="noopener">Spotify</a> · <a href="https://bloodyhopes.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a> · <a href="mailto:bloodyhopesmusic@gmail.com">Contact</a>
+      <a href="https://open.spotify.com/artist/7jf2PjpwpyaTlsCcI4wN7p" target="_blank" rel="noopener">Spotify</a> · <a href="https://bloodyhopes.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a> · <a href="/privacy">Privacy</a> · <a href="mailto:bloodyhopesmusic@gmail.com">Contact</a>
     </div>
   </div>
 </footer>
