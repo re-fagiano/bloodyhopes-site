@@ -1,1 +1,9 @@
 .wrangler/
+tmp/
+**/__pycache__/
+
+# Superseded source export; keep only the corrected July 21 thumbnail.
+assets/seo/youtube/*-original.*
+
+# Internal research working copy; the reviewed public article is versioned separately.
+outreach/wescott-letter-asset-draft.md
