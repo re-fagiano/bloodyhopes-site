@@ -63,14 +63,17 @@ const articleOrder = [
   "why-uss-constitution-called-old-ironsides.html", "behind-the-army.html", "from-lance-to-repeater.html",
   "bred-for-battle.html",
 ];
+const historyOrder = ["the-elephant-of-appomattox.html"];
 const pages = [
   ...songOrder.map((name) => ({ kind: "PAGE", name })),
   ...articleOrder.map((name) => ({ kind: "ARTICLE", name })),
-].map(({ kind, name }) => {
-  const folder = kind === "PAGE" ? "songs" : "articles";
+  ...historyOrder.map((name) => ({ kind: "ARTICLE", name, folder: "articles", urlFolder: "history" })),
+].map(({ kind, name, folder: explicitFolder, urlFolder: explicitUrlFolder }) => {
+  const folder = explicitFolder ?? (kind === "PAGE" ? "songs" : "articles");
+  const urlFolder = explicitUrlFolder ?? folder;
   const html = fs.readFileSync(path.join(root, folder, name), "utf8");
   const title = inline(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? name);
-  return `${kind}: ${title}\nURL: https://bloodyhopes.com/${folder}/${name.replace(/\.html$/, "")}\n\n${pageText(html)}`;
+  return `${kind}: ${title}\nURL: https://bloodyhopes.com/${urlFolder}/${name.replace(/\.html$/, "")}\n\n${pageText(html)}`;
 });
 
 fs.writeFileSync(path.join(root, "llms-full.txt"), `${[header, ...pages].join("\n\n----\n\n")}\n`, "utf8");

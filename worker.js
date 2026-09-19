@@ -338,7 +338,7 @@ function botVerification(request) {
 
 function isReadablePage(pathname) {
   if (pathname === "/") return true;
-  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press|privacy|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+)(?:\.html)?$/.test(pathname)) return true;
+  if (/^\/(?:index|about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press|privacy|songs\/[a-z0-9-]+|articles\/[a-z0-9-]+|history\/the-elephant-of-appomattox)(?:\.html)?$/.test(pathname)) return true;
   if (pathname === "/campfire/first-100" || pathname === "/campfire/first-100.html") return true;
   return /^\/(?:robots|llms|llms-full)\.txt$/.test(pathname)
     || pathname === "/agents.md"
@@ -1455,7 +1455,7 @@ export default {
       } else if (/^\/(?:about|catalog|campfire|agents|agent-entry|install|harness|challenge|articles|history-and-songs|press|privacy)\.html$/.test(url.pathname)
         || url.pathname === "/campfire/first-100.html") {
         canonicalPath = url.pathname.slice(0, -5);
-      } else if (/^\/(?:articles|songs)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
+      } else if (/^\/(?:articles|songs|history)\/[a-z0-9-]+\.html$/.test(url.pathname)) {
         canonicalPath = url.pathname.slice(0, -5);
       }
       if (canonicalPath) {
@@ -1718,7 +1718,13 @@ export default {
       }));
     }
 
-    let assetResponse = await env.ASSETS.fetch(request);
+    let assetRequest = request;
+    if (url.pathname === "/history/the-elephant-of-appomattox") {
+      const articleUrl = new URL(request.url);
+      articleUrl.pathname = "/articles/the-elephant-of-appomattox";
+      assetRequest = new Request(articleUrl, request);
+    }
+    let assetResponse = await env.ASSETS.fetch(assetRequest);
     if (url.pathname === "/campfire" || url.pathname === "/campfire/first-100") {
       assetResponse = await renderCampfireSnapshot(assetResponse, request, env, url.pathname);
     }

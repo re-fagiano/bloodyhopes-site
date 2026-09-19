@@ -67,6 +67,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 
 ## Historical deep-dive articles and source studies
 
+- [The Elephant of Appomattox](https://bloodyhopes.com/history/the-elephant-of-appomattox): A source-based study separating the political causes declared by Confederate governments from the varied motives of individual soldiers, with evidence on tariffs, conscription, mortality, Northern racism and European diplomacy.
 - [The Three Days at Appomattox](https://bloodyhopes.com/articles/three-days-at-appomattox): Grant and Lee's April 9 terms, paroles and rations, the April 12 stacking of arms, Chamberlain's retrospective account and the competing memories behind the two Appomattox ballads.
 - [Wescott’s Farmington Charge: July 21, Not July 22, 1864](https://bloodyhopes.com/articles/wescott-farmington-july-21-1864): a line-by-line source check showing that Wescott’s fifteen-minute charge and Farmington casualty sentence belong to July 21, before the Battle of Atlanta on July 22, with explicit evidential limits.
 - [The Four Clocks of Waterloo](https://bloodyhopes.com/articles/four-clocks-of-waterloo): Waterloo reconstructed through contemporary British, French, Prussian, Dutch-Belgian and enlisted testimony.
