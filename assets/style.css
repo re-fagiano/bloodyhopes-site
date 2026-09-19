@@ -146,6 +146,8 @@ nav.primary a:hover, nav.primary a.active { color: var(--accent-bright); text-de
 .watch-cta-row > span { color: var(--ink-dim); font-size: .78rem; line-height: 1.45; text-align: right; }
 .watch-cta { display: inline-flex; align-items: center; min-height: 48px; padding: .78rem 1.15rem; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: .78rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; text-decoration: none; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
 .watch-cta:hover, .watch-cta:focus { background: #a62922; border-color: #b73a32; color: #fff; text-decoration: none; transform: translateY(-2px); }
+.companion-links { margin: -1.35rem 0 2.25rem; color: var(--ink-dim); font-size: .82rem; }
+.companion-links a { display: inline-block; margin: .2rem .6rem .2rem 0; }
 
 /* ---------- Sections ---------- */
 section { padding: 3.4rem 0; }

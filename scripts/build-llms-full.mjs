@@ -48,6 +48,7 @@ const header = `# Bloody Hopes — llms-full.txt
 # https://bloodyhopes.com/llms.txt. Human-readable guide: /agents.`;
 
 const songOrder = [
+  "some-dreams-only-sleep.html", "it-has-to-mean-something.html",
   "open-blockhouse.html", "white-shirts-borodino.html", "discipline.html", "the-elephant.html", "gettysburg-ballad.html", "farmington-mourning.html",
   "shiloh-ballad.html", "tim-and-jones.html", "rum-alabama-rum.html", "austerlitz-sun.html",
   "waterloo-smile.html", "leipzig-watch.html", "montreal-smile.html", "cheers-to-fritz.html",
@@ -55,6 +56,7 @@ const songOrder = [
   "broken-mirrors.html", "blood-for-blood.html", "italy-will-be-made.html", "send-the-italian.html",
 ];
 const articleOrder = [
+  "three-days-at-appomattox.html",
   "wescott-farmington-july-21-1864.html", "four-clocks-of-waterloo.html", "battle-that-could-not-recognize-itself.html", "two-elephants-of-shiloh.html", "the-lash-and-the-line.html", "battlefield-mercy.html", "from-napoleon-to-gettysburg.html", "doomed-messengers.html",
   "flag-you-cannot-lose.html", "smile-as-a-mask.html", "who-gets-to-be-a-hero.html", "wescott-shiloh-letter-puzzle.html",
   "winter-that-broke-armies.html", "from-line-to-skirmish.html", "seeing-the-elephant-civil-war.html",

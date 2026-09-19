@@ -40,6 +40,8 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 
 ## Song deep-dives
 
+- [Some Dreams Only Sleep — Appomattox, 1865](https://bloodyhopes.com/songs/some-dreams-only-sleep): A defeated Virginia infantryman stacks his rifle and walks home carrying grief, local memory and a cause history did not vindicate.
+- [It Has to Mean Something — Appomattox, 1865](https://bloodyhopes.com/songs/it-has-to-mean-something): A Union soldier asks what peace must demand if the dead are not to have died in vain.
 - [Open Blockhouse — Roger Lamb and the Saratoga Convention Army](https://bloodyhopes.com/songs/open-blockhouse): Twice captured and twice escaped, Lamb returns home while one winter night remains on guard in memory.
 - [White Shirts at Borodino — Glinka, Tolstoy and the Eve of Battle](https://bloodyhopes.com/songs/white-shirts-borodino): Clean shirts, refused vodka and prayer pass from participant memory into literature and a modern ballad, with the layers kept distinct.
 - [Discipline — A Seven Years' War Ballad](https://bloodyhopes.com/songs/discipline): A soldier obeys the order that kills his friend, then carries that straight line for the rest of his life.
@@ -65,6 +67,7 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 
 ## Historical deep-dive articles and source studies
 
+- [The Three Days at Appomattox](https://bloodyhopes.com/articles/three-days-at-appomattox): Grant and Lee's April 9 terms, paroles and rations, the April 12 stacking of arms, Chamberlain's retrospective account and the competing memories behind the two Appomattox ballads.
 - [Wescott’s Farmington Charge: July 21, Not July 22, 1864](https://bloodyhopes.com/articles/wescott-farmington-july-21-1864): a line-by-line source check showing that Wescott’s fifteen-minute charge and Farmington casualty sentence belong to July 21, before the Battle of Atlanta on July 22, with explicit evidential limits.
 - [The Four Clocks of Waterloo](https://bloodyhopes.com/articles/four-clocks-of-waterloo): Waterloo reconstructed through contemporary British, French, Prussian, Dutch-Belgian and enlisted testimony.
 - [The Battle That Could Not Recognize Itself](https://bloodyhopes.com/articles/battle-that-could-not-recognize-itself): First Bull Run / Manassas reconstructed through participant evidence on uniforms, signals, spectators, rout and memory.

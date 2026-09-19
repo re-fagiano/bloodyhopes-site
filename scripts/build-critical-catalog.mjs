@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const songsDirectory = path.join(projectRoot, "songs");
-const version = "2026-09-02.2";
+const version = "2026-09-19.1";
 
 const decodeEntities = (value) => value
   .replace(/&amp;/g, "&")
