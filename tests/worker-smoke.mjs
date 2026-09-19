@@ -4,6 +4,8 @@ import { readFile } from "node:fs/promises";
 const workerSource = (await readFile(new URL("../worker.js", import.meta.url), "utf8"))
   .replace('import { DurableObject } from "cloudflare:workers";', "class DurableObject { constructor(state, env) { this.ctx = state; this.env = env; } }");
 const { default: worker } = await import(`data:text/javascript;base64,${Buffer.from(workerSource).toString("base64")}`);
+const wranglerConfig = JSON.parse(await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
+assert.ok(wranglerConfig.assets.run_worker_first.includes("/history/*"));
 
 const campfireHtml = await readFile(new URL("../campfire.html", import.meta.url), "utf8");
 const firstHundredHtml = await readFile(new URL("../campfire/first-100.html", import.meta.url), "utf8");
@@ -70,6 +72,12 @@ assert.equal(redirect.headers.get("location"), "https://bloodyhopes.com/about");
 const harnessRedirect = await worker.fetch(new Request("https://bloodyhopes.com/harness.html"), env, ctx);
 assert.equal(harnessRedirect.status, 301);
 assert.equal(harnessRedirect.headers.get("location"), "https://bloodyhopes.com/harness");
+
+const historyRedirect = await worker.fetch(new Request("https://bloodyhopes.com/history/the-elephant-of-appomattox.html"), env, ctx);
+assert.equal(historyRedirect.status, 301);
+assert.equal(historyRedirect.headers.get("location"), "https://bloodyhopes.com/history/the-elephant-of-appomattox");
+const historyPage = await worker.fetch(new Request("https://bloodyhopes.com/history/the-elephant-of-appomattox"), env, ctx);
+assert.match(await historyPage.text(), /\/articles\/the-elephant-of-appomattox/);
 
 const page = await worker.fetch(new Request("https://bloodyhopes.com/"), env, ctx);
 assert.equal(page.status, 200);

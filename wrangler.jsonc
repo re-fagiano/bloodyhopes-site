@@ -53,6 +53,7 @@
       "/articles.html",
       "/history-and-songs",
       "/history-and-songs.html",
+      "/history/*",
       "/songs/*",
       "/articles/*",
       "/robots.txt",
