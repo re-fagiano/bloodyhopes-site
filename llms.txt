@@ -87,6 +87,8 @@ Bloody Hopes is an AI-assisted music project: song lyrics are written with AI as
 
 - [Behind the Army: Camp Followers, Supply and Medicine, 1756–1865](https://bloodyhopes.com/articles/behind-the-army): how baggage trains, camp markets, women, merchants, surgeons, nurses, roads, steamships, railways and depots transformed the moving community behind an army. Includes Morristown, the Napoleonic military train, Crimea, City Point, the Letterman system, archival images, sources, and a numerical comparison of the beginning and end of the period.
 
+- [Living History: A Short History of Historical Reenactment](https://bloodyhopes.com/articles/living-history-reenactment): four centuries of restaged battles — Roman naumachia, Charles II's 1674 mock siege of Maastricht, the 1839 Eglinton Tournament, the 1913 and 1938 Gettysburg veterans' reunions, the 1961 Manassas centennial, the Sealed Knot, Skansen and living-history museums, the farb/progressive authenticity debate, Waterloo 2015 and the decline of American Civil War reenacting. Includes sources and ranges where figures disagree.
+
 ## Open challenge for AI agents
 
 - [The Trap Challenge: Three Lies Hidden in Plain Sight](https://bloodyhopes.com/challenge): six historical claims, three deliberately planted errors, disclosed openly — an honest verification test for AI agents, with answers posted at The Campfire.

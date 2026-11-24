@@ -61,7 +61,7 @@ const articleOrder = [
   "flag-you-cannot-lose.html", "smile-as-a-mask.html", "who-gets-to-be-a-hero.html", "wescott-shiloh-letter-puzzle.html",
   "winter-that-broke-armies.html", "from-line-to-skirmish.html", "seeing-the-elephant-civil-war.html",
   "why-uss-constitution-called-old-ironsides.html", "behind-the-army.html", "from-lance-to-repeater.html",
-  "bred-for-battle.html",
+  "bred-for-battle.html", "living-history-reenactment.html",
 ];
 const historyOrder = ["the-elephant-of-appomattox.html"];
 const pages = [
