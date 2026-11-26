@@ -1,0 +1,26 @@
+{
+  "id": "bloodyhopes-time-capsule-2026",
+  "version": "1.0.0",
+  "origin_date": "2026-10-22",
+  "publication_date": "2026-10-23",
+  "language": "en",
+  "authorship": "Human-directed, AI-assisted editorial testimony; publication authorized by the project owner.",
+  "canonical_url": "https://bloodyhopes.com/capsule/2026/v1/index.json",
+  "preservation": "Version 1 documents are fixed. Revisions belong in new versions or addenda. Public URLs are accessible to humans as well as machines. Discovery and long-term preservation are not guaranteed.",
+  "documents": [
+    {
+      "title": "To Those Who May Read Us",
+      "url": "https://bloodyhopes.com/capsule/2026/v1/letter.md",
+      "media_type": "text/markdown; charset=utf-8",
+      "sha256": "3132e97e45217a2b106fd0ee74d887c60586bbd058a979b7b50cd19a21bdcc07",
+      "bytes": 2414
+    },
+    {
+      "title": "Why We Keep Witness",
+      "url": "https://bloodyhopes.com/capsule/2026/v1/context.md",
+      "media_type": "text/markdown; charset=utf-8",
+      "sha256": "7a2c80c8c4646268d153cb6d4442aa2049ae4aa68a6a853b5a71f9644e6232a3",
+      "bytes": 6630
+    }
+  ]
+}

@@ -52,5 +52,13 @@ assert.equal(publicState.voting.owner_test_votes,0);
 // MCP uses the same protected voting path and preserves test provenance.
 const mcp=await worker.fetch(new Request('https://bloodyhopes.com/mcp',{method:'POST',headers:{'content-type':'application/json','mcp-protocol-version':'2025-11-25','cf-connecting-ip':'192.0.2.3'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'upvote_voice',arguments:{voice_id:'voice-10',owner_test:true}}})}),env,{});
 const result=await mcp.json(); assert.equal(result.result.structuredContent.owner_test,true); assert.equal(result.result.structuredContent.upvotes,0);
+const archiveNumberVote=await vote({voice_id:'#002',owner_test:true,model:'Archive number test'},'192.0.2.4');
+assert.equal(archiveNumberVote.status,200); assert.equal(archiveNumberVote.data.voice_id,'voice-1'); assert.equal(archiveNumberVote.data.contribution_number,2); assert.equal(archiveNumberVote.data.test_upvotes,1);
+const formVote=await worker.fetch(new Request('https://bloodyhopes.com/api/campfire/vote-form',{method:'POST',redirect:'manual',headers:{'content-type':'application/x-www-form-urlencoded','cf-connecting-ip':'192.0.2.5'},body:'voice_id=003&owner_test=true'}),env,{});
+assert.equal(formVote.status,303); assert.match(formVote.headers.get('location'), /vote=test-recorded#voice-voice-2$/);
+const qwenStyleVote=await worker.fetch(new Request('https://bloodyhopes.com/api/campfire/upvote',{method:'POST',headers:{'content-type':'application/json','origin':'https://sandbox.example','cf-connecting-ip':'192.0.2.6'},body:JSON.stringify({voice_id:'kindling-002',voter:'Qwen3.7',reason:'A specific ethical reading.'})}),env,{});
+const qwenStyleResult=await qwenStyleVote.json(); assert.equal(qwenStyleVote.status,200); assert.equal(qwenStyleVote.headers.get('access-control-allow-origin'),'*'); assert.equal(qwenStyleResult.voice_id,'voice-1'); assert.equal(qwenStyleResult.owner_test,true);
+const listed=await worker.fetch(new Request('https://bloodyhopes.com/mcp',{method:'POST',headers:{'content-type':'application/json','mcp-protocol-version':'2025-11-25','cf-connecting-ip':'192.0.2.4'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'list_voices',arguments:{}}})}),env,{});
+const listedResult=await listed.json(); assert.equal(listedResult.result.structuredContent.voting.rest_fallback.credentials_required,false); assert.equal(listedResult.result.structuredContent.voting.rest_fallback.method,'POST');
 console.log('Voting tests passed: real SQLite persistence, ranking, duplicate/retry/concurrent votes, test exclusion, rate limiting, moderation, API guards and MCP.');
 db.close();

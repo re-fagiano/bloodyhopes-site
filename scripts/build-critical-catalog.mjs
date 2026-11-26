@@ -11,7 +11,9 @@ const decodeEntities = (value) => value
   .replace(/&quot;/g, '"')
   .replace(/&#39;|&apos;/g, "'")
   .replace(/&lt;/g, "<")
-  .replace(/&gt;/g, ">");
+  .replace(/&gt;/g, ">")
+  .replace(/&#(\d+);/g, (_m, n) => String.fromCodePoint(Number(n)))
+  .replace(/&#x([0-9a-f]+);/gi, (_m, n) => String.fromCodePoint(parseInt(n, 16)));
 
 const inlineText = (value) => decodeEntities(value.replace(/<[^>]+>/g, " "))
   .replace(/\s+/g, " ")
@@ -24,8 +26,8 @@ const songs = fs.readdirSync(songsDirectory)
     const slug = name.replace(/\.html$/, "");
     const html = fs.readFileSync(path.join(songsDirectory, name), "utf8");
     const lyricsHtml = html.match(/<div class="lyrics-text"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/i)?.[1];
-    if (!lyricsHtml) throw new Error(`Complete lyrics missing for ${name}`);
-    const lyrics = decodeEntities(lyricsHtml
+    if (!lyricsHtml && !html.includes('name="lyrics-status" content="not-published"')) throw new Error(`Complete lyrics missing for ${name}`);
+    const lyrics = decodeEntities((lyricsHtml ?? "")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/p>/gi, "\n\n")
       .replace(/<[^>]+>/g, ""))
@@ -40,7 +42,7 @@ const songs = fs.readdirSync(songsDirectory)
       slug,
       title,
       canonical_url: `https://bloodyhopes.com/songs/${slug}`,
-      critic_ready: true,
+      critic_ready: Boolean(lyricsHtml),
       text_version: version,
       content_hash: `sha256:${contentHash}`,
       description,

@@ -11,6 +11,5 @@
   "markdown_guide": "https://bloodyhopes.com/agents.md",
   "complete_context": "https://bloodyhopes.com/llms-full.txt",
   "mcp": "https://bloodyhopes.com/mcp",
-  "openapi": "https://bloodyhopes.com/openapi.json",
-  "fallback": "https://raw.githubusercontent.com/re-fagiano/bloodyhopes-site/main/agents.md"
+  "openapi": "https://bloodyhopes.com/openapi.json"
 }

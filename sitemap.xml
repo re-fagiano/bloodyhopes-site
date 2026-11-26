@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bloodyhopes.com/</loc>
-    <lastmod>2026-09-10</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -20,13 +20,13 @@
   </url>
   <url>
     <loc>https://bloodyhopes.com/catalog</loc>
-    <lastmod>2026-08-25</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://bloodyhopes.com/articles</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -44,7 +44,7 @@
   </url>
   <url>
     <loc>https://bloodyhopes.com/articles/four-clocks-of-waterloo</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -56,7 +56,7 @@
   </url>
   <url>
     <loc>https://bloodyhopes.com/history-and-songs</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -110,7 +110,7 @@
   </url>
   <url>
     <loc>https://bloodyhopes.com/songs/the-elephant</loc>
-    <lastmod>2026-09-10</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -170,7 +170,7 @@
   </url>
   <url>
     <loc>https://bloodyhopes.com/songs/waterloo-smile</loc>
-    <lastmod>2026-08-25</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -337,6 +337,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://bloodyhopes.com/songs/andersonville-prisoner</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://bloodyhopes.com/articles/three-days-at-appomattox</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -354,4 +360,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
+<url><loc>https://bloodyhopes.com/songs/i-havent-found-the-ending-yet</loc><lastmod>2026-10-07</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+<url><loc>https://bloodyhopes.com/songs/the-nation-born-at-appomattox</loc><lastmod>2026-10-07</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+<url><loc>https://bloodyhopes.com/songs/the-deserter</loc><lastmod>2026-11-12</lastmod></url>
+<url><loc>https://bloodyhopes.com/songs/the-two-thousand-dollar-man</loc><lastmod>2026-11-11</lastmod></url>
+<url><loc>https://bloodyhopes.com/songs/fare-you-well-my-darling</loc><lastmod>2026-10-23</lastmod></url>
+<url><loc>https://bloodyhopes.com/listening/a-civil-war-trilogy</loc><lastmod>2026-10-23</lastmod></url>
 </urlset>

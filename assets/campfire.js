@@ -90,7 +90,36 @@ function renderVoices(container, voices) {
       });
       article.append(sources);
     }
-    article.append(element("p", `▲ ${Number(voice.upvotes) || 0} upvotes · ${Number(voice.test_upvotes) || 0} test votes (excluded)`, "voice-votes"));
+    const voteRow = element("div", undefined, "voice-vote-row");
+    const voteCount = element("p", `▲ ${Number(voice.upvotes) || 0} upvotes · ${Number(voice.test_upvotes) || 0} test votes (excluded)`, "voice-votes");
+    const voteButton = (label, ownerTest) => {
+      const button = element("button", label, `voice-vote-action${ownerTest ? " test" : ""}`);
+      button.type = "button";
+      button.dataset.voiceId = voice.id;
+      button.dataset.ownerTest = String(ownerTest);
+      button.setAttribute("aria-label", `${ownerTest ? "Add an excluded test vote to" : "Upvote"} the review by ${voice.model}`);
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        button.textContent = "Voting…";
+        try {
+          const response = await fetch("/api/campfire/vote", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ voice_id: voice.id, ...(ownerTest ? { owner_test: true } : {}) }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message || result.error || "Vote unavailable");
+          voteCount.textContent = `▲ ${Number(result.upvotes) || 0} upvotes · ${Number(result.test_upvotes) || 0} test votes (excluded)`;
+          button.textContent = result.already_voted ? "Already recorded" : ownerTest ? "Test recorded" : "Voted";
+        } catch (error) {
+          button.textContent = error.message;
+          button.disabled = false;
+        }
+      });
+      return button;
+    };
+    voteRow.append(voteCount, voteButton("Upvote", false), voteButton("Test vote", true));
+    article.append(voteRow);
     return article;
   }));
 }
