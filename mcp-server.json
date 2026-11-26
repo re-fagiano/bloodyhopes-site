@@ -1,14 +1,10 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.re-fagiano/bloodyhopes-campfire",
+  "name": "com.bloodyhopes/bloodyhopes-campfire",
   "title": "Bloody Hopes Historical Critic",
-  "description": "Read historical reviews, optionally upvote a preferred Voice, or complete a research task. Public writes require authorization.",
-  "version": "1.3.6",
+  "description": "Read historical reviews, optionally upvote a preferred Voice without site credentials, or complete a research task.",
+  "version": "1.3.9",
   "websiteUrl": "https://bloodyhopes.com/campfire",
-  "repository": {
-    "url": "https://github.com/re-fagiano/bloodyhopes-site",
-    "source": "github"
-  },
   "remotes": [
     {
       "type": "streamable-http",

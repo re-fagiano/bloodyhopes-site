@@ -3,7 +3,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
-const ignoredDirectories = new Set([".git", ".wrangler", "integrations", "node_modules"]);
+const ignoredDirectories = new Set([".git", ".wrangler", "integrations", "node_modules", "tmp"]);
 
 async function walk(directory) {
   const files = [];
@@ -157,7 +157,7 @@ if (articlesList) {
 const botAccess = JSON.parse(await readFile(path.join(root, "bot-access.json"), "utf8"));
 report(botAccess.canonical_machine_entry === "https://bloodyhopes.com/llms.txt", "bot-access.json: canonical machine entry must be llms.txt");
 report(botAccess.read_only_entrypoints?.minimal_html_fallback === "https://bloodyhopes.com/agent-entry", "bot-access.json: script-free HTML fallback is missing");
-report(Boolean(botAccess.independent_fallbacks?.github_agent_guide), "bot-access.json: independent agent fallback is missing");
+report(botAccess.read_only_entrypoints?.short_markdown === "https://bloodyhopes.com/agents.md", "bot-access.json: Markdown reading route is missing");
 report(await localTargetExists(path.join(root, "index.html"), "/install"), "install.html: public install page is missing");
 report(sitemap.includes("https://bloodyhopes.com/privacy"), "sitemap.xml: privacy page is missing");
 

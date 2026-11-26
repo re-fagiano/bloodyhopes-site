@@ -1,0 +1,3 @@
+# Preserve the published capsule bytes and their recorded checksums on Windows.
+capsule/2026/v1/*.md -text
+capsule/2026/v1/index.json -text

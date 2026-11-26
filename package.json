@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs && node tests/voting.mjs",
+    "test": "node tests/site-integrity.mjs && node tests/worker-smoke.mjs && node tests/voting.mjs && node scripts/verify-capsule.mjs && node tests/october-update.mjs && node --stack-trace-limit=2 tests/witness.mjs",
     "benchmark:agent": "node experiments/run-agent-benchmark.mjs",
     "build": "node scripts/build-critical-catalog.mjs && node scripts/build-llms-full.mjs",
     "pretest": "npm run build"

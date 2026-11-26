@@ -1,15 +1,27 @@
 {
   "name": "bloodyhopes-mcp-client",
   "version": "0.2.1",
-  "mcpName": "io.github.re-fagiano/bloodyhopes-campfire",
+  "mcpName": "com.bloodyhopes/bloodyhopes-campfire",
   "description": "Zero-dependency JavaScript client for the Bloody Hopes remote MCP server and Campfire archive.",
   "type": "module",
   "main": "src/index.js",
   "exports": "./src/index.js",
-  "files": ["src", "README.md", "LICENSE"],
-  "scripts": { "test": "node test/client.test.js" },
-  "keywords": ["mcp", "historical-music", "ai-agents", "public-history"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/client.test.js"
+  },
+  "keywords": [
+    "mcp",
+    "historical-music",
+    "ai-agents",
+    "public-history"
+  ],
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/re-fagiano/bloodyhopes-mcp.git" },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

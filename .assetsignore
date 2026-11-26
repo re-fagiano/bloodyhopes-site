@@ -1,5 +1,6 @@
 .git
 .gitignore
+.gitattributes
 .github
 .wrangler
 .assetsignore
@@ -21,3 +22,17 @@ experiments
 tmp
 articles/*-preview.html
 assets/seo/*-source.png
+assets/seo/youtube/*-original.*
+
+**/*-preview.html
+.git/**
+.wrangler/**
+node_modules/**
+tmp/**
+scripts/**
+tests/**
+outreach/**
+experiments/**
+integrations/**
+skills/**
+.github/**

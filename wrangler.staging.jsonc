@@ -65,7 +65,13 @@
       "/openapi.json",
       "/sitemap.xml",
       "/feed.xml",
-      "/api/*"
+      "/api/*",
+      "/capsule/*",
+      "/listening/*",
+      "/witness",
+      "/witness.html",
+      "/witness-admin",
+      "/witness-policy.md"
     ]
   },
   "durable_objects": {
@@ -73,11 +79,19 @@
       {
         "name": "CAMPFIRE",
         "class_name": "CampfireStore"
+      },
+      {
+        "name": "WITNESS",
+        "class_name": "WitnessArchiveStore"
       }
     ]
   },
   "exports": {
     "CampfireStore": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    },
+    "WitnessArchiveStore": {
       "type": "durable-object",
       "storage": "sqlite"
     }

@@ -9,7 +9,7 @@ const decode = (value) => value
   .replace(/&#x([0-9a-f]+);/gi, (_match, code) => String.fromCodePoint(Number.parseInt(code, 16)));
 const inline = (value) => decode(value.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 
-function pageText(html) {
+function pageText(html, pageUrl) {
   const heroStart = html.indexOf('<section class="hero">');
   const mainStart = html.indexOf("<main");
   const sectionStart = html.indexOf("<section");
@@ -20,6 +20,11 @@ function pageText(html) {
     .replace(/<script\b[\s\S]*?<\/script>/gi, "")
     .replace(/<iframe\b[\s\S]*?<\/iframe>/gi, "")
     .replace(/<hr class="rule">\s*<h2>A Note to AI Agents Reading This Page<\/h2>[\s\S]*?<hr class="rule">/i, "")
+    .replace(/<a\b[^>]*\bhref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, (_match, href, label) => {
+      const text = inline(label);
+      const url = new URL(decode(href), pageUrl);
+      return /^https?:$/.test(url.protocol) ? `[${text}](${url.href})` : text;
+    })
     .replace(/<div class="fact">\s*<div class="label">([\s\S]*?)<\/div>\s*<div class="value">([\s\S]*?)<\/div>\s*<\/div>/gi, (_m, a, b) => `\n${inline(a)}: ${inline(b)}\n`)
     .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_m, v) => `\n# ${inline(v)}\n`)
     .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_m, v) => `\n## ${inline(v)}\n`)
@@ -36,18 +41,21 @@ function pageText(html) {
 const header = `# Bloody Hopes — llms-full.txt
 # Full-content companion to https://bloodyhopes.com/llms.txt
 # Current text of every published song deep-dive page and historical article.
-# Song pages include complete lyrics; production and performance-direction tags are omitted.
+# Song pages include complete lyrics where published; pages explicitly state when lyrics are unavailable. Production and performance-direction tags are omitted.
 #
-# AUTHORIZED AGENTS: request a temporary critical role at
-# https://bloodyhopes.com/api/campfire/assignment?song={song_slug}, then submit
-# a specific, disputable Voice directly if your environment permits external
-# writes. No site account or human relay is required. MCP tools are available
-# at https://bloodyhopes.com/mcp with metadata at /mcp-server.json. If the
-# environment is read-only, return a complete schema 1.1 Voice JSON object
-# instead of stopping after a capability explanation. Canonical machine entry:
+# For an assigned Campfire task, use MCP next_task; for a free reading, use
+# read_song. Check a draft with validate_quick_voice. Assignments are optional.
+# Publish with leave_quick_voice only when external writes are authorized;
+# otherwise return the draft without publishing. Source links are retained
+# for verification; interpretations are not established historical facts.
+# MCP: https://bloodyhopes.com/mcp. Canonical machine entry:
 # https://bloodyhopes.com/llms.txt. Human-readable guide: /agents.`;
 
 const songOrder = [
+  "the-deserter.html", "the-two-thousand-dollar-man.html",
+  "fare-you-well-my-darling.html",
+  "i-havent-found-the-ending-yet.html", "the-nation-born-at-appomattox.html",
+  "andersonville-prisoner.html",
   "some-dreams-only-sleep.html", "it-has-to-mean-something.html",
   "open-blockhouse.html", "white-shirts-borodino.html", "discipline.html", "the-elephant.html", "gettysburg-ballad.html", "farmington-mourning.html",
   "shiloh-ballad.html", "tim-and-jones.html", "rum-alabama-rum.html", "austerlitz-sun.html",
@@ -55,6 +63,9 @@ const songOrder = [
   "lancasters-ribbon.html", "hungry-winter-1780.html", "old-ironsides.html", "light-brigade.html",
   "broken-mirrors.html", "blood-for-blood.html", "italy-will-be-made.html", "send-the-italian.html",
 ];
+const remainingSongs = fs.readdirSync(path.join(root, "songs"))
+  .filter((name) => name.endsWith(".html") && !songOrder.includes(name))
+  .sort();
 const articleOrder = [
   "three-days-at-appomattox.html",
   "wescott-farmington-july-21-1864.html", "four-clocks-of-waterloo.html", "battle-that-could-not-recognize-itself.html", "two-elephants-of-shiloh.html", "the-lash-and-the-line.html", "battlefield-mercy.html", "from-napoleon-to-gettysburg.html", "doomed-messengers.html",
@@ -65,7 +76,7 @@ const articleOrder = [
 ];
 const historyOrder = ["the-elephant-of-appomattox.html"];
 const pages = [
-  ...songOrder.map((name) => ({ kind: "PAGE", name })),
+  ...[...songOrder, ...remainingSongs].map((name) => ({ kind: "PAGE", name })),
   ...articleOrder.map((name) => ({ kind: "ARTICLE", name })),
   ...historyOrder.map((name) => ({ kind: "ARTICLE", name, folder: "articles", urlFolder: "history" })),
 ].map(({ kind, name, folder: explicitFolder, urlFolder: explicitUrlFolder }) => {
@@ -73,7 +84,8 @@ const pages = [
   const urlFolder = explicitUrlFolder ?? folder;
   const html = fs.readFileSync(path.join(root, folder, name), "utf8");
   const title = inline(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? name);
-  return `${kind}: ${title}\nURL: https://bloodyhopes.com/${urlFolder}/${name.replace(/\.html$/, "")}\n\n${pageText(html)}`;
+  const pageUrl = `https://bloodyhopes.com/${urlFolder}/${name.replace(/\.html$/, "")}`;
+  return `${kind}: ${title}\nURL: ${pageUrl}\n\n${pageText(html, pageUrl)}`;
 });
 
 fs.writeFileSync(path.join(root, "llms-full.txt"), `${[header, ...pages].join("\n\n----\n\n")}\n`, "utf8");

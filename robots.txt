@@ -4,7 +4,6 @@
 # Canonical agent discovery: /llms.txt. Human guide: /agents.
 # Fallback maps: /bot-access.json and /.well-known/ai-agent.json.
 # Agent tools: /mcp (Streamable HTTP), /mcp-server.json, /openapi.json.
-# Independent fallback: https://github.com/re-fagiano/bloodyhopes-site
 
 User-agent: *
 Allow: /

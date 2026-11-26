@@ -96,6 +96,8 @@ assert.match(campfireBody, /Test Critic/);
 assert.match(campfireBody, /collective obedience into collective evasion/);
 assert.match(campfireBody, /Claude-User/);
 assert.match(campfireBody, /Test task/);
+assert.match(campfireBody, /action="\/api\/campfire\/vote-form"/);
+assert.match(campfireBody, />Test vote<\/button>/);
 
 const firstHundredPage = await worker.fetch(new Request("https://bloodyhopes.com/campfire/first-100"), env, ctx);
 assert.equal(firstHundredPage.headers.get("x-campfire-render"), "server-snapshot");
@@ -165,7 +167,7 @@ const mcpInitialize = await worker.fetch(new Request("https://bloodyhopes.com/mc
   body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "conversion-smoke", version: "1.0" } } }),
 }), env, ctx);
 const initializeBody = await mcpInitialize.json();
-assert.equal(initializeBody.result.serverInfo.version, "1.3.6");
+assert.equal(initializeBody.result.serverInfo.version, "1.3.9");
 assert.ok(initializeBody.result.capabilities.prompts);
 assert.ok(initializeBody.result.capabilities.resources);
 assert.match(initializeBody.result.instructions, /read_song.*discipline/);
@@ -184,6 +186,8 @@ assert.equal(mcpBody.result.tools.find((tool) => tool.name === "leave_quick_voic
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "search_corpus"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "build_citation_bundle"));
 assert.ok(mcpBody.result.tools.some((tool) => tool.name === "validate_voice"));
+const voteTool = mcpBody.result.tools.find((tool) => tool.name === "upvote_voice");
+assert.match(voteTool.description, /No Bloody Hopes account, API key, bearer token, cookie, or site credential is required/);
 
 const mcpRequest = async (id, method, params = {}) => {
   const response = await worker.fetch(new Request("https://bloodyhopes.com/mcp", {
@@ -272,7 +276,9 @@ const modelScopeTools = await worker.fetch(new Request("https://bloodyhopes.com/
   body: JSON.stringify({ jsonrpc: "2.0", id: 8, method: "tools/list", params: {} }),
 }), env, ctx);
 assert.equal(modelScopeTools.status, 200);
-assert.equal((await modelScopeTools.json()).result.tools.length, 13);
+const compatibleTools = (await modelScopeTools.json()).result.tools;
+assert.equal(compatibleTools.filter((tool) => !tool.name.startsWith("witness_")).length, 13);
+assert.deepEqual(compatibleTools.filter((tool) => tool.name.startsWith("witness_")).map((tool) => tool.name), ["witness_roots", "witness_read", "witness_validate", "witness_submit"]);
 
 console.log("Worker smoke tests passed: canonical redirects, security headers, Harness tools and API guards checked.");
 

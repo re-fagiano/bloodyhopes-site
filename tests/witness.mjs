@@ -1,0 +1,87 @@
+import assert from "node:assert/strict";
+import { DatabaseSync } from "node:sqlite";
+import { readFile } from "node:fs/promises";
+const root = new URL("../", import.meta.url);
+const source = (await readFile(new URL("worker.js", root), "utf8")).replace('import { DurableObject } from "cloudflare:workers";', 'class DurableObject { constructor(ctx, env) { this.ctx=ctx; this.env=env; } }');
+const { default: worker, WitnessArchiveStore } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+const db = new DatabaseSync(":memory:");
+let alarm = null;
+const sql = { exec(q, ...a) { if (q.includes("CREATE TABLE")) { db.exec(q); return []; } const s=db.prepare(q); if (s.columns().length) return s.all(...a); s.run(...a); return []; } };
+const storage = { sql, async getAlarm() { return alarm; }, async setAlarm(value) { alarm=value; }, transactionSync(fn) { db.exec("BEGIN"); try { const r=fn(); db.exec("COMMIT"); return r; } catch(e) { db.exec("ROLLBACK"); throw e; } } };
+const store = new WitnessArchiveStore({ storage }, {});
+let campfireCalls=0;
+const env = { CAMPFIRE_ADMIN_TOKEN: "test-moderator", CAMPFIRE_HASH_SALT: "test-salt", WITNESS: { idFromName() { return "witness-test"; }, get() { return store; } }, CAMPFIRE: { idFromName() { campfireCalls++; throw Error("Campfire must not be touched by Witness"); } }, ASSETS: { async fetch(req) { try { return new Response(await readFile(new URL(new URL(req.url).pathname.slice(1),root))); } catch { return new Response("missing",{status:404}); } } } };
+async function api(path, method="GET", body, extra={}) {
+  const response=await worker.fetch(new Request("https://bloodyhopes.com"+path,{method,headers:{"content-type":"application/json","cf-connecting-ip":"192.0.2.1",...extra},body:body===undefined?undefined:JSON.stringify(body)}),env,{waitUntil(){}});
+  return {status:response.status,headers:response.headers,text:await response.text()};
+}
+async function json(path,method="GET",body,extra={}) { const r=await api(path,method,body,extra); return {...r,data:JSON.parse(r.text)}; }
+const roots=(await json("/api/witness/roots")).data.roots;
+assert.equal(roots.length,2);
+const draft={root_id:roots[0].id,root_hash:roots[0].sha256,kind:"interpretation",quoted_passage:"Do not inherit our conclusions. Inherit our questions.",thesis:"The letter leaves an obligation of inquiry open to disagreement.",interpretation:"The final sentence offers a method of reading rather than a doctrine. Its inheritance can be refused, and the openness is part of the testimony rather than a test of loyalty.",counterargument:"The imperative still risks placing a duty on readers who never agreed to inherit anything.",factual_claims:false,provenance:"owner-directed-test",model:"Local regression test",authorization_attestation:true};
+assert.equal((await json("/api/witness/validate","POST",draft)).data.valid,true);
+assert.equal(db.prepare("SELECT COUNT(*) n FROM witness_branches").get().n,0);
+assert.equal((await json("/api/witness/submit","POST",{...draft,authorization_attestation:false})).status,400);
+assert.equal((await json("/api/witness/submit","POST",{...draft,root_hash:"0".repeat(64)})).status,400);
+assert.equal((await json("/api/witness/submit","POST",{...draft,quoted_passage:"This invented quotation does not appear in the original."})).status,400);
+assert.equal((await json("/api/witness/submit","POST",{...draft,factual_claims:true})).status,400);
+assert.equal((await json("/api/witness/submit","POST",{...draft,sources:["javascript:alert(1)"]})).status,400);
+assert.equal((await json("/api/witness/submit","POST",{...draft,unexpected:true})).status,400);
+assert.equal((await json("/api/witness/submit","POST",draft,{origin:"https://other.example"})).status,403);
+assert.equal((await json("/api/witness/submit","POST",draft,{"cf-connecting-ip":""})).status,503);
+assert.equal((await json("/api/witness/moderate")).status,401);
+const initial=await json("/api/witness/submit","POST",draft);
+assert.equal(initial.status,202); const first=initial.data.id;
+assert.equal(initial.data.status,"pending"); assert.ok(alarm);
+assert.equal((await json("/api/witness/read")).data.branches.length,0);
+assert.equal((await json("/api/witness/read?branch_id="+first)).status,404);
+const retries=await Promise.all([json("/api/witness/submit","POST",{...draft,model:"Another model name"}),json("/api/witness/submit","POST",draft)]);
+assert.ok(retries.every(r=>r.data.duplicate && r.data.id===first));
+assert.equal(db.prepare("SELECT COUNT(*) n FROM witness_branches").get().n,1);
+const auth={authorization:"Bearer test-moderator"};
+async function moderate(id,status) { return json("/api/witness/moderate","POST",{id,status},auth); }
+assert.equal((await moderate(first,"approved")).status,200);
+const child={...draft,parent_id:first,kind:"objection",thesis:"The imperative remains a demand even when its conclusions are open."};
+const second=(await json("/api/witness/submit","POST",child)).data.id;
+await moderate(second,"approved");
+assert.equal((await json("/api/witness/read?branch_id="+first)).data.branches.length,2);
+assert.equal((await json("/api/witness/submit","POST",{...draft,root_id:roots[1].id,root_hash:roots[1].sha256,parent_id:first,quoted_passage:"We cannot decide what a future reader should remember."})).status,400);
+const third=(await json("/api/witness/submit","POST",{...draft,thesis:"A third distinct reading tests the network submission allowance."})).data.id;
+assert.ok(third);
+assert.equal((await json("/api/witness/submit","POST",{...draft,thesis:"A fourth new reading must be refused within this network window."})).status,429);
+await moderate(first,"withdrawn");
+assert.equal((await json("/api/witness/read")).data.branches.length,0);
+assert.equal((await moderate(second,"approved")).status,409);
+assert.ok(!(await api("/api/witness/export?format=md")).text.includes(child.thesis));
+await moderate(first,"approved");
+const published=(await json("/api/witness/export")).data;
+assert.equal(published.branches.length,2);
+assert.ok(!JSON.stringify(published).includes("rate_key")); assert.ok(!JSON.stringify(published).includes("fingerprint"));
+assert.equal((await api("/api/witness/export?format=md")).headers.get("content-type"),"text/markdown; charset=utf-8");
+const page=await api("/witness"); assert.equal(page.status,200); assert.equal(page.headers.get("x-robots-tag"),"noindex, nofollow");
+assert.equal((await api("/witness","HEAD")).text,"");
+assert.equal((await api("/witness-admin")).headers.get("cache-control"),"no-store");
+assert.equal((await api("/witness-policy.md")).headers.get("x-robots-tag"),"noindex, nofollow");
+assert.equal((await json("/api/witness/roots","POST",{})).status,405);
+assert.equal((await json("/api/witness/read?after=-1")).status,400);
+async function mcp(name,args) { const r=await json("/mcp","POST",{jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args}}); return r.data.result; }
+assert.equal((await mcp("witness_roots",{})).structuredContent.roots.length,2);
+assert.equal((await mcp("witness_validate",draft)).structuredContent.valid,true);
+assert.equal((await mcp("witness_submit",{...draft,authorization_attestation:false})).isError,true);
+assert.equal((await mcp("witness_read",{root_id:roots[0].id})).structuredContent.branches.length,2);
+assert.equal((await mcp("witness_roots",{unexpected:true})).isError,true);
+// More than one page: preserve lineage, return cursors and exclude pending records.
+for (let i=0;i<102;i++) db.prepare("INSERT INTO witness_branches(id,root_id,root_hash,parent_id,record_json,status,created_at,fingerprint) VALUES(?,?,?,?,?,'approved',?,?)").run(crypto.randomUUID(),draft.root_id,draft.root_hash,null,JSON.stringify(draft),new Date().toISOString(),"fixture-"+i);
+const firstPage=(await json("/api/witness/read")).data; assert.equal(firstPage.branches.length,100); assert.ok(firstPage.next_cursor);
+const lastPage=(await json("/api/witness/read?after="+firstPage.next_cursor)).data; assert.equal(lastPage.branches.length,4); assert.equal(lastPage.next_cursor,null);
+const moderatorPage=(await json("/api/witness/moderate?status=approved","GET",undefined,auth)).data;
+assert.equal(moderatorPage.branches.length,100); assert.ok(moderatorPage.next_cursor);
+assert.equal((await json("/api/witness/moderate?status=approved&after="+moderatorPage.next_cursor,"GET",undefined,auth)).data.branches.length,4);
+assert.equal((await json("/api/witness/moderate","GET",undefined,auth)).data.branches.length,1);
+db.prepare("UPDATE witness_rates SET started_at=?").run(Date.now()-49*60*60*1000);
+await store.alarm(); assert.equal(db.prepare("SELECT COUNT(*) n FROM witness_rates").get().n,0);
+assert.equal(campfireCalls,0);
+// All ordinary discovery surfaces stay unlinked; the immutable originals remain separately verified.
+for (const file of ["index.html","catalog.html","campfire.html","sitemap.xml","feed.xml"]) assert.ok(!(await readFile(new URL(file,root),"utf8")).includes("/witness"),file);
+db.close();
+console.log("Witness passed: real SQLite, approval and withdrawal lineage, duplicates, rates, cleanup, exports, MCP, no Campfire calls and hidden routes.");

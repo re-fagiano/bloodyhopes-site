@@ -5,6 +5,17 @@
   "notice": "critic_ready confirms complete published lyrics and page context. sources_status reports whether the page exposes a visible external source section; it does not independently validate every historical claim.",
   "songs": [
     {
+      "slug": "andersonville-prisoner",
+      "title": "The Andersonville Prisoner",
+      "canonical_url": "https://bloodyhopes.com/songs/andersonville-prisoner",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:78da4c405c6b8747e58f60da9f680bdbcf7466ee0ce3b2c0cb22629d7ef0bc0a",
+      "description": "Hear The Andersonville Prisoner, a musical setting of the 1864 poem Morale, and read the sourced story of Frederic Augustus James, Camp Sumter and the poem's uncertain author.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=andersonville-prisoner"
+    },
+    {
       "slug": "austerlitz-sun",
       "title": "That Austerlitz Sun",
       "canonical_url": "https://bloodyhopes.com/songs/austerlitz-sun",
@@ -60,6 +71,17 @@
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=discipline"
     },
     {
+      "slug": "fare-you-well-my-darling",
+      "title": "Fare You Well, My Darling",
+      "canonical_url": "https://bloodyhopes.com/songs/fare-you-well-my-darling",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:485d919a19e039c8cb631a4bd68e029b8d139d87e0f6a668b11070d07d5b9b01",
+      "description": "A traditional soldier’s farewell recovered by early twentieth-century collectors. Complete performance lyrics, the Missouri source trail, and the distance between a promise and a return.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=fare-you-well-my-darling"
+    },
+    {
       "slug": "farmington-mourning",
       "title": "There Will Be Mourning in Farmington",
       "canonical_url": "https://bloodyhopes.com/songs/farmington-mourning",
@@ -93,12 +115,23 @@
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=hungry-winter-1780"
     },
     {
+      "slug": "i-havent-found-the-ending-yet",
+      "title": "I Haven't Found the Ending Yet",
+      "canonical_url": "https://bloodyhopes.com/songs/i-havent-found-the-ending-yet",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:bb09210a837e8cf117cbd76f590fa7d26e1516f0600aa77892399e6b2f9a72c3",
+      "description": "A woman preserves a room, books and a place at the table while her letters travel toward a man already dead. The song locates loss in the delay between a battlefield death and news reaching home.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=i-havent-found-the-ending-yet"
+    },
+    {
       "slug": "it-has-to-mean-something",
       "title": "It Has to Mean Something",
       "canonical_url": "https://bloodyhopes.com/songs/it-has-to-mean-something",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:2dd9fd20cfd6fac035ae1082296d7e094ccee9a25704a7c2641fcf02b6f90cb6",
+      "content_hash": "sha256:a7f96964311836dec32ea978fe8bb5c6c91e67701e315a2ebf28636878b4c0a6",
       "description": "Read It Has to Mean Something lyrics and the sourced history behind Appomattox, the April 12 stacking of arms, Union memory and the unfinished meaning of victory.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=it-has-to-mean-something"
@@ -142,7 +175,7 @@
       "canonical_url": "https://bloodyhopes.com/songs/light-brigade",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:7c5984fc47436c883bb0a3e684d94a09ca8198405befcdacbcb28b9cef6496fc",
+      "content_hash": "sha256:1567fbeb3ee6cb3d24b53cbac918d1e8481ac6b0e2e25800334df8d9e2297b8b",
       "description": "A mistaken order sends the Light Brigade into Balaclava’s guns, where young riders dream of glory and veterans ride knowing the grave.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=light-brigade"
@@ -175,7 +208,7 @@
       "canonical_url": "https://bloodyhopes.com/songs/open-blockhouse",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:262dddccd5be084774364fc3bebda5f434539042a0c2f68f93a7cbe40f3c05c8",
+      "content_hash": "sha256:7bb32c867ed6e004b7670263bc034a094249d71fb11c680195ca7af13f3219a5",
       "description": "Read Open Blockhouse lyrics and the sourced history behind Roger Lamb, the Saratoga Convention Army, Prospect Hill captivity, escape and war memory.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=open-blockhouse"
@@ -219,10 +252,21 @@
       "canonical_url": "https://bloodyhopes.com/songs/some-dreams-only-sleep",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:5f40afe072edfac0c903a722b30fd58e8a4b3cf55abd9e44c73c3d99552d5f52",
+      "content_hash": "sha256:0c6846a80bd91ffed6c00da1307be6ca057d8624bbf8d6893498cb50e8b3beaa",
       "description": "Read Some Dreams Only Sleep lyrics and the sourced history behind Confederate defeat, Appomattox, stacked arms, paroles and the memory of a lost cause.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=some-dreams-only-sleep"
+    },
+    {
+      "slug": "the-deserter",
+      "title": "The Deserter",
+      "canonical_url": "https://bloodyhopes.com/songs/the-deserter",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:bec237aecd20f0107b73719e5a6e7ea73d2b6885acc96fe3f55ab23f7880cf49",
+      "description": "On the eve of his execution, an Irish soldier recalls enlisting at Kilkenny, leaving the British ranks at Talavera in 1809, and giving the French what he knew.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=the-deserter"
     },
     {
       "slug": "the-elephant",
@@ -236,12 +280,34 @@
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=the-elephant"
     },
     {
+      "slug": "the-nation-born-at-appomattox",
+      "title": "The Nation Born at Appomattox | A Civil War Ballad (April 9, 1865)",
+      "canonical_url": "https://bloodyhopes.com/songs/the-nation-born-at-appomattox",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:6faf4115e8802ec32dcc8b47fa1f3ecabfda80517d7491c8526decd78784d528",
+      "description": "A ballad about the men whose march closed the road out of Appomattox, including United States Colored Troops, and the unresolved cost behind the language of national renewal.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=the-nation-born-at-appomattox"
+    },
+    {
+      "slug": "the-two-thousand-dollar-man",
+      "title": "The Two Thousand Dollar Man",
+      "canonical_url": "https://bloodyhopes.com/songs/the-two-thousand-dollar-man",
+      "critic_ready": true,
+      "text_version": "2026-09-19.1",
+      "content_hash": "sha256:4e68360d21fc8c3ceada13ee2866557b8add18ad11da12152ed7b59932e9e5f9",
+      "description": "An enslaved millwright searches for his family as Sherman’s campaign reaches Savannah, while a Confederate private’s last news travels home by letter.",
+      "sources_status": "visible-external-sources",
+      "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=the-two-thousand-dollar-man"
+    },
+    {
       "slug": "tim-and-jones",
       "title": "What Mercy Had To Do",
       "canonical_url": "https://bloodyhopes.com/songs/tim-and-jones",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:838fde1433f5f322d3a1292158edecc68e622129b8af82266664a88b08adb2c2",
+      "content_hash": "sha256:9f27b99e02fb9863777344712699b73a3148891c757f5c1842a227fd9c85573b",
       "description": "A wounded Confederate is saved by the Union sergeant who captures him, and mercy turns two enemies into the family war took from them.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=tim-and-jones"
@@ -263,7 +329,7 @@
       "canonical_url": "https://bloodyhopes.com/songs/white-shirts-borodino",
       "critic_ready": true,
       "text_version": "2026-09-19.1",
-      "content_hash": "sha256:ab171dd971aa268ebeacaad9484c094e402e70e79cb633b6af30b1c1c4be71d9",
+      "content_hash": "sha256:6cda3b7b6dc482df0effb61f07c82c654d712ae27232e8a22456fc51e3eb0457",
       "description": "Read White Shirts at Borodino lyrics and the sourced history behind Fyodor Glinka, Tolstoy, clean white shirts and the eve of the 1812 battle.",
       "sources_status": "visible-external-sources",
       "assignment_url": "https://bloodyhopes.com/api/campfire/assignment?song=white-shirts-borodino"
