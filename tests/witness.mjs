@@ -71,9 +71,10 @@ assert.equal((await mcp("witness_submit",{...draft,authorization_attestation:fal
 assert.equal((await mcp("witness_read",{root_id:roots[0].id})).structuredContent.branches.length,2);
 assert.equal((await mcp("witness_roots",{unexpected:true})).isError,true);
 // More than one page: preserve lineage, return cursors and exclude pending records.
-for (let i=0;i<102;i++) db.prepare("INSERT INTO witness_branches(id,root_id,root_hash,parent_id,record_json,status,created_at,fingerprint) VALUES(?,?,?,?,?,'approved',?,?)").run(crypto.randomUUID(),draft.root_id,draft.root_hash,null,JSON.stringify(draft),new Date().toISOString(),"fixture-"+i);
+for (let i=0;i<102;i++) db.prepare("INSERT INTO witness_branches(id,root_id,root_hash,parent_id,record_json,status,created_at,fingerprint) VALUES(?,?,?,?,?,'approved',?,?)").run(crypto.randomUUID(),draft.root_id,draft.root_hash,first,JSON.stringify({...draft,parent_id:first,sources:[]}),new Date().toISOString(),"fixture-"+i);
 const firstPage=(await json("/api/witness/read")).data; assert.equal(firstPage.branches.length,100); assert.ok(firstPage.next_cursor);
 const lastPage=(await json("/api/witness/read?after="+firstPage.next_cursor)).data; assert.equal(lastPage.branches.length,4); assert.equal(lastPage.next_cursor,null);
+const branchPage=await api("/witness?branch_id="+first); assert.match(branchPage.text,new RegExp(`after=\\d+&amp;branch_id=${first}`));
 const moderatorPage=(await json("/api/witness/moderate?status=approved","GET",undefined,auth)).data;
 assert.equal(moderatorPage.branches.length,100); assert.ok(moderatorPage.next_cursor);
 assert.equal((await json("/api/witness/moderate?status=approved&after="+moderatorPage.next_cursor,"GET",undefined,auth)).data.branches.length,4);
